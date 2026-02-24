@@ -44,20 +44,11 @@ export default function SplashScreen() {
   return (
     <div
       onClick={dismiss}
+      className="splash-screen"
       style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        background: "#040006",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        overflow: "hidden",
         opacity: leaving ? 0 : 1,
         transform: leaving ? "scale(1.04)" : "scale(1)",
-        transition: "opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)",
+        transition: "opacity var(--duration-slowest) var(--ease-out), transform var(--duration-slowest) var(--ease-out)",
       }}
     >
       {/* ── Blood drips along top edge ── */}
@@ -70,7 +61,7 @@ export default function SplashScreen() {
             left: `${left}%`,
             width: "2px",
             height: `${20 + Math.floor(i * 7) % 40}px`,
-            background: `linear-gradient(to bottom, #cc0000, #880000)`,
+            background: "linear-gradient(to bottom, var(--red), var(--red-darker))",
             borderRadius: "0 0 3px 3px",
             animation: `splash-drip ${DRIP_DURATIONS[i]}s ease-in ${DRIP_DELAYS[i]}s infinite`,
             opacity: 0.7,
@@ -78,75 +69,38 @@ export default function SplashScreen() {
         />
       ))}
 
-      {/* ── Large background seal ── */}
-      <div
-        style={{
-          position: "absolute",
-          width: "min(600px, 90vw)",
-          height: "min(600px, 90vw)",
-          borderRadius: "50%",
-          border: "1px solid rgba(204,0,0,0.15)",
-          animation: "splash-seal-in 1.2s cubic-bezier(0.16,1,0.3,1) both",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          width: "min(480px, 70vw)",
-          height: "min(480px, 70vw)",
-          borderRadius: "50%",
-          border: "1px solid rgba(201,162,39,0.08)",
-          animation: "splash-seal-in 1.4s cubic-bezier(0.16,1,0.3,1) 0.1s both",
-          pointerEvents: "none",
-        }}
-      />
+      {/* ── Large background seals ── */}
+      <div className="splash-seal splash-seal-outer" />
+      <div className="splash-seal splash-seal-inner" />
 
       {/* ── Centre cross-hair ── */}
-      <div style={{ position: "absolute", width: "1px", height: "min(300px,40vw)", background: "linear-gradient(to bottom, transparent, rgba(204,0,0,0.2), transparent)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", height: "1px", width: "min(300px,40vw)", background: "linear-gradient(to right, transparent, rgba(204,0,0,0.2), transparent)", pointerEvents: "none" }} />
+      <div className="splash-crosshair-v" />
+      <div className="splash-crosshair-h" />
 
       {/* ── Ambient red glow ── */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(120,0,0,0.12) 0%, transparent 70%)",
-          pointerEvents: "none",
-          animation: "splash-glow-breathe 3s ease-in-out infinite",
-        }}
-      />
+      <div className="splash-glow" />
 
       {/* ── Content ── */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 2,
-          textAlign: "center",
-          padding: "0 24px",
-          maxWidth: "800px",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="splash-content" onClick={(e) => e.stopPropagation()}>
         {/* Eye-of-DXD top label */}
         <div
           className="splash-line"
           style={{
             animationDelay: "0.2s",
-            fontFamily: "var(--font-space-grotesk)",
-            fontSize: "clamp(8px,1vw,10px)",
-            letterSpacing: "5px",
-            color: "#cc0000",
-            marginBottom: "32px",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(8px, 1vw, 10px)",
+            letterSpacing: "var(--tracking-caps-wide)",
+            color: "var(--red)",
+            marginBottom: "var(--space-12)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "14px",
+            gap: "var(--space-6)",
           }}
         >
-          <span style={{ display: "inline-block", width: "40px", height: "1px", background: "linear-gradient(to right, transparent, #cc0000)" }} />
+          <span style={{ display: "inline-block", width: "40px", height: "1px", background: "linear-gradient(to right, transparent, var(--red))" }} />
           ✦ XD PROTOCOL · SACRED BLOOD CONTRACT ✦
-          <span style={{ display: "inline-block", width: "40px", height: "1px", background: "linear-gradient(to left, transparent, #cc0000)" }} />
+          <span style={{ display: "inline-block", width: "40px", height: "1px", background: "linear-gradient(to left, transparent, var(--red))" }} />
         </div>
 
         {/* Scare quote — line 1 */}
@@ -154,14 +108,14 @@ export default function SplashScreen() {
           className="splash-line"
           style={{
             animationDelay: "0.45s",
-            fontFamily: "var(--font-cormorant)",
+            fontFamily: "var(--font-serif)",
             fontStyle: "italic",
             fontWeight: "300",
             fontSize: "clamp(28px, 5vw, 68px)",
-            color: "#cc3333",
+            color: "var(--red-muted)",
             lineHeight: 1.1,
-            marginBottom: "8px",
-            letterSpacing: "-1px",
+            marginBottom: "var(--space-3)",
+            letterSpacing: "var(--tracking-normal)",
           }}
         >
           Die on our first date,
@@ -172,13 +126,13 @@ export default function SplashScreen() {
           className="splash-line splash-glitch-text"
           style={{
             animationDelay: "0.7s",
-            fontFamily: "var(--font-cormorant)",
+            fontFamily: "var(--font-serif)",
             fontWeight: "700",
             fontSize: "clamp(32px, 6vw, 84px)",
-            color: "#f5f0e8",
+            color: "var(--text-primary)",
             lineHeight: 1.0,
-            marginBottom: "28px",
-            letterSpacing: "-2px",
+            marginBottom: "var(--space-11)",
+            letterSpacing: "var(--tracking-tight)",
           }}
         >
           let&apos;s make market, baby.
@@ -189,11 +143,11 @@ export default function SplashScreen() {
           className="splash-line"
           style={{
             animationDelay: "1.0s",
-            fontFamily: "var(--font-space-grotesk)",
-            fontSize: "clamp(10px,1.2vw,13px)",
-            color: "#666",
-            letterSpacing: "3px",
-            marginBottom: "8px",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(10px, 1.2vw, 13px)",
+            color: "var(--text-muted)",
+            letterSpacing: "var(--tracking-label-wider)",
+            marginBottom: "var(--space-3)",
           }}
         >
           YOUR SOUL FOR SACRED SPREADS
@@ -202,11 +156,11 @@ export default function SplashScreen() {
           className="splash-line"
           style={{
             animationDelay: "1.15s",
-            fontFamily: "var(--font-space-grotesk)",
-            fontSize: "clamp(9px,1vw,11px)",
-            color: "#555",
-            letterSpacing: "4px",
-            marginBottom: "56px",
+            fontFamily: "var(--font-sans)",
+            fontSize: "clamp(9px, 1vw, 11px)",
+            color: "var(--text-dim)",
+            letterSpacing: "var(--tracking-caps)",
+            marginBottom: "var(--space-16)",
           }}
         >
           EVERY TRADE · A BLOOD CONTRACT
@@ -220,7 +174,7 @@ export default function SplashScreen() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "20px",
+            gap: "var(--space-9)",
           }}
         >
           <button
@@ -229,104 +183,75 @@ export default function SplashScreen() {
             style={{
               background: "transparent",
               border: "1px solid rgba(204,0,0,0.5)",
-              color: "#cc0000",
-              fontFamily: "var(--font-space-grotesk)",
-              fontSize: "10px",
-              letterSpacing: "5px",
+              color: "var(--red)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--text-base)",
+              letterSpacing: "var(--tracking-caps-wide)",
               fontWeight: "700",
-              padding: "14px 48px",
+              padding: "var(--space-6) var(--space-15)",
               cursor: "pointer",
-              transition: "all 0.3s",
+              transition: "all var(--duration-normal)",
               position: "relative",
               overflow: "hidden",
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget;
               el.style.background = "rgba(204,0,0,0.1)";
-              el.style.borderColor = "#cc0000";
-              el.style.color = "#ff4444";
+              el.style.borderColor = "var(--red)";
+              el.style.color = "var(--red-bright)";
               el.style.boxShadow = "0 0 30px rgba(204,0,0,0.3)";
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget;
               el.style.background = "transparent";
               el.style.borderColor = "rgba(204,0,0,0.5)";
-              el.style.color = "#cc0000";
+              el.style.color = "var(--red)";
               el.style.boxShadow = "";
             }}
           >
             ✦ ENTER THE MARKET
           </button>
 
-          <div style={{ fontSize: "9px", letterSpacing: "2px", color: "#222", fontFamily: "var(--font-space-grotesk)" }}>
+          <div style={{ fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-label)", color: "var(--text-ghost)", fontFamily: "var(--font-sans)" }}>
             or wait · auto-entering soon
           </div>
         </div>
       </div>
 
       {/* ── Progress bar at bottom ── */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: "2px",
-          background: "rgba(204,0,0,0.08)",
-        }}
-      >
+      <div className="splash-progress">
         <div
+          className="splash-progress-bar"
           style={{
-            height: "100%",
             width: `${barWidth}%`,
-            background: "linear-gradient(to right, #880000, #cc0000, #c9a227)",
-            transition: `width ${3.8}s linear`,
-            boxShadow: "0 0 8px rgba(204,0,0,0.6)",
+            transition: "width 3.8s linear",
           }}
         />
       </div>
 
       {/* ── Bottom DXD stamp ── */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "18px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          fontFamily: "var(--font-cormorant)",
-          fontSize: "clamp(32px,4vw,52px)",
-          fontWeight: "700",
-          letterSpacing: "10px",
-          color: "rgba(204,0,0,0.06)",
-          userSelect: "none",
-          pointerEvents: "none",
-          whiteSpace: "nowrap",
-          animation: "splash-flicker 8s ease-in-out 2s infinite",
-        }}
-      >
+      <div className="splash-stamp" style={{ fontSize: "clamp(32px, 4vw, 52px)" }}>
         XD
       </div>
 
       {/* ── Corner runes ── */}
       {[
-        { top: "20px", left: "24px" },
-        { top: "20px", right: "24px" },
-        { bottom: "24px", left: "24px" },
-        { bottom: "24px", right: "24px" },
+        { top: "20px", left: "24px", text: "✦ XD" },
+        { top: "20px", right: "24px", text: "XD ✦" },
+        { bottom: "24px", left: "24px", text: "✦ XD" },
+        { bottom: "24px", right: "24px", text: "XD ✦" },
       ].map((pos, i) => (
         <div
           key={i}
+          className="splash-corner-rune"
           style={{
-            position: "absolute",
-            ...pos,
-            fontFamily: "var(--font-space-grotesk)",
-            fontSize: "9px",
-            letterSpacing: "2px",
-            color: "rgba(204,0,0,0.2)",
-            pointerEvents: "none",
+            top: pos.top,
+            left: pos.left,
+            right: pos.right,
+            bottom: pos.bottom,
           }}
         >
-          {["✦ XD", "XD ✦", "✦ XD", "XD ✦"][i]}
+          {pos.text}
         </div>
       ))}
     </div>

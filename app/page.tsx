@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <>
       <SplashScreen />
-      <main style={{ background: "#07000d", minHeight: "100vh" }}>
+      <main style={{ background: "var(--bg-base)", minHeight: "100vh" }}>
         <Navbar />
         <Ticker />
         <HeroSection />

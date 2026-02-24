@@ -11,7 +11,7 @@ const platforms = [
     volume: "$142M",
     pairs: "234 pairs",
     icon: "🔥",
-    color: "#cc0000",
+    color: "var(--red)",
     bars: [0.5, 0.75, 0.55, 0.9, 0.65, 0.8, 1.0],
   },
   {
@@ -20,7 +20,7 @@ const platforms = [
     volume: "$198M",
     pairs: "189 pairs",
     icon: "⚡",
-    color: "#7b00c8",
+    color: "var(--purple)",
     bars: [0.4, 0.65, 0.85, 0.6, 0.9, 0.7, 0.95],
   },
   {
@@ -29,7 +29,7 @@ const platforms = [
     volume: "Soon™",
     pairs: "∞ pairs",
     icon: "◎",
-    color: "#2a5aaa",
+    color: "var(--blue)",
     bars: [0.2, 0.25, 0.2, 0.3, 0.2, 0.28, 0.32],
     soon: true,
   },
@@ -69,7 +69,7 @@ function MiniBarChart({ bars, color, delay = 0 }: { bars: number[]; color: strin
             height: "100%",
             position: "relative",
             background: "rgba(255,255,255,0.06)",
-            borderRadius: "1px",
+            borderRadius: "var(--radius-xs)",
           }}
         >
           <div
@@ -78,12 +78,12 @@ function MiniBarChart({ bars, color, delay = 0 }: { bars: number[]; color: strin
               bottom: 0,
               left: 0,
               right: 0,
-              borderRadius: "1px",
+              borderRadius: "var(--radius-xs)",
               background: color,
               transformOrigin: "bottom",
               transform: ready ? `scaleY(${h})` : "scaleY(0)",
               height: "100%",
-              transition: `transform 0.7s cubic-bezier(0.16,1,0.3,1) ${i * 55 + delay}ms`,
+              transition: `transform 0.7s var(--ease-out) ${i * 55 + delay}ms`,
             }}
           />
         </div>
@@ -98,29 +98,17 @@ function StatBlock({ value, label, delay }: { value: string; label: string; dela
   return (
     <div style={{ textAlign: "center" }}>
       <div
+        className="stat-value"
         style={{
-          fontFamily: "var(--font-cormorant)",
-          fontSize: "clamp(18px,2vw,26px)",
-          fontWeight: "700",
-          color: "#c9a227",
+          fontSize: "clamp(18px, 2vw, 26px)",
           transform: show ? "translateY(0)" : "translateY(12px)",
           opacity: show ? 1 : 0,
-          transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
+          transition: "all var(--duration-slower) var(--ease-out)",
         }}
       >
         {value}
       </div>
-      <div
-        style={{
-          fontFamily: "var(--font-space-grotesk)",
-          fontSize: "7px",
-          letterSpacing: "2px",
-          color: "#444",
-          marginTop: "4px",
-        }}
-      >
-        {label}
-      </div>
+      <div className="stat-label">{label}</div>
     </div>
   );
 }
@@ -147,31 +135,13 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      style={{
-        position: "relative",
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        overflow: "hidden",
-        background: "#07000d",
-        padding: "100px 0 80px",
-      }}
-    >
+    <section ref={sectionRef} className="hero-section">
       {/* Animated grid background */}
       <div className="hero-bg-grid" />
 
       {/* Radial glow overlays */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse 60% 70% at 15% 55%, rgba(180,0,0,0.09) 0%, transparent 55%), radial-gradient(ellipse 45% 60% at 85% 20%, rgba(80,0,130,0.07) 0%, transparent 55%)",
-          pointerEvents: "none",
-        }}
-      />
+      <div className="glow-overlay-red" />
+      <div className="glow-overlay-purple" />
 
       {/* Bottom left warm glow */}
       <div
@@ -188,85 +158,55 @@ export default function HeroSection() {
 
       <Particles count={28} />
 
-      <div className="max-w-7xl mx-auto px-6 w-full" style={{ position: "relative", zIndex: 1 }}>
+      <div className="container" style={{ position: "relative", zIndex: 1 }}>
         <div className="hero-grid">
 
           {/* ══════════════ LEFT ══════════════ */}
           <div>
             {/* Protocol badge */}
-            <div
-              className="animate-fade-in-left"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "32px",
-                fontFamily: "var(--font-space-grotesk)",
-                fontSize: "9px",
-                letterSpacing: "3px",
-                color: "#cc0000",
-                fontWeight: "600",
-                border: "1px solid rgba(204,0,0,0.2)",
-                padding: "7px 14px",
-                background: "rgba(204,0,0,0.04)",
-                backdropFilter: "blur(10px)",
-              }}
-            >
+            <div className="animate-fade-in-left badge badge-red" style={{ marginBottom: "var(--space-12)" }}>
               <span className="animate-spark" style={{ fontSize: "10px" }}>✦</span>
               XD · LIVE
             </div>
 
             {/* Heading — each line staggered */}
-            <h1 style={{ lineHeight: 1.04, marginBottom: "28px", margin: "0 0 28px" }}>
+            <h1 className="heading-display" style={{ marginBottom: "var(--space-11)" }}>
               <span
-                className="animate-fade-in-left delay-100"
+                className="animate-fade-in-left delay-100 heading-display-italic"
                 style={{
                   display: "block",
-                  fontFamily: "var(--font-cormorant)",
-                  fontStyle: "italic",
                   fontSize: "clamp(50px, 6vw, 84px)",
-                  fontWeight: "300",
-                  color: "#cc3333",
-                  letterSpacing: "-1px",
+                  letterSpacing: "var(--tracking-normal)",
                 }}
               >
                 Pure
               </span>
               <span
-                className="animate-fade-in-left delay-200"
+                className="animate-fade-in-left delay-200 heading-display-bold"
                 style={{
                   display: "block",
-                  fontFamily: "var(--font-cormorant)",
                   fontSize: "clamp(50px, 6vw, 84px)",
-                  fontWeight: "700",
-                  color: "#f5f0e8",
-                  letterSpacing: "-1.5px",
+                  letterSpacing: "var(--tracking-snug)",
                 }}
               >
                 Deep
               </span>
               <span
-                className="animate-fade-in-left delay-300 animate-glow-gold"
+                className="animate-fade-in-left delay-300 animate-glow-gold heading-display-gold"
                 style={{
                   display: "block",
-                  fontFamily: "var(--font-cormorant)",
                   fontSize: "clamp(46px, 5.5vw, 78px)",
-                  fontWeight: "700",
-                  color: "#c9a227",
-                  letterSpacing: "-1px",
+                  letterSpacing: "var(--tracking-normal)",
                 }}
               >
                 Market
               </span>
               <span
-                className="animate-fade-in-left delay-400"
+                className="animate-fade-in-left delay-400 heading-display-bold"
                 style={{
                   display: "block",
-                  fontFamily: "var(--font-cormorant)",
                   fontSize: "clamp(50px, 6vw, 84px)",
-                  fontWeight: "700",
-                  color: "#f5f0e8",
-                  letterSpacing: "-1.5px",
+                  letterSpacing: "var(--tracking-snug)",
                 }}
               >
                 Liquidity
@@ -274,90 +214,21 @@ export default function HeroSection() {
             </h1>
 
             {/* Description */}
-            <p
-              className="animate-fade-in-left delay-500"
-              style={{
-                fontFamily: "var(--font-space-grotesk)",
-                fontSize: "14px",
-                color: "#666",
-                lineHeight: 1.8,
-                marginBottom: "40px",
-                maxWidth: "420px",
-              }}
-            >
+            <p className="animate-fade-in-left delay-500 text-body" style={{ marginBottom: "var(--space-14)", maxWidth: "420px" }}>
               Fast routing. Tight spreads. Live on every major venue.
             </p>
 
             {/* CTA buttons */}
-            <div
-              className="animate-fade-in-left delay-600 hero-cta-row"
-              style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}
-            >
+            <div className="animate-fade-in-left delay-600 hero-cta-row" style={{ display: "flex", gap: "var(--space-6)", flexWrap: "wrap" }}>
               <a
                 href=""
                 target="_blank"
                 rel="noopener noreferrer"
-                className="animate-glow-red"
-                style={{
-                  background: "linear-gradient(135deg, #cc0000, #990000)",
-                  color: "#fff",
-                  padding: "15px 36px",
-                  fontSize: "10px",
-                  letterSpacing: "2.5px",
-                  fontFamily: "var(--font-space-grotesk)",
-                  fontWeight: "700",
-                  textDecoration: "none",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
-                  position: "relative",
-                  overflow: "hidden",
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.background = "linear-gradient(135deg, #e00000, #bb0000)";
-                  el.style.transform = "translateY(-3px)";
-                  el.style.boxShadow = "0 16px 48px rgba(204,0,0,0.45)";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.background = "linear-gradient(135deg, #cc0000, #990000)";
-                  el.style.transform = "translateY(0)";
-                  el.style.boxShadow = "";
-                }}
+                className="btn btn-primary animate-glow-red"
               >
                 START
               </a>
-              <a
-                href="#platforms"
-                style={{
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  color: "#777",
-                  padding: "15px 32px",
-                  fontSize: "10px",
-                  letterSpacing: "2.5px",
-                  fontFamily: "var(--font-space-grotesk)",
-                  fontWeight: "600",
-                  textDecoration: "none",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.borderColor = "rgba(201,162,39,0.35)";
-                  el.style.color = "#c9a227";
-                  el.style.transform = "translateY(-2px)";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.borderColor = "rgba(255,255,255,0.12)";
-                  el.style.color = "#777";
-                  el.style.transform = "translateY(0)";
-                }}
-              >
+              <a href="#platforms" className="btn btn-secondary">
                 STACK
               </a>
             </div>
@@ -373,185 +244,76 @@ export default function HeroSection() {
             <div
               ref={cardRef}
               style={{
-                transition: "transform 0.15s cubic-bezier(0.16,1,0.3,1)",
+                transition: "transform 0.15s var(--ease-out)",
                 transformStyle: "preserve-3d",
                 position: "relative",
               }}
             >
               {/* Outer glow halo */}
-              <div
-                style={{
-                  position: "absolute",
-                  inset: "-2px",
-                  background: "linear-gradient(135deg, rgba(204,0,0,0.25) 0%, transparent 50%, rgba(100,0,150,0.15) 100%)",
-                  borderRadius: "6px",
-                  filter: "blur(12px)",
-                  opacity: 0.6,
-                  pointerEvents: "none",
-                }}
-              />
+              <div className="hero-card-glow" />
 
               {/* Card body */}
-              <div
-                style={{
-                  position: "relative",
-                  background:
-                    "linear-gradient(160deg, rgba(26,0,38,0.97) 0%, rgba(10,0,18,0.99) 100%)",
-                  border: "1px solid rgba(204,0,0,0.25)",
-                  borderRadius: "4px",
-                  padding: "28px",
-                  overflow: "hidden",
-                }}
-              >
+              <div className="hero-card">
                 {/* Scan line */}
-                <div
-                  className="hero-scan-line"
-                  style={{ position: "absolute", left: 0, right: 0, height: "1px" }}
-                />
+                <div className="hero-scan-line" />
 
                 {/* Corner accents */}
-                <div style={{ position: "absolute", top: 0, left: 0, width: "80px", height: "2px", background: "linear-gradient(to right, #cc0000, transparent)" }} />
-                <div style={{ position: "absolute", top: 0, left: 0, width: "2px", height: "80px", background: "linear-gradient(to bottom, #cc0000, transparent)" }} />
+                <div style={{ position: "absolute", top: 0, left: 0, width: "80px", height: "2px", background: "linear-gradient(to right, var(--red), transparent)" }} />
+                <div style={{ position: "absolute", top: 0, left: 0, width: "2px", height: "80px", background: "linear-gradient(to bottom, var(--red), transparent)" }} />
                 <div style={{ position: "absolute", bottom: 0, right: 0, width: "60px", height: "1px", background: "linear-gradient(to left, rgba(201,162,39,0.4), transparent)" }} />
                 <div style={{ position: "absolute", bottom: 0, right: 0, width: "1px", height: "60px", background: "linear-gradient(to top, rgba(201,162,39,0.4), transparent)" }} />
 
                 {/* Header row */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-9)" }}>
                   <div>
-                    <div
-                      style={{
-                        fontSize: "8px",
-                        letterSpacing: "3px",
-                        color: "#cc0000",
-                        fontFamily: "var(--font-space-grotesk)",
-                        marginBottom: "6px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "7px",
-                        opacity: 0.9,
-                      }}
-                    >
-                      <span
-                        className="live-dot"
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          background: "#cc0000",
-                          display: "inline-block",
-                          flexShrink: 0,
-                        }}
-                      />
+                    <div className="text-label-sm" style={{ color: "var(--red)", marginBottom: "var(--space-2)", display: "flex", alignItems: "center", gap: "var(--space-2)", opacity: 0.9 }}>
+                      <span className="live-dot dot dot-sm dot-red" />
                       ACTIVE PROTOCOL
                     </div>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-cormorant)",
-                        fontSize: "38px",
-                        fontWeight: "700",
-                        color: "#c9a227",
-                        letterSpacing: "5px",
-                        lineHeight: 1,
-                      }}
-                      className="animate-glow-gold"
-                    >
+                    <div className="animate-glow-gold logo-text" style={{ fontSize: "var(--text-8xl)", color: "var(--gold)", letterSpacing: "5px" }}>
                       XD
                     </div>
                   </div>
-                  <div
-                    style={{
-                      border: "1px solid rgba(0,200,100,0.35)",
-                      color: "#00c864",
-                      padding: "5px 12px",
-                      fontSize: "8px",
-                      letterSpacing: "2px",
-                      fontFamily: "var(--font-space-grotesk)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      background: "rgba(0,200,100,0.04)",
-                    }}
-                  >
-                    <span
-                      className="live-dot"
-                      style={{
-                        width: "5px",
-                        height: "5px",
-                        borderRadius: "50%",
-                        background: "#00c864",
-                        display: "inline-block",
-                        flexShrink: 0,
-                      }}
-                    />
+                  <div className="badge badge-live">
+                    <span className="live-dot dot dot-sm dot-green" />
                     LIVE
                   </div>
                 </div>
 
                 {/* Platform rows */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "7px", marginBottom: "20px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", marginBottom: "var(--space-9)" }}>
                   {platforms.map((p, i) => (
                     <div
                       key={i}
-                      style={{
-                        background: "rgba(255,255,255,0.02)",
-                        border: "1px solid rgba(255,255,255,0.05)",
-                        borderLeft: `2px solid ${p.color}`,
-                        borderRadius: "2px",
-                        padding: "12px 14px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        transition: "all 0.25s",
-                        cursor: p.soon ? "default" : "pointer",
-                        opacity: p.soon ? 0.5 : 1,
-                      }}
-                      onMouseEnter={(e) => {
-                        if (p.soon) return;
-                        const el = e.currentTarget as HTMLDivElement;
-                        el.style.background = "rgba(255,255,255,0.04)";
-                        el.style.borderColor = `rgba(255,255,255,0.12)`;
-                        el.style.transform = "translateX(3px)";
-                      }}
-                      onMouseLeave={(e) => {
-                        const el = e.currentTarget as HTMLDivElement;
-                        el.style.background = "rgba(255,255,255,0.02)";
-                        el.style.borderColor = "rgba(255,255,255,0.05)";
-                        el.style.transform = "translateX(0)";
-                      }}
+                      className={`platform-row ${p.soon ? "platform-row-disabled" : ""}`}
+                      style={{ borderLeft: `2px solid ${p.color}` }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
                         <span
+                          className="icon-circle icon-circle-sm"
                           style={{
-                            width: "30px",
-                            height: "30px",
-                            borderRadius: "50%",
-                            background: `${p.color}20`,
-                            border: `1px solid ${p.color}33`,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "13px",
-                            flexShrink: 0,
+                            background: `color-mix(in srgb, ${p.color} 12%, transparent)`,
+                            border: `1px solid color-mix(in srgb, ${p.color} 20%, transparent)`,
                           }}
                         >
                           {p.icon}
                         </span>
                         <div>
-                          <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "12px", fontWeight: "600", color: "#f5f0e8" }}>
+                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-lg)", fontWeight: "600", color: "var(--text-primary)" }}>
                             {p.name}
                           </div>
-                          <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "8px", letterSpacing: "1.5px", color: "#444", marginTop: "1px" }}>
+                          <div className="text-label-xs" style={{ color: "var(--text-faint)", marginTop: "1px" }}>
                             {p.type}
                           </div>
                         </div>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-5)" }}>
                         <MiniBarChart bars={p.bars} color={p.color} delay={i * 120} />
                         <div style={{ textAlign: "right" }}>
-                          <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "12px", fontWeight: "700", color: p.soon ? "#333" : "#c9a227" }}>
+                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-lg)", fontWeight: "700", color: p.soon ? "var(--text-ghost)" : "var(--gold)" }}>
                             {p.volume}
                           </div>
-                          <div style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "8px", color: "#333", marginTop: "1px", letterSpacing: "0.5px" }}>
+                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-xs)", color: "var(--text-ghost)", marginTop: "1px", letterSpacing: "var(--tracking-wide)" }}>
                             {p.pairs}
                           </div>
                         </div>
@@ -565,9 +327,9 @@ export default function HeroSection() {
                   style={{
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr",
-                    borderTop: "1px solid rgba(204,0,0,0.12)",
-                    paddingTop: "18px",
-                    gap: "4px",
+                    borderTop: "1px solid var(--border-red-light)",
+                    paddingTop: "var(--space-8)",
+                    gap: "var(--space-1)",
                   }}
                 >
                   <StatBlock value={`$${vol}M+`} label="DAILY VOLUME" delay={1000} />

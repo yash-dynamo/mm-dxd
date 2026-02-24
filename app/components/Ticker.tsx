@@ -87,41 +87,11 @@ export default function Ticker() {
   const allItems = useMemo(() => [...items, ...items], [items]);
 
   return (
-    <div
-      style={{
-        background: "rgba(10, 0, 18, 0.95)",
-        borderBottom: "1px solid rgba(204, 0, 0, 0.15)",
-        overflow: "hidden",
-        marginTop: "65px",
-        padding: "10px 0",
-        position: "relative",
-      }}
-    >
+    <div className="ticker-wrapper">
       {/* Left fade */}
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: "80px",
-          background:
-            "linear-gradient(to right, rgba(7,0,13,1), transparent)",
-          zIndex: 2,
-        }}
-      />
+      <div className="ticker-fade-left" />
       {/* Right fade */}
-      <div
-        style={{
-          position: "absolute",
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: "80px",
-          background: "linear-gradient(to left, rgba(7,0,13,1), transparent)",
-          zIndex: 2,
-        }}
-      />
+      <div className="ticker-fade-right" />
 
       <div
         className="animate-ticker"
@@ -133,33 +103,10 @@ export default function Ticker() {
         }}
       >
         {allItems.map((item, i) => (
-          <span
-            key={i}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "0 28px",
-              fontFamily: "var(--font-space-grotesk)",
-              fontSize: "11px",
-              borderRight: "1px solid rgba(255,255,255,0.05)",
-            }}
-          >
-            <span style={{ color: "#555", letterSpacing: "1px" }}>
-              {item.pair}
-            </span>
-            <span style={{ color: "#d0ccc8", fontWeight: "600" }}>
-              {item.value}
-            </span>
-            <span
-              style={{
-                color: item.up ? "#22c55e" : "#cc0000",
-                fontWeight: "600",
-                display: "flex",
-                alignItems: "center",
-                gap: "2px",
-              }}
-            >
+          <span key={i} className="ticker-item">
+            <span className="ticker-pair">{item.pair}</span>
+            <span className="ticker-value">{item.value}</span>
+            <span className={`ticker-change ${item.up ? "ticker-change-up" : "ticker-change-down"}`}>
               {item.up ? "▲" : "▼"} {item.change}
             </span>
           </span>

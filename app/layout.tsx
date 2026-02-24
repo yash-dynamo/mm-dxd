@@ -3,7 +3,7 @@ import { Cormorant_Garamond, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
+  variable: "--font-serif",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
@@ -11,7 +11,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+  variable: "--font-sans",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
@@ -30,10 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${cormorant.variable} ${spaceGrotesk.variable} antialiased`}
-        style={{ background: "#07000d", color: "#f5f0e8" }}
-      >
+      <body className={`${cormorant.variable} ${spaceGrotesk.variable} antialiased`}>
         {children}
       </body>
     </html>

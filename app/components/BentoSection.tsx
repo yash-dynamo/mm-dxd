@@ -12,12 +12,11 @@ const cards = [
     tag: "XD · INNER CIRCLE",
     ability: "Crimson Depth",
     power: 100,
-    color: "#cc0000",
-    colorDim: "rgba(204,0,0,0.18)",
+    color: "var(--red)",
+    colorRaw: "#cc0000",
     stars: 5,
     desc: "Deep books. Clean fills.",
     size: "large",
-    glowColor: "rgba(204,0,0,0.35)",
   },
   {
     img: "/cards/2.png",
@@ -26,12 +25,11 @@ const cards = [
     tag: "XD · THUNDER FILLS",
     ability: "Holy Lightning",
     power: 97,
-    color: "#7b00c8",
-    colorDim: "rgba(123,0,200,0.18)",
+    color: "var(--purple)",
+    colorRaw: "#7b00c8",
     stars: 5,
     desc: "Low latency. High hit rate.",
     size: "small",
-    glowColor: "rgba(123,0,200,0.35)",
   },
   {
     img: "/cards/3.png",
@@ -40,12 +38,11 @@ const cards = [
     tag: "XD · IRON SHIELD",
     ability: "Senjutsu Ward",
     power: 88,
-    color: "#2a5aaa",
-    colorDim: "rgba(42,90,170,0.18)",
+    color: "var(--blue)",
+    colorRaw: "#2a5aaa",
     stars: 4,
     desc: "Risk first. Always on.",
     size: "small",
-    glowColor: "rgba(42,90,170,0.35)",
   },
   {
     img: "/cards/4.png",
@@ -54,12 +51,11 @@ const cards = [
     tag: "XD · TWILIGHT HEAL",
     ability: "Sacred Recovery",
     power: 92,
-    color: "#1a8a3a",
-    colorDim: "rgba(26,138,58,0.18)",
+    color: "var(--green-dark)",
+    colorRaw: "#1a8a3a",
     stars: 4,
     desc: "Recovery engine online.",
     size: "large",
-    glowColor: "rgba(26,138,58,0.35)",
   },
 ];
 
@@ -68,21 +64,21 @@ function PowerBar({ power, color }: { power: number; color: string }) {
   return (
     <div style={{ width: "100%" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
-        <span style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "7px", letterSpacing: "2px", color: "#444" }}>
+        <span className="text-label-xs" style={{ color: "var(--text-faint)" }}>
           POWER LEVEL
         </span>
-        <span style={{ fontFamily: "var(--font-space-grotesk)", fontSize: "10px", fontWeight: "700", color }}>
+        <span style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-base)", fontWeight: "700", color }}>
           {power}
         </span>
       </div>
-      <div style={{ height: "2px", background: "rgba(255,255,255,0.06)", borderRadius: "1px", overflow: "hidden" }}>
+      <div style={{ height: "2px", background: "var(--border-light)", borderRadius: "var(--radius-xs)", overflow: "hidden" }}>
         <div
           style={{
             height: "100%",
             width: `${power}%`,
-            background: `linear-gradient(to right, ${color}88, ${color})`,
-            borderRadius: "1px",
-            transition: "width 0.8s cubic-bezier(0.16,1,0.3,1)",
+            background: `linear-gradient(to right, color-mix(in srgb, ${color} 50%, transparent), ${color})`,
+            borderRadius: "var(--radius-xs)",
+            transition: "width 0.8s var(--ease-out)",
           }}
         />
       </div>
@@ -103,20 +99,23 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
     });
   }, []);
 
+  const colorDim = `color-mix(in srgb, ${card.color} 18%, transparent)`;
+  const glowColor = `color-mix(in srgb, ${card.color} 35%, transparent)`;
+
   return (
     <div
       className={`animate-fade-in-up delay-${(index + 1) * 100} bento-card`}
       style={{
         position: "relative",
-        borderRadius: "3px",
+        borderRadius: "var(--radius-md)",
         overflow: "hidden",
         cursor: "pointer",
         aspectRatio: card.size === "large" ? "3/4" : "2/3",
         background: "#06000e",
-        transition: "all 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
-        border: hovered ? `1px solid ${card.color}66` : "1px solid rgba(255,255,255,0.06)",
+        transition: "all 0.45s var(--ease-out)",
+        border: hovered ? `1px solid color-mix(in srgb, ${card.color} 40%, transparent)` : "1px solid var(--border-light)",
         boxShadow: hovered
-          ? `0 24px 80px ${card.glowColor}, 0 0 0 1px ${card.color}33`
+          ? `0 24px 80px ${glowColor}, 0 0 0 1px color-mix(in srgb, ${card.color} 20%, transparent)`
           : "none",
         transform: hovered ? "translateY(-10px) scale(1.015)" : "translateY(0) scale(1)",
       }}
@@ -131,7 +130,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           position: "absolute",
           inset: 0,
           transform: hovered ? "scale(1.07)" : "scale(1)",
-          transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)",
+          transition: "transform var(--duration-slower) var(--ease-out)",
         }}
       >
         <Image
@@ -149,7 +148,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           inset: 0,
           background: `radial-gradient(circle 120px at ${mousePos.x}% ${mousePos.y}%, rgba(255,255,255,0.07) 0%, transparent 70%)`,
           opacity: hovered ? 1 : 0,
-          transition: "opacity 0.3s",
+          transition: "opacity var(--duration-normal)",
           pointerEvents: "none",
           zIndex: 2,
         }}
@@ -165,12 +164,12 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
               to bottom,
               transparent 0%,
               transparent 30%,
-              ${card.colorDim} 55%,
+              ${colorDim} 55%,
               rgba(6,0,14,0.88) 72%,
               rgba(6,0,14,0.98) 100%
             )
           `,
-          transition: "opacity 0.4s",
+          transition: "opacity var(--duration-medium)",
           zIndex: 1,
         }}
       />
@@ -184,7 +183,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           right: 0,
           height: hovered ? "3px" : "2px",
           background: `linear-gradient(to right, ${card.color}, transparent 70%)`,
-          transition: "height 0.3s",
+          transition: "height var(--duration-normal)",
           zIndex: 5,
         }}
       />
@@ -193,19 +192,19 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
       <div
         style={{
           position: "absolute",
-          top: "14px",
-          left: "14px",
+          top: "var(--space-6)",
+          left: "var(--space-6)",
           background: "rgba(6,0,14,0.8)",
           backdropFilter: "blur(10px)",
-          border: `1px solid ${card.color}44`,
-          padding: "4px 10px",
-          fontSize: "7px",
-          letterSpacing: "2px",
-          fontFamily: "var(--font-space-grotesk)",
+          border: `1px solid color-mix(in srgb, ${card.color} 27%, transparent)`,
+          padding: "var(--space-1) var(--space-4)",
+          fontSize: "var(--text-2xs)",
+          letterSpacing: "var(--tracking-label)",
+          fontFamily: "var(--font-sans)",
           color: card.color,
           fontWeight: "700",
           zIndex: 5,
-          transition: "all 0.3s",
+          transition: "all var(--duration-normal)",
           transform: hovered ? "translateY(-2px)" : "translateY(0)",
         }}
       >
@@ -216,21 +215,21 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
       <div
         style={{
           position: "absolute",
-          top: "14px",
-          right: "14px",
-          background: `${card.color}22`,
+          top: "var(--space-6)",
+          right: "var(--space-6)",
+          background: `color-mix(in srgb, ${card.color} 13%, transparent)`,
           backdropFilter: "blur(10px)",
-          border: `1px solid ${card.color}55`,
-          padding: "4px 10px",
-          fontSize: "7px",
-          letterSpacing: "1.5px",
-          fontFamily: "var(--font-space-grotesk)",
+          border: `1px solid color-mix(in srgb, ${card.color} 33%, transparent)`,
+          padding: "var(--space-1) var(--space-4)",
+          fontSize: "var(--text-2xs)",
+          letterSpacing: "var(--tracking-widest)",
+          fontFamily: "var(--font-sans)",
           color: card.color,
           fontWeight: "600",
           zIndex: 5,
           opacity: hovered ? 1 : 0,
           transform: hovered ? "translateY(0)" : "translateY(-8px)",
-          transition: "all 0.35s cubic-bezier(0.16,1,0.3,1)",
+          transition: "all 0.35s var(--ease-out)",
         }}
       >
         ⚡ {card.ability}
@@ -243,23 +242,23 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           bottom: 0,
           left: 0,
           right: 0,
-          padding: "20px",
+          padding: "var(--space-9)",
           zIndex: 5,
           transform: hovered ? "translateY(-4px)" : "translateY(0)",
-          transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1)",
+          transition: "transform var(--duration-medium) var(--ease-out)",
         }}
       >
         {/* Description — reveals on hover */}
         <p
           style={{
-            fontFamily: "var(--font-space-grotesk)",
-            fontSize: "11px",
-            color: "#888",
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--text-md)",
+            color: "var(--text-secondary)",
             lineHeight: 1.55,
-            marginBottom: "12px",
+            marginBottom: "var(--space-5)",
             opacity: hovered ? 1 : 0,
             transform: hovered ? "translateY(0)" : "translateY(10px)",
-            transition: "all 0.35s cubic-bezier(0.16,1,0.3,1) 0.05s",
+            transition: "all 0.35s var(--ease-out) 0.05s",
             maxHeight: "40px",
             overflow: "hidden",
           }}
@@ -270,12 +269,12 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
         {/* Name */}
         <div
           style={{
-            fontFamily: "var(--font-cormorant)",
-            fontSize: "clamp(16px,1.5vw,20px)",
+            fontFamily: "var(--font-serif)",
+            fontSize: "clamp(16px, 1.5vw, 20px)",
             fontWeight: "700",
-            color: "#f5f0e8",
+            color: "var(--text-primary)",
             marginBottom: "2px",
-            letterSpacing: "0.5px",
+            letterSpacing: "var(--tracking-wide)",
           }}
         >
           {card.name}
@@ -283,13 +282,10 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
 
         {/* Role */}
         <div
+          className="text-label-sm"
           style={{
-            fontFamily: "var(--font-space-grotesk)",
-            fontSize: "8px",
-            letterSpacing: "2.5px",
             color: card.color,
-            marginBottom: "12px",
-            fontWeight: "700",
+            marginBottom: "var(--space-5)",
             opacity: 0.9,
           }}
         >
@@ -308,8 +304,8 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           right: 0,
           width: hovered ? "50px" : "30px",
           height: "1px",
-          background: `linear-gradient(to left, ${card.color}88, transparent)`,
-          transition: "width 0.4s",
+          background: `linear-gradient(to left, color-mix(in srgb, ${card.color} 53%, transparent), transparent)`,
+          transition: "width var(--duration-medium)",
           zIndex: 5,
         }}
       />
@@ -320,8 +316,8 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           right: 0,
           width: "1px",
           height: hovered ? "50px" : "30px",
-          background: `linear-gradient(to top, ${card.color}88, transparent)`,
-          transition: "height 0.4s",
+          background: `linear-gradient(to top, color-mix(in srgb, ${card.color} 53%, transparent), transparent)`,
+          transition: "height var(--duration-medium)",
           zIndex: 5,
         }}
       />
@@ -332,78 +328,33 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
 /* ─────────────────────────── section ─────────────────────────── */
 export default function BentoSection() {
   return (
-    <section
-      id="platforms"
-      style={{
-        padding: "100px 0 80px",
-        position: "relative",
-        background:
-          "radial-gradient(ellipse 100% 60% at 50% -10%, rgba(100,0,0,0.07) 0%, transparent 60%), #07000d",
-        overflow: "hidden",
-      }}
-    >
+    <section id="platforms" className="bento-section">
       {/* Vertical divider from top */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: "50%",
-          width: "1px",
-          height: "100px",
-          background: "linear-gradient(to bottom, transparent, rgba(204,0,0,0.5), transparent)",
-        }}
-      />
+      <div className="bento-divider" />
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="container">
         {/* Section header */}
-        <div style={{ marginBottom: "56px" }}>
-          <div
-            className="animate-fade-in-up"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              marginBottom: "16px",
-              fontFamily: "var(--font-space-grotesk)",
-              fontSize: "9px",
-              letterSpacing: "3px",
-              color: "#cc0000",
-              fontWeight: "700",
-            }}
-          >
-            <span
-              style={{
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                background: "#cc0000",
-                display: "inline-block",
-                animation: "live-pulse 2s ease-in-out infinite",
-              }}
-            />
+        <div style={{ marginBottom: "var(--space-16)" }}>
+          <div className="animate-fade-in-up section-label">
+            <span className="live-dot dot dot-red" />
             CORE TEAM
           </div>
 
-          <h2 className="animate-fade-in-up delay-100" style={{ lineHeight: 1.05, margin: 0 }}>
+          <h2 className="animate-fade-in-up delay-100 heading-display" style={{ margin: 0 }}>
             <span
+              className="heading-display-bold"
               style={{
                 display: "block",
-                fontFamily: "var(--font-cormorant)",
                 fontSize: "clamp(38px, 5vw, 64px)",
-                fontWeight: "700",
-                color: "#f5f0e8",
               }}
             >
               Core
             </span>
             <span
+              className="heading-display-italic"
               style={{
                 display: "block",
-                fontFamily: "var(--font-cormorant)",
-                fontStyle: "italic",
                 fontSize: "clamp(38px, 5vw, 64px)",
-                fontWeight: "300",
-                color: "#cc3333",
               }}
             >
               Stack
@@ -411,14 +362,10 @@ export default function BentoSection() {
           </h2>
 
           <p
-            className="animate-fade-in-up delay-200"
+            className="animate-fade-in-up delay-200 text-body-sm"
             style={{
-              fontFamily: "var(--font-space-grotesk)",
-              fontSize: "13px",
-              color: "#484848",
-              marginTop: "14px",
+              marginTop: "var(--space-6)",
               maxWidth: "460px",
-              lineHeight: 1.7,
             }}
           >
             Four modules. One execution engine.
@@ -436,27 +383,27 @@ export default function BentoSection() {
         <div
           className="animate-fade-in-up delay-500"
           style={{
-            marginTop: "48px",
+            marginTop: "var(--space-15)",
             textAlign: "center",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "20px",
+            gap: "var(--space-9)",
           }}
         >
-          <div style={{ height: "1px", width: "60px", background: "linear-gradient(to right, transparent, rgba(204,0,0,0.3))" }} />
+          <div style={{ height: "1px", width: "60px", background: "linear-gradient(to right, transparent, var(--border-red-strong))" }} />
           <span
             style={{
-              fontFamily: "var(--font-cormorant)",
+              fontFamily: "var(--font-serif)",
               fontStyle: "italic",
-              fontSize: "18px",
-              color: "#333",
-              letterSpacing: "0.5px",
+              fontSize: "var(--text-4xl)",
+              color: "var(--text-ghost)",
+              letterSpacing: "var(--tracking-wide)",
             }}
           >
             Built for speed.
           </span>
-          <div style={{ height: "1px", width: "60px", background: "linear-gradient(to left, transparent, rgba(204,0,0,0.3))" }} />
+          <div style={{ height: "1px", width: "60px", background: "linear-gradient(to left, transparent, var(--border-red-strong))" }} />
         </div>
       </div>
     </section>

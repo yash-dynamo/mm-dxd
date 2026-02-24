@@ -4,86 +4,46 @@ import Image from "next/image";
 
 const features = [
   {
-    icon: "⚔",
-    title: "Adaptive Engine",
-    desc: "Auto-tunes to market flow.",
-    color: "#cc0000",
-    stat: "∞ Power",
-  },
-  {
-    icon: "♾",
-    title: "Scale Mode",
-    desc: "Adds depth where it matters.",
-    color: "#c9a227",
-    stat: "2× / 10s",
-  },
-  {
-    icon: "✦",
-    title: "Spread Control",
-    desc: "Tight and stable quotes.",
-    color: "#6b00a8",
-    stat: "0.008%",
-  },
-  {
     icon: "◈",
     title: "Risk Guard",
     desc: "Limits downside fast.",
-    color: "#1a7a4a",
+    color: "var(--green-muted)",
     stat: "99.9%",
   },
   {
     icon: "🔥",
     title: "Fast Execution",
     desc: "Low-latency order routing.",
-    color: "#cc4400",
+    color: "var(--orange)",
     stat: "<1ms",
   },
   {
     icon: "⬡",
     title: "Cross-Venue Sync",
     desc: "One strategy, many venues.",
-    color: "#2a5aaa",
+    color: "var(--blue)",
     stat: "7 Venues",
+  },
+  {
+    icon: "✕",
+    title: "Adaptive Engine",
+    desc: "Auto-tunes to market flow.",
+    color: "var(--red)",
+    stat: "∞ Power",
   },
 ];
 
 export default function SeductiveSection() {
   return (
-    <section
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        background:
-          "radial-gradient(ellipse 80% 60% at 100% 50%, rgba(100,0,0,0.08) 0%, transparent 60%), #07000d",
-      }}
-    >
+    <section className="seductive-section">
       {/* Separator */}
-      <div
-        style={{
-          height: "1px",
-          background:
-            "linear-gradient(to right, transparent, rgba(204,0,0,0.3), rgba(201,162,39,0.3), transparent)",
-        }}
-      />
+      <div className="divider-red-gold" />
 
       <div className="seductive-grid">
         {/* ====== LEFT: Image ====== */}
-        <div
-          className="animate-fade-in-left"
-          style={{
-            position: "relative",
-          }}
-        >
+        <div className="animate-fade-in-left" style={{ position: "relative" }}>
           {/* Outer glow frame */}
-          <div
-            className="animate-glow-red"
-            style={{
-              position: "relative",
-              borderRadius: "4px",
-              overflow: "hidden",
-              border: "1px solid rgba(204,0,0,0.25)",
-            }}
-          >
+          <div className="animate-glow-red seductive-image-frame">
             <Image
               src="/seductive/5.png"
               alt="Sacred Power"
@@ -117,171 +77,98 @@ export default function SeductiveSection() {
                 left: 0,
                 right: 0,
                 height: "3px",
-                background:
-                  "linear-gradient(to right, #cc0000, #c9a227, transparent)",
+                background: "linear-gradient(to right, var(--red), var(--gold), transparent)",
               }}
             />
           </div>
 
-          {/* Floating stat badge */}
+          {/* Floating stat badge - bottom */}
           <div
             className="animate-float-slow seductive-float-badge"
             style={{
-              position: "absolute",
               bottom: "-20px",
               right: "-20px",
-              background: "rgba(16, 0, 22, 0.95)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(201,162,39,0.35)",
-              borderRadius: "4px",
-              padding: "20px 24px",
-              textAlign: "center",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+              border: "1px solid var(--border-gold-strong)",
+              padding: "var(--space-9) var(--space-10)",
             }}
           >
             <div
-              style={{
-                fontFamily: "var(--font-cormorant)",
-                fontSize: "38px",
-                fontWeight: "700",
-                color: "#c9a227",
-                lineHeight: 1,
-              }}
-              className="animate-glow-gold"
+              className="animate-glow-gold stat-value"
+              style={{ fontSize: "var(--text-8xl)" }}
             >
               ∞
             </div>
-            <div
-              style={{
-                fontFamily: "var(--font-space-grotesk)",
-                fontSize: "8px",
-                letterSpacing: "2.5px",
-                color: "#555",
-                marginTop: "6px",
-              }}
-            >
+            <div className="stat-label" style={{ color: "var(--text-dim)" }}>
               POWER LEVEL
             </div>
           </div>
 
-          {/* Floating stat badge 2 */}
+          {/* Floating stat badge - top */}
           <div
             className="animate-float-medium seductive-float-badge"
             style={{
-              position: "absolute",
               top: "30px",
               right: "-30px",
-              background: "rgba(16, 0, 22, 0.95)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(204,0,0,0.3)",
-              borderRadius: "4px",
-              padding: "14px 18px",
-              textAlign: "center",
+              border: "1px solid var(--border-red-strong)",
+              padding: "var(--space-6) var(--space-8)",
               boxShadow: "0 10px 40px rgba(204,0,0,0.15)",
             }}
           >
             <div
               style={{
-                fontFamily: "var(--font-space-grotesk)",
-                fontSize: "18px",
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--text-4xl)",
                 fontWeight: "700",
-                color: "#cc0000",
+                color: "var(--red)",
                 lineHeight: 1,
               }}
             >
               99.9%
             </div>
-            <div
-              style={{
-                fontFamily: "var(--font-space-grotesk)",
-                fontSize: "7px",
-                letterSpacing: "2px",
-                color: "#444",
-                marginTop: "4px",
-              }}
-            >
-              UPTIME
-            </div>
+            <div className="stat-label">UPTIME</div>
           </div>
         </div>
 
         {/* ====== RIGHT: Content ====== */}
         <div className="animate-fade-in-right delay-200">
           {/* Section label */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "24px",
-              fontFamily: "var(--font-space-grotesk)",
-              fontSize: "10px",
-              letterSpacing: "3px",
-              color: "#c9a227",
-              fontWeight: "600",
-            }}
-          >
-            <span
-              style={{
-                width: "5px",
-                height: "5px",
-                borderRadius: "50%",
-                background: "#c9a227",
-                display: "inline-block",
-              }}
-            />
+          <div className="section-label section-label-gold">
+            <span className="dot dot-sm dot-gold" />
             TOOLSET
           </div>
 
           {/* Heading */}
-          <h2 style={{ marginBottom: "20px", lineHeight: 1.05 }}>
+          <h2 className="heading-display" style={{ marginBottom: "var(--space-9)" }}>
             <span
+              className="heading-display-italic"
               style={{
                 display: "block",
-                fontFamily: "var(--font-cormorant)",
-                fontStyle: "italic",
                 fontSize: "clamp(38px, 4.5vw, 60px)",
-                fontWeight: "400",
-                color: "#cc3333",
               }}
             >
               Clean
             </span>
             <span
+              className="heading-display-bold"
               style={{
                 display: "block",
-                fontFamily: "var(--font-cormorant)",
                 fontSize: "clamp(38px, 4.5vw, 60px)",
-                fontWeight: "700",
-                color: "#f5f0e8",
               }}
             >
               Design.
             </span>
             <span
+              className="animate-glow-gold heading-display-gold"
               style={{
                 display: "block",
-                fontFamily: "var(--font-cormorant)",
                 fontSize: "clamp(38px, 4.5vw, 60px)",
-                fontWeight: "700",
-                color: "#c9a227",
               }}
-              className="animate-glow-gold"
             >
               Real Edge.
             </span>
           </h2>
 
-          <p
-            style={{
-              fontFamily: "var(--font-space-grotesk)",
-              fontSize: "14px",
-              color: "#666",
-              lineHeight: 1.8,
-              marginBottom: "44px",
-              maxWidth: "440px",
-            }}
-          >
+          <p className="text-body" style={{ marginBottom: "var(--space-14)", maxWidth: "440px" }}>
             Minimal surface. Maximum execution.
           </p>
 
@@ -291,59 +178,29 @@ export default function SeductiveSection() {
               position: "relative",
               height: "340px",
               overflow: "hidden",
-              /* fade top + bottom edges */
               maskImage:
                 "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
               WebkitMaskImage:
                 "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
             }}
           >
-            {/* Invisible sentinel that pauses the CSS animation on hover */}
             <div
               className="arsenal-track"
-              style={{ display: "flex", flexDirection: "column", gap: "14px" }}
+              style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}
             >
               {/* Render items TWICE for seamless loop */}
               {[...features, ...features].map((f, i) => (
                 <div
                   key={i}
-                  style={{
-                    display: "flex",
-                    gap: "14px",
-                    alignItems: "flex-start",
-                    padding: "14px 16px",
-                    border: "1px solid rgba(255,255,255,0.04)",
-                    background: "rgba(255,255,255,0.01)",
-                    borderRadius: "2px",
-                    borderLeft: `2px solid ${f.color}`,
-                    transition: "background 0.3s, box-shadow 0.3s",
-                    cursor: "default",
-                    flexShrink: 0,
-                  }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget as HTMLDivElement;
-                    el.style.background = "rgba(255,255,255,0.04)";
-                    el.style.boxShadow = `0 0 20px ${f.color}18`;
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget as HTMLDivElement;
-                    el.style.background = "rgba(255,255,255,0.01)";
-                    el.style.boxShadow = "none";
-                  }}
+                  className="feature-row"
+                  style={{ borderLeft: `2px solid ${f.color}` }}
                 >
                   {/* Icon */}
                   <div
+                    className="icon-circle icon-circle-lg"
                     style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "2px",
-                      background: `${f.color}1a`,
-                      border: `1px solid ${f.color}33`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "16px",
-                      flexShrink: 0,
+                      background: `color-mix(in srgb, ${f.color} 10%, transparent)`,
+                      border: `1px solid color-mix(in srgb, ${f.color} 20%, transparent)`,
                     }}
                   >
                     {f.icon}
@@ -353,20 +210,20 @@ export default function SeductiveSection() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
-                        fontFamily: "var(--font-space-grotesk)",
-                        fontSize: "12px",
+                        fontFamily: "var(--font-sans)",
+                        fontSize: "var(--text-lg)",
                         fontWeight: "600",
-                        color: "#f5f0e8",
-                        marginBottom: "4px",
+                        color: "var(--text-primary)",
+                        marginBottom: "var(--space-1)",
                       }}
                     >
                       {f.title}
                     </div>
                     <div
                       style={{
-                        fontFamily: "var(--font-space-grotesk)",
-                        fontSize: "11px",
-                        color: "#4a4a4a",
+                        fontFamily: "var(--font-sans)",
+                        fontSize: "var(--text-md)",
+                        color: "var(--text-faint)",
                         lineHeight: 1.5,
                       }}
                     >
@@ -377,13 +234,13 @@ export default function SeductiveSection() {
                   {/* Stat badge */}
                   <div
                     style={{
-                      fontFamily: "var(--font-space-grotesk)",
-                      fontSize: "10px",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--text-base)",
                       fontWeight: "700",
                       color: f.color,
                       flexShrink: 0,
-                      paddingLeft: "10px",
-                      letterSpacing: "1px",
+                      paddingLeft: "var(--space-4)",
+                      letterSpacing: "var(--tracking-wider)",
                       alignSelf: "center",
                       opacity: 0.8,
                     }}
@@ -398,13 +255,7 @@ export default function SeductiveSection() {
       </div>
 
       {/* Separator */}
-      <div
-        style={{
-          height: "1px",
-          background:
-            "linear-gradient(to right, transparent, rgba(201,162,39,0.2), rgba(204,0,0,0.2), transparent)",
-        }}
-      />
+      <div className="divider-gold-red" />
     </section>
   );
 }
