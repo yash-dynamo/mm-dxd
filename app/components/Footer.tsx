@@ -114,13 +114,18 @@ export default function Footer() {
           >
             Real-time liquidity.
           </div>
-          <div style={{ display: "flex", gap: "var(--space-1)", alignItems: "center" }}>
-            {["★", "★", "★", "★", "★"].map((s, i) => (
+          <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center" }}>
+            {[1, 2, 3, 4, 5].map((_, i) => (
               <span
                 key={i}
-                style={{ color: "var(--gold)", fontSize: "var(--text-base)", opacity: 0.6 }}
+                style={{ 
+                  color: "var(--gold)", 
+                  fontSize: "var(--text-2xs)", 
+                  opacity: 0.4 + (i * 0.1),
+                  letterSpacing: "1px"
+                }}
               >
-                {s}
+                ✦
               </span>
             ))}
           </div>

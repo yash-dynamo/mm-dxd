@@ -1,7 +1,10 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
+import Image from "next/image";
 import Particles from "./Particles";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 
 /* ─────────────────────────── data ─────────────────────────── */
 const platforms = [
@@ -10,8 +13,7 @@ const platforms = [
     type: "PERP DEX · LIVE",
     volume: "$142M",
     pairs: "234 pairs",
-    icon: "🔥",
-    color: "var(--red)",
+    logo: "/logos/hotstuff.svg",
     bars: [0.5, 0.75, 0.55, 0.9, 0.65, 0.8, 1.0],
   },
   {
@@ -19,8 +21,7 @@ const platforms = [
     type: "PERP DEX · LIVE",
     volume: "$198M",
     pairs: "189 pairs",
-    icon: "⚡",
-    color: "var(--purple)",
+    logo: "/logos/hyperliquid.svg",
     bars: [0.4, 0.65, 0.85, 0.6, 0.9, 0.7, 0.95],
   },
   {
@@ -28,8 +29,8 @@ const platforms = [
     type: "COMING Q2 2026",
     volume: "Soon™",
     pairs: "∞ pairs",
+    logo: null,
     icon: "◎",
-    color: "var(--blue)",
     bars: [0.2, 0.25, 0.2, 0.3, 0.2, 0.28, 0.32],
     soon: true,
   },
@@ -56,7 +57,7 @@ function useAnimatedNumber(target: number, duration = 1800, delay = 700) {
 }
 
 /* ─────────────────────────── sub-components ─────────────────────────── */
-function MiniBarChart({ bars, color, delay = 0 }: { bars: number[]; color: string; delay?: number }) {
+function MiniBarChart({ bars, delay = 0, muted = false }: { bars: number[]; delay?: number; muted?: boolean }) {
   const [ready, setReady] = useState(false);
   useEffect(() => { const t = setTimeout(() => setReady(true), 900 + delay); return () => clearTimeout(t); }, [delay]);
   return (
@@ -79,7 +80,7 @@ function MiniBarChart({ bars, color, delay = 0 }: { bars: number[]; color: strin
               left: 0,
               right: 0,
               borderRadius: "var(--radius-xs)",
-              background: color,
+              background: muted ? "var(--text-dim)" : "var(--gold)",
               transformOrigin: "bottom",
               transform: ready ? `scaleY(${h})` : "scaleY(0)",
               height: "100%",
@@ -96,19 +97,28 @@ function StatBlock({ value, label, delay }: { value: string; label: string; dela
   const [show, setShow] = useState(false);
   useEffect(() => { const t = setTimeout(() => setShow(true), delay); return () => clearTimeout(t); }, [delay]);
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ textAlign: "center", padding: "0 var(--space-2)" }}>
       <div
         className="stat-value"
         style={{
-          fontSize: "clamp(18px, 2vw, 26px)",
+          fontSize: "clamp(20px, 2.2vw, 28px)",
           transform: show ? "translateY(0)" : "translateY(12px)",
           opacity: show ? 1 : 0,
           transition: "all var(--duration-slower) var(--ease-out)",
+          marginBottom: "var(--space-2)",
         }}
       >
         {value}
       </div>
-      <div className="stat-label">{label}</div>
+      <div 
+        className="text-label-xs" 
+        style={{ 
+          color: "var(--text-dim)",
+          letterSpacing: "var(--tracking-label)",
+        }}
+      >
+        {label}
+      </div>
     </div>
   );
 }
@@ -116,23 +126,8 @@ function StatBlock({ value, label, delay }: { value: string; label: string; dela
 /* ─────────────────────────── main component ─────────────────────────── */
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
   const vol = useAnimatedNumber(420, 1800, 800);
   const uptime = useAnimatedNumber(999, 1600, 1000);
-
-  const handleCardMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 12;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
-    cardRef.current.style.transform = `perspective(1200px) rotateY(${x}deg) rotateX(${y}deg) translateZ(16px)`;
-  }, []);
-
-  const handleCardMouseLeave = useCallback(() => {
-    if (!cardRef.current) return;
-    cardRef.current.style.transform =
-      "perspective(1200px) rotateY(0deg) rotateX(0deg) translateZ(0px)";
-  }, []);
 
   return (
     <section ref={sectionRef} className="hero-section">
@@ -157,6 +152,9 @@ export default function HeroSection() {
       />
 
       <Particles count={28} />
+      
+      {/* Aceternity Background Beams */}
+      <BackgroundBeams className="opacity-40" />
 
       <div className="container" style={{ position: "relative", zIndex: 1 }}>
         <div className="hero-grid">
@@ -165,51 +163,33 @@ export default function HeroSection() {
           <div>
             {/* Protocol badge */}
             <div className="animate-fade-in-left badge badge-red" style={{ marginBottom: "var(--space-12)" }}>
-              <span className="animate-spark" style={{ fontSize: "10px" }}>✦</span>
+              <span className="animate-spark" style={{ fontSize: "var(--text-xs)" }}>✦</span>
               XD · LIVE
             </div>
 
-            {/* Heading — each line staggered */}
+            {/* Heading — two words per line */}
             <h1 className="heading-display" style={{ marginBottom: "var(--space-11)" }}>
               <span
-                className="animate-fade-in-left delay-100 heading-display-italic"
+                className="animate-fade-in-left delay-100"
                 style={{
                   display: "block",
-                  fontSize: "clamp(50px, 6vw, 84px)",
+                  fontSize: "clamp(44px, 5.5vw, 72px)",
                   letterSpacing: "var(--tracking-normal)",
                 }}
               >
-                Pure
+                <span className="heading-display-italic">Pure</span>{" "}
+                <span className="heading-display-bold">Deep</span>
               </span>
               <span
-                className="animate-fade-in-left delay-200 heading-display-bold"
+                className="animate-fade-in-left delay-200"
                 style={{
                   display: "block",
-                  fontSize: "clamp(50px, 6vw, 84px)",
-                  letterSpacing: "var(--tracking-snug)",
-                }}
-              >
-                Deep
-              </span>
-              <span
-                className="animate-fade-in-left delay-300 animate-glow-gold heading-display-gold"
-                style={{
-                  display: "block",
-                  fontSize: "clamp(46px, 5.5vw, 78px)",
+                  fontSize: "clamp(44px, 5.5vw, 72px)",
                   letterSpacing: "var(--tracking-normal)",
                 }}
               >
-                Market
-              </span>
-              <span
-                className="animate-fade-in-left delay-400 heading-display-bold"
-                style={{
-                  display: "block",
-                  fontSize: "clamp(50px, 6vw, 84px)",
-                  letterSpacing: "var(--tracking-snug)",
-                }}
-              >
-                Liquidity
+                <span className="animate-glow-gold heading-display-gold">Market</span>{" "}
+                <span className="heading-display-bold">Liquidity</span>
               </span>
             </h1>
 
@@ -234,86 +214,125 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* ══════════════ RIGHT — tilt card ══════════════ */}
-          <div
-            className="animate-fade-in-right delay-300"
-            style={{ perspective: "1200px" }}
-            onMouseMove={handleCardMouseMove}
-            onMouseLeave={handleCardMouseLeave}
-          >
-            <div
-              ref={cardRef}
-              style={{
-                transition: "transform 0.15s var(--ease-out)",
-                transformStyle: "preserve-3d",
-                position: "relative",
-              }}
-            >
-              {/* Outer glow halo */}
-              <div className="hero-card-glow" />
-
-              {/* Card body */}
-              <div className="hero-card">
+          {/* ══════════════ RIGHT — Aceternity 3D Card ══════════════ */}
+          <div className="animate-fade-in-right delay-300">
+            <CardContainer containerClassName="py-0">
+              <CardBody className="hero-card relative h-auto w-auto group/card">
                 {/* Scan line */}
                 <div className="hero-scan-line" />
 
-                {/* Corner accents */}
-                <div style={{ position: "absolute", top: 0, left: 0, width: "80px", height: "2px", background: "linear-gradient(to right, var(--red), transparent)" }} />
-                <div style={{ position: "absolute", top: 0, left: 0, width: "2px", height: "80px", background: "linear-gradient(to bottom, var(--red), transparent)" }} />
-                <div style={{ position: "absolute", bottom: 0, right: 0, width: "60px", height: "1px", background: "linear-gradient(to left, rgba(201,162,39,0.4), transparent)" }} />
-                <div style={{ position: "absolute", bottom: 0, right: 0, width: "1px", height: "60px", background: "linear-gradient(to top, rgba(201,162,39,0.4), transparent)" }} />
-
                 {/* Header row */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-9)" }}>
-                  <div>
-                    <div className="text-label-sm" style={{ color: "var(--red)", marginBottom: "var(--space-2)", display: "flex", alignItems: "center", gap: "var(--space-2)", opacity: 0.9 }}>
-                      <span className="live-dot dot dot-sm dot-red" />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-10)" }}>
+                  <CardItem translateZ="50" className="w-auto">
+                    <div 
+                      className="text-label-xs" 
+                      style={{ 
+                        color: "rgba(201, 162, 39, 0.7)", 
+                        marginBottom: "var(--space-3)", 
+                        display: "flex", 
+                        alignItems: "center", 
+                        gap: "var(--space-3)",
+                      }}
+                    >
+                      <span 
+                        style={{ 
+                          width: "5px", 
+                          height: "5px", 
+                          borderRadius: "50%", 
+                          background: "rgba(201, 162, 39, 0.7)",
+                          boxShadow: "0 0 4px rgba(201, 162, 39, 0.3)"
+                        }} 
+                      />
                       ACTIVE PROTOCOL
                     </div>
-                    <div className="animate-glow-gold logo-text" style={{ fontSize: "var(--text-8xl)", color: "var(--gold)", letterSpacing: "5px" }}>
+                    <div 
+                      className="animate-glow-gold logo-text" 
+                      style={{ 
+                        fontSize: "clamp(36px, 4vw, 48px)", 
+                        color: "var(--gold)", 
+                        letterSpacing: "8px",
+                        textShadow: "0 0 30px rgba(201, 162, 39, 0.3)"
+                      }}
+                    >
                       XD
                     </div>
-                  </div>
-                  <div className="badge badge-live">
-                    <span className="live-dot dot dot-sm dot-green" />
-                    LIVE
-                  </div>
+                  </CardItem>
+                  <CardItem translateZ="70" className="w-auto">
+                    <div 
+                      className="badge badge-gold"
+                      style={{
+                        padding: "var(--space-2) var(--space-5)",
+                        borderRadius: "var(--radius-sm)",
+                      }}
+                    >
+                      <span 
+                        style={{ 
+                          width: "6px", 
+                          height: "6px", 
+                          borderRadius: "50%", 
+                          background: "var(--gold)",
+                          boxShadow: "0 0 8px rgba(201, 162, 39, 0.6)"
+                        }} 
+                      />
+                      LIVE
+                    </div>
+                  </CardItem>
                 </div>
 
-                {/* Platform rows */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", marginBottom: "var(--space-9)" }}>
+                {/* Platform rows - no 3D translate, stays flat with card */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", marginBottom: "var(--space-10)" }}>
                   {platforms.map((p, i) => (
                     <div
                       key={i}
                       className={`platform-row ${p.soon ? "platform-row-disabled" : ""}`}
-                      style={{ borderLeft: `2px solid ${p.color}` }}
+                      style={{ 
+                        borderLeft: p.soon ? "none" : "2px solid rgba(201, 162, 39, 0.25)",
+                      }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-5)" }}>
                         <span
-                          className="icon-circle icon-circle-sm"
+                          className="icon-circle"
                           style={{
-                            background: `color-mix(in srgb, ${p.color} 12%, transparent)`,
-                            border: `1px solid color-mix(in srgb, ${p.color} 20%, transparent)`,
+                            width: "32px",
+                            height: "32px",
+                            fontSize: "var(--text-lg)",
+                            background: "rgba(255, 255, 255, 0.04)",
+                            border: "1px solid rgba(255, 255, 255, 0.08)",
+                            borderRadius: "var(--radius-sm)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            overflow: "hidden",
                           }}
                         >
-                          {p.icon}
+                          {p.logo ? (
+                            <Image 
+                              src={p.logo} 
+                              alt={p.name} 
+                              width={20} 
+                              height={20} 
+                              style={{ objectFit: "contain" }}
+                            />
+                          ) : (
+                            p.icon
+                          )}
                         </span>
                         <div>
-                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-lg)", fontWeight: "600", color: "var(--text-primary)" }}>
+                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-2xl)", fontWeight: "600", color: "var(--text-primary)", letterSpacing: "0.3px" }}>
                             {p.name}
                           </div>
-                          <div className="text-label-xs" style={{ color: "var(--text-faint)", marginTop: "1px" }}>
+                          <div className="text-label-xs" style={{ color: "var(--text-muted)", marginTop: "2px" }}>
                             {p.type}
                           </div>
                         </div>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-5)" }}>
-                        <MiniBarChart bars={p.bars} color={p.color} delay={i * 120} />
-                        <div style={{ textAlign: "right" }}>
-                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-lg)", fontWeight: "700", color: p.soon ? "var(--text-ghost)" : "var(--gold)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-6)" }}>
+                        <MiniBarChart bars={p.bars} delay={i * 120} muted={p.soon} />
+                        <div style={{ textAlign: "right", minWidth: "70px" }}>
+                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-2xl)", fontWeight: "700", color: p.soon ? "var(--text-dim)" : "var(--gold)" }}>
                             {p.volume}
                           </div>
-                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-xs)", color: "var(--text-ghost)", marginTop: "1px", letterSpacing: "var(--tracking-wide)" }}>
+                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-xs)", color: "var(--text-dim)", marginTop: "2px", letterSpacing: "var(--tracking-wide)" }}>
                             {p.pairs}
                           </div>
                         </div>
@@ -323,21 +342,24 @@ export default function HeroSection() {
                 </div>
 
                 {/* Stats row */}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    borderTop: "1px solid var(--border-red-light)",
-                    paddingTop: "var(--space-8)",
-                    gap: "var(--space-1)",
-                  }}
-                >
-                  <StatBlock value={`$${vol}M+`} label="DAILY VOLUME" delay={1000} />
-                  <StatBlock value="0.008%" label="AVG SPREAD" delay={1100} />
-                  <StatBlock value={`${Math.floor(uptime / 10)}.${uptime % 10}%`} label="UPTIME" delay={1200} />
-                </div>
-              </div>
-            </div>
+                <CardItem translateZ="60" className="w-full">
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                      paddingTop: "var(--space-9)",
+                      marginTop: "var(--space-2)",
+                      gap: "var(--space-4)",
+                    }}
+                  >
+                    <StatBlock value={`$${vol}M+`} label="DAILY VOLUME" delay={1000} />
+                    <StatBlock value="0.008%" label="AVG SPREAD" delay={1100} />
+                    <StatBlock value={`${Math.floor(uptime / 10)}.${uptime % 10}%`} label="UPTIME" delay={1200} />
+                  </div>
+                </CardItem>
+              </CardBody>
+            </CardContainer>
           </div>
 
         </div>

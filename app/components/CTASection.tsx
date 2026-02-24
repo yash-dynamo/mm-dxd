@@ -1,47 +1,74 @@
 "use client";
 
 import Particles from "./Particles";
+import { SparklesCore } from "@/components/ui/sparkles";
 
 const AIRTABLE_LINK = ""; // TODO: Add Airtable link
 
 export default function CTASection() {
   return (
     <section className="cta-section">
-      <Particles count={25} />
+      {/* Aceternity Sparkles Background - subtle gold */}
+      <div className="absolute inset-0 w-full h-full opacity-40">
+        <SparklesCore
+          id="cta-sparkles"
+          background="transparent"
+          minSize={0.3}
+          maxSize={1}
+          particleDensity={25}
+          particleColor="#C9A227"
+          speed={0.8}
+        />
+      </div>
+
+      <Particles count={15} />
 
       {/* Decorative rings */}
       <div className="cta-ring cta-ring-outer" />
       <div className="cta-ring cta-ring-inner" />
 
       <div className="container-sm" style={{ position: "relative", zIndex: 1 }}>
-        {/* Label */}
-        <div className="animate-fade-in-up badge badge-red" style={{ marginBottom: "var(--space-12)" }}>
-          <span className="animate-spark" style={{ fontSize: "12px" }}>✦</span>
-          START NOW
+        {/* Label badge - gold like hero */}
+        <div 
+          className="animate-fade-in-up" 
+          style={{ 
+            marginBottom: "var(--space-12)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            fontFamily: "var(--font-sans)",
+            fontSize: "10px",
+            letterSpacing: "3px",
+            color: "var(--gold)",
+            fontWeight: "700",
+          }}
+        >
+          <span
+            style={{
+              width: "6px",
+              height: "6px",
+              borderRadius: "50%",
+              background: "var(--gold)",
+              boxShadow: "0 0 8px rgba(201, 162, 39, 0.5)",
+              display: "inline-block",
+            }}
+          />
+          GET STARTED
         </div>
 
-        {/* Heading */}
-        <h2 className="animate-fade-in-up delay-100 heading-display" style={{ marginBottom: "var(--space-10)" }}>
-          <span
-            className="heading-display-italic"
-            style={{
-              display: "block",
-              fontSize: "clamp(44px, 6vw, 80px)",
-            }}
-          >
-            Go
-          </span>
-          <span
-            className="heading-display-bold"
-            style={{
-              display: "block",
-              fontSize: "clamp(44px, 6vw, 80px)",
-            }}
-          >
-            with{" "}
-            <span className="animate-glow-gold" style={{ color: "var(--gold)" }}>
-              XD
-            </span>
+        {/* Heading - single line like hero */}
+        <h2 
+          className="animate-fade-in-up delay-100 heading-display" 
+          style={{ 
+            marginBottom: "var(--space-10)",
+            fontSize: "clamp(48px, 7vw, 88px)",
+            letterSpacing: "var(--tracking-normal)",
+          }}
+        >
+          <span className="heading-display-italic">Go</span>{" "}
+          <span className="heading-display-bold">with</span>{" "}
+          <span className="animate-glow-gold logo-text" style={{ color: "var(--gold)", letterSpacing: "6px" }}>
+            XD
           </span>
         </h2>
 
@@ -57,13 +84,13 @@ export default function CTASection() {
           Live liquidity. Minimal friction.
         </p>
 
-        {/* CTA Buttons */}
+        {/* CTA Buttons - matching hero style */}
         <div
           className="animate-fade-in-up delay-300"
           style={{
             display: "flex",
             justifyContent: "center",
-            gap: "var(--space-7)",
+            gap: "var(--space-6)",
             flexWrap: "wrap",
           }}
         >
@@ -71,29 +98,63 @@ export default function CTASection() {
             href={AIRTABLE_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-solid-red animate-glow-red"
+            className="btn btn-primary animate-glow-red"
           >
             JOIN XD
           </a>
 
-          <a href="#platforms" className="btn btn-outline-gold">
+          <a href="#platforms" className="btn btn-secondary">
             STACK
           </a>
         </div>
 
-        {/* Trust badges */}
-        <div className="animate-fade-in-up delay-400 cta-stats">
+        {/* Stats row - cleaner dividers */}
+        <div 
+          className="animate-fade-in-up delay-400" 
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "0",
+            marginTop: "64px",
+            flexWrap: "wrap",
+          }}
+        >
           {[
             { label: "$420M+", sub: "Volume" },
             { label: "99.9%", sub: "Uptime" },
             { label: "0.008%", sub: "Spread" },
             { label: "2+", sub: "DEXes" },
           ].map((item, i) => (
-            <div key={i} className={`cta-stat ${i > 0 ? "cta-stat-divider" : ""}`}>
-              <div className="stat-value" style={{ fontSize: "var(--text-6xl)" }}>
+            <div 
+              key={i} 
+              style={{
+                textAlign: "center",
+                padding: "0 32px",
+                borderLeft: i > 0 ? "1px solid rgba(201, 162, 39, 0.15)" : "none",
+              }}
+            >
+              <div 
+                style={{ 
+                  fontFamily: "var(--font-serif)",
+                  fontStyle: "italic",
+                  fontSize: "clamp(28px, 3.5vw, 36px)",
+                  color: "var(--gold)",
+                  marginBottom: "6px",
+                }}
+              >
                 {item.label}
               </div>
-              <div className="stat-label">{item.sub}</div>
+              <div 
+                style={{ 
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "10px",
+                  letterSpacing: "2px",
+                  color: "var(--text-muted)",
+                  textTransform: "uppercase",
+                }}
+              >
+                {item.sub}
+              </div>
             </div>
           ))}
         </div>

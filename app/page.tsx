@@ -18,7 +18,7 @@ export default function Home() {
         <BentoSection />
         <SeductiveSection />
         <CTASection />
-        <Footer />
+        {/* <Footer /> */}
       </main>
     </>
   );

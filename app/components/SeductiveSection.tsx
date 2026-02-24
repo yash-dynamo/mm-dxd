@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import AsciiImage from "./AsciiImage";
 
 const features = [
   {
@@ -42,44 +42,39 @@ export default function SeductiveSection() {
       <div className="seductive-grid">
         {/* ====== LEFT: Image ====== */}
         <div className="animate-fade-in-left" style={{ position: "relative" }}>
-          {/* Outer glow frame */}
-          <div className="animate-glow-red seductive-image-frame">
-            <Image
+          {/* Image frame with static glow */}
+          <div 
+            className="seductive-image-frame"
+            style={{
+              boxShadow: "0 0 60px rgba(204,0,0,0.3), 0 0 120px rgba(204,0,0,0.15)",
+            }}
+          >
+            <AsciiImage
               src="/seductive/5.png"
               alt="Sacred Power"
-              width={600}
-              height={750}
+              aspectRatio="750/422"
+              resolution={150}
+              contrast={1.8}
+              skinToneBoost={true}
+              showImageOnHover={true}
+              imageOpacity={0}
+              imageHoverOpacity={0.5}
               style={{
                 width: "100%",
-                height: "auto",
                 display: "block",
-                objectFit: "cover",
               }}
-              priority
-            />
-
-            {/* Image overlay gradient */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(to right, transparent 60%, rgba(7,0,13,0.5) 100%), linear-gradient(to top, rgba(7,0,13,0.3) 0%, transparent 30%)",
-                pointerEvents: "none",
-              }}
-            />
-
-            {/* Red top accent */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "3px",
-                background: "linear-gradient(to right, var(--red), var(--gold), transparent)",
-              }}
-            />
+            >
+              {/* Image overlay gradient */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(to right, transparent 60%, rgba(7,0,13,0.5) 100%), linear-gradient(to top, rgba(7,0,13,0.3) 0%, transparent 30%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </AsciiImage>
           </div>
 
           {/* Floating stat badge - bottom */}
@@ -90,11 +85,13 @@ export default function SeductiveSection() {
               right: "-20px",
               border: "1px solid var(--border-gold-strong)",
               padding: "var(--space-9) var(--space-10)",
+              zIndex: 10,
+              boxShadow: "0 10px 40px rgba(201,162,39,0.2)",
             }}
           >
             <div
-              className="animate-glow-gold stat-value"
-              style={{ fontSize: "var(--text-8xl)" }}
+              className="stat-value"
+              style={{ fontSize: "var(--text-8xl)", color: "var(--gold)" }}
             >
               ∞
             </div>
@@ -112,6 +109,7 @@ export default function SeductiveSection() {
               border: "1px solid var(--border-red-strong)",
               padding: "var(--space-6) var(--space-8)",
               boxShadow: "0 10px 40px rgba(204,0,0,0.15)",
+              zIndex: 10,
             }}
           >
             <div
@@ -140,22 +138,13 @@ export default function SeductiveSection() {
           {/* Heading */}
           <h2 className="heading-display" style={{ marginBottom: "var(--space-9)" }}>
             <span
-              className="heading-display-italic"
               style={{
                 display: "block",
                 fontSize: "clamp(38px, 4.5vw, 60px)",
               }}
             >
-              Clean
-            </span>
-            <span
-              className="heading-display-bold"
-              style={{
-                display: "block",
-                fontSize: "clamp(38px, 4.5vw, 60px)",
-              }}
-            >
-              Design.
+              <span className="heading-display-italic">Clean</span>{" "}
+              <span className="heading-display-bold">Design.</span>
             </span>
             <span
               className="animate-glow-gold heading-display-gold"

@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-const symbols = ["BTC", "ETH", "SOL", "ARB", "PEPE"];
+// Expanded list of popular crypto instruments
+const symbols = [
+  "BTC", "ETH", "SOL", "ARB", "PEPE", 
+  "DOGE", "AVAX", "LINK", "MATIC", "OP",
+  "SUI", "APT", "INJ", "TIA", "SEI"
+];
 
 export async function GET() {
   const apiKey =

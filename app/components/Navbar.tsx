@@ -40,8 +40,8 @@ export default function Navbar() {
               JOIN XD
             </a>
 
-            {/* Hamburger button — visible on mobile only */}
-            <button
+            {/* Hamburger button — hidden for now */}
+            {/* <button
               className="flex md:hidden hamburger-btn"
               onClick={() => setMenuOpen((v) => !v)}
               aria-label="Toggle menu"
@@ -55,7 +55,7 @@ export default function Navbar() {
                   <span className="hamburger-line hamburger-line-long" />
                 </>
               )}
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>
