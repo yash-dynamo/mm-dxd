@@ -3,8 +3,8 @@
 import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Particles from "./Particles";
-import { BackgroundBeams } from "@/components/ui/background-beams";
-import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
+import { BackgroundBeams } from "../../components/ui/background-beams";
+import { CardContainer, CardBody, CardItem } from "../../components/ui/3d-card";
 
 /* ─────────────────────────── data ─────────────────────────── */
 const platforms = [
@@ -146,7 +146,7 @@ export default function HeroSection() {
           left: "-80px",
           width: "520px",
           height: "520px",
-          background: "radial-gradient(circle, rgba(204,0,0,0.05) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(204,51,51,0.05) 0%, transparent 70%)",
           pointerEvents: "none",
         }}
       />
@@ -227,7 +227,7 @@ export default function HeroSection() {
                     <div 
                       className="text-label-xs" 
                       style={{ 
-                        color: "rgba(201, 162, 39, 0.7)", 
+                        color: "rgba(255, 255, 255, 0.7)", 
                         marginBottom: "var(--space-3)", 
                         display: "flex", 
                         alignItems: "center", 
@@ -239,19 +239,19 @@ export default function HeroSection() {
                           width: "5px", 
                           height: "5px", 
                           borderRadius: "50%", 
-                          background: "rgba(201, 162, 39, 0.7)",
-                          boxShadow: "0 0 4px rgba(201, 162, 39, 0.3)"
+                          background: "rgba(255, 255, 255, 0.7)",
+                          boxShadow: "0 0 4px rgba(255, 255, 255, 0.3)"
                         }} 
                       />
                       ACTIVE PROTOCOL
                     </div>
                     <div 
-                      className="animate-glow-gold logo-text" 
+                      className="animate-glow-red logo-text" 
                       style={{ 
                         fontSize: "clamp(36px, 4vw, 48px)", 
-                        color: "var(--gold)", 
+                        color: "var(--red)", 
                         letterSpacing: "8px",
-                        textShadow: "0 0 30px rgba(201, 162, 39, 0.3)"
+                        textShadow: "0 0 30px rgba(204, 51, 51, 0.3)"
                       }}
                     >
                       XD
@@ -259,7 +259,7 @@ export default function HeroSection() {
                   </CardItem>
                   <CardItem translateZ="70" className="w-auto">
                     <div 
-                      className="badge badge-gold"
+                      className="badge badge-red"
                       style={{
                         padding: "var(--space-2) var(--space-5)",
                         borderRadius: "var(--radius-sm)",
@@ -270,8 +270,8 @@ export default function HeroSection() {
                           width: "6px", 
                           height: "6px", 
                           borderRadius: "50%", 
-                          background: "var(--gold)",
-                          boxShadow: "0 0 8px rgba(201, 162, 39, 0.6)"
+                          background: "var(--red)",
+                          boxShadow: "0 0 8px rgba(204, 51, 51, 0.6)"
                         }} 
                       />
                       LIVE

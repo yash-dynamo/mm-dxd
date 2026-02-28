@@ -49,7 +49,7 @@ function PowerBar({ power }: { power: number }) {
             fontFamily: "var(--font-sans)",
             fontSize: "8px",
             letterSpacing: "2px",
-            color: "var(--text-faint)",
+            color: "rgba(255, 255, 255, 0.6)",
           }}
         >
           POWER
@@ -59,7 +59,7 @@ function PowerBar({ power }: { power: number }) {
             fontFamily: "var(--font-sans)",
             fontSize: "11px",
             fontWeight: "700",
-            color: "var(--gold)",
+            color: "rgba(255, 255, 255, 0.9)",
           }}
         >
           {power}
@@ -68,7 +68,7 @@ function PowerBar({ power }: { power: number }) {
       <div
         style={{
           height: "2px",
-          background: "rgba(255,255,255,0.06)",
+          background: "rgba(255,255,255,0.15)",
           borderRadius: "1px",
           overflow: "hidden",
         }}
@@ -77,7 +77,7 @@ function PowerBar({ power }: { power: number }) {
           style={{
             height: "100%",
             width: `${power}%`,
-            background: "linear-gradient(to right, rgba(201,162,39,0.4), var(--gold))",
+            background: "linear-gradient(to right, rgba(255,255,255,0.4), rgba(255,255,255,0.9))",
             borderRadius: "1px",
             transition: "width 0.8s var(--ease-out)",
           }}
@@ -103,10 +103,10 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
         background: "#06000e",
         transition: "all 0.45s var(--ease-out)",
         border: hovered
-          ? "1px solid rgba(204,0,0,0.4)"
+          ? "1px solid rgba(204,51,51,0.4)"
           : "1px solid rgba(255,255,255,0.06)",
         boxShadow: hovered
-          ? "0 24px 80px rgba(204,0,0,0.2), 0 0 0 1px rgba(204,0,0,0.15)"
+          ? "0 24px 80px rgba(204,51,51,0.2), 0 0 0 1px rgba(204,51,51,0.15)"
           : "none",
         transform: hovered ? "translateY(-8px) scale(1.02)" : "translateY(0) scale(1)",
       }}
@@ -184,7 +184,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           left: "12px",
           background: "rgba(6,0,14,0.85)",
           backdropFilter: "blur(10px)",
-          border: "1px solid rgba(204,0,0,0.3)",
+          border: "1px solid rgba(204,51,51,0.3)",
           padding: "4px 10px",
           fontSize: "8px",
           letterSpacing: "2px",
@@ -248,7 +248,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
             fontFamily: "var(--font-sans)",
             fontSize: "9px",
             letterSpacing: "2px",
-            color: "var(--red)",
+            color: "var(--gold)",
             marginBottom: "12px",
             fontWeight: "600",
           }}
@@ -268,7 +268,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           right: 0,
           width: hovered ? "40px" : "24px",
           height: "1px",
-          background: "linear-gradient(to left, rgba(204,0,0,0.5), transparent)",
+          background: "linear-gradient(to left, rgba(204,51,51,0.5), transparent)",
           transition: "width 0.4s",
           zIndex: 5,
         }}
@@ -280,7 +280,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           right: 0,
           width: "1px",
           height: hovered ? "40px" : "24px",
-          background: "linear-gradient(to top, rgba(204,0,0,0.5), transparent)",
+          background: "linear-gradient(to top, rgba(204,51,51,0.5), transparent)",
           transition: "height 0.4s",
           zIndex: 5,
         }}
@@ -298,7 +298,7 @@ export default function BentoSection() {
         padding: "100px 0 80px",
         position: "relative",
         background:
-          "radial-gradient(ellipse 100% 60% at 50% -10%, rgba(100,0,0,0.07) 0%, transparent 60%), var(--bg-base)",
+          "radial-gradient(ellipse 100% 60% at 50% -10%, rgba(120,30,30,0.07) 0%, transparent 60%), var(--bg-base)",
         overflow: "hidden",
       }}
     >
@@ -310,7 +310,7 @@ export default function BentoSection() {
           left: "50%",
           width: "1px",
           height: "100px",
-          background: "linear-gradient(to bottom, transparent, rgba(204,0,0,0.5), transparent)",
+          background: "linear-gradient(to bottom, transparent, rgba(204,51,51,0.5), transparent)",
         }}
       />
 
@@ -346,25 +346,14 @@ export default function BentoSection() {
 
           <h2 className="animate-fade-in-up delay-100 heading-display" style={{ lineHeight: 1.05, margin: 0 }}>
             <span
-              className="heading-display-bold"
               style={{
                 display: "block",
                 fontSize: "clamp(44px, 5.5vw, 72px)",
                 letterSpacing: "var(--tracking-normal)",
               }}
             >
-              Core
-            </span>
-            <span
-              className="heading-display-italic"
-              style={{
-                display: "block",
-                fontSize: "clamp(44px, 5.5vw, 72px)",
-                letterSpacing: "var(--tracking-normal)",
-                color: "var(--red-muted)",
-              }}
-            >
-              Stack
+              <span className="heading-display-bold">Core</span>{" "}
+              <span className="heading-display-italic" style={{ color: "var(--red-muted)" }}>Stack</span>
             </span>
           </h2>
 
@@ -408,7 +397,7 @@ export default function BentoSection() {
             style={{
               height: "1px",
               width: "60px",
-              background: "linear-gradient(to right, transparent, rgba(204,0,0,0.3))",
+              background: "linear-gradient(to right, transparent, rgba(204,51,51,0.3))",
             }}
           />
           <span
@@ -416,7 +405,7 @@ export default function BentoSection() {
               fontFamily: "var(--font-serif)",
               fontStyle: "italic",
               fontSize: "18px",
-              color: "var(--text-ghost)",
+              color: "var(--text-secondary)",
               letterSpacing: "0.5px",
             }}
           >
@@ -426,7 +415,7 @@ export default function BentoSection() {
             style={{
               height: "1px",
               width: "60px",
-              background: "linear-gradient(to left, transparent, rgba(204,0,0,0.3))",
+              background: "linear-gradient(to left, transparent, rgba(204,51,51,0.3))",
             }}
           />
         </div>

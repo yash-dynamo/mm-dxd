@@ -182,7 +182,7 @@ export default function SplashScreen() {
             className="splash-enter-btn"
             style={{
               background: "transparent",
-              border: "1px solid rgba(204,0,0,0.5)",
+              border: "1px solid rgba(204,51,51,0.5)",
               color: "var(--red)",
               fontFamily: "var(--font-sans)",
               fontSize: "var(--text-base)",
@@ -196,15 +196,15 @@ export default function SplashScreen() {
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget;
-              el.style.background = "rgba(204,0,0,0.1)";
+              el.style.background = "rgba(204,51,51,0.1)";
               el.style.borderColor = "var(--red)";
               el.style.color = "var(--red-bright)";
-              el.style.boxShadow = "0 0 30px rgba(204,0,0,0.3)";
+              el.style.boxShadow = "0 0 30px rgba(204,51,51,0.3)";
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget;
               el.style.background = "transparent";
-              el.style.borderColor = "rgba(204,0,0,0.5)";
+              el.style.borderColor = "rgba(204,51,51,0.5)";
               el.style.color = "var(--red)";
               el.style.boxShadow = "";
             }}

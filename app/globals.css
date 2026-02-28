@@ -16,12 +16,12 @@
   --bg-ticker: rgba(10, 0, 18, 0.95);
 
   /* ─── Colors: Brand ─── */
-  --red: #cc0000;
-  --red-light: #e60000;
-  --red-bright: #ff1a1a;
+  --red: #cc3333;
+  --red-light: #dd4444;
+  --red-bright: #ee5555;
   --red-muted: #cc3333;
-  --red-dark: #990000;
-  --red-darker: #880000;
+  --red-dark: #aa2222;
+  --red-darker: #881818;
 
   --gold: #c9a227;
   --gold-light: #f0c840;
@@ -46,10 +46,10 @@
   --text-ticker: #d0ccc8;
 
   /* ─── Colors: Borders ─── */
-  --border-red: rgba(204, 0, 0, 0.2);
-  --border-red-light: rgba(204, 0, 0, 0.15);
-  --border-red-medium: rgba(204, 0, 0, 0.25);
-  --border-red-strong: rgba(204, 0, 0, 0.3);
+  --border-red: rgba(204, 51, 51, 0.2);
+  --border-red-light: rgba(204, 51, 51, 0.15);
+  --border-red-medium: rgba(204, 51, 51, 0.25);
+  --border-red-strong: rgba(204, 51, 51, 0.3);
   --border-gold: rgba(201, 162, 39, 0.3);
   --border-gold-light: rgba(201, 162, 39, 0.2);
   --border-gold-strong: rgba(201, 162, 39, 0.35);
@@ -134,8 +134,8 @@
   --duration-slowest: 0.9s;
 
   /* ─── Shadows ─── */
-  --shadow-glow-red: 0 0 20px rgba(204, 0, 0, 0.3);
-  --shadow-glow-red-strong: 0 16px 48px rgba(204, 0, 0, 0.45);
+  --shadow-glow-red: 0 0 20px rgba(204, 51, 51, 0.3);
+  --shadow-glow-red-strong: 0 16px 48px rgba(204, 51, 51, 0.45);
   --shadow-glow-gold: 0 0 20px rgba(201, 162, 39, 0.2);
   --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.5);
   --shadow-card-hover: 0 24px 80px rgba(0, 0, 0, 0.6);
@@ -214,7 +214,7 @@ body {
 
 /* ===================== SELECTION ===================== */
 ::selection {
-  background: rgba(204, 0, 0, 0.3);
+  background: rgba(204, 51, 51, 0.3);
   color: #fff;
 }
 
@@ -323,7 +323,7 @@ body {
 }
 
 .btn-outline-red:hover {
-  background: rgba(204, 0, 0, 0.15);
+  background: rgba(204, 51, 51, 0.15);
   box-shadow: var(--shadow-glow-red);
 }
 
@@ -354,7 +354,7 @@ body {
 .btn-solid-red:hover {
   background: var(--red-light);
   transform: translateY(-3px);
-  box-shadow: 0 20px 60px rgba(204, 0, 0, 0.4);
+  box-shadow: 0 20px 60px rgba(204, 51, 51, 0.4);
 }
 
 /* ===================== CARD UTILITIES ===================== */
@@ -398,7 +398,7 @@ body {
 .badge-red {
   color: var(--red);
   border: 1px solid var(--border-red);
-  background: rgba(204, 0, 0, 0.04);
+  background: rgba(204, 51, 51, 0.04);
   backdrop-filter: blur(10px);
 }
 
@@ -486,12 +486,12 @@ body {
 
 .divider-red-gold {
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(204, 0, 0, 0.3), rgba(201, 162, 39, 0.3), transparent);
+  background: linear-gradient(to right, transparent, rgba(204, 51, 51, 0.3), rgba(201, 162, 39, 0.3), transparent);
 }
 
 .divider-gold-red {
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(201, 162, 39, 0.2), rgba(204, 0, 0, 0.2), transparent);
+  background: linear-gradient(to right, transparent, rgba(201, 162, 39, 0.2), rgba(204, 51, 51, 0.2), transparent);
 }
 
 /* ===================== STAT DISPLAY ===================== */
@@ -578,11 +578,16 @@ body {
   letter-spacing: var(--tracking-label-wide);
   color: var(--text-muted);
   text-decoration: none;
-  transition: color var(--duration-fast);
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: transparent;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .nav-link:hover {
   color: var(--text-primary);
+  background: rgba(204, 51, 51, 0.1);
+  box-shadow: 0 0 16px rgba(204, 51, 51, 0.15);
 }
 
 .footer-link {
@@ -615,7 +620,7 @@ body {
 .social-btn:hover {
   color: var(--red);
   border-color: var(--border-red-strong);
-  background: rgba(204, 0, 0, 0.05);
+  background: rgba(204, 51, 51, 0.05);
 }
 
 /* ===================== PLATFORM ROW ===================== */
@@ -698,8 +703,8 @@ body {
 }
 
 @keyframes glow-pulse-red {
-  0%, 100% { box-shadow: 0 0 20px rgba(204, 0, 0, 0.25), inset 0 0 20px rgba(204, 0, 0, 0.05); }
-  50% { box-shadow: 0 0 50px rgba(204, 0, 0, 0.5), 0 0 100px rgba(204, 0, 0, 0.15), inset 0 0 30px rgba(204, 0, 0, 0.08); }
+  0%, 100% { text-shadow: 0 0 10px rgba(204, 51, 51, 0.3); }
+  50% { text-shadow: 0 0 30px rgba(204, 51, 51, 0.6), 0 0 60px rgba(204, 51, 51, 0.3); }
 }
 
 @keyframes glow-pulse-gold {
@@ -826,8 +831,8 @@ body {
 }
 
 @keyframes splash-glow-breathe {
-  0%, 100% { text-shadow: 0 0 20px rgba(204,0,0,0.4), 0 0 60px rgba(204,0,0,0.1); }
-  50%       { text-shadow: 0 0 40px rgba(204,0,0,0.8), 0 0 100px rgba(204,0,0,0.3), 0 0 200px rgba(204,0,0,0.1); }
+  0%, 100% { text-shadow: 0 0 20px rgba(204,51,51,0.4), 0 0 60px rgba(204,51,51,0.1); }
+  50%       { text-shadow: 0 0 40px rgba(204,51,51,0.8), 0 0 100px rgba(204,51,51,0.3), 0 0 200px rgba(204,51,51,0.1); }
 }
 
 @keyframes splash-glitch {
@@ -838,8 +843,8 @@ body {
 }
 
 @keyframes splash-enter-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(204,0,0,0.5); }
-  50%       { box-shadow: 0 0 0 12px rgba(204,0,0,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(204,51,51,0.5); }
+  50%       { box-shadow: 0 0 0 12px rgba(204,51,51,0); }
 }
 
 @keyframes splash-bar-fill {
@@ -919,8 +924,8 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(204,0,0,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(204,0,0,0.025) 1px, transparent 1px);
+    linear-gradient(rgba(204,51,51,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204,51,51,0.025) 1px, transparent 1px);
   background-size: 48px 48px;
   animation: grid-shift 30s linear infinite;
   pointer-events: none;
@@ -932,7 +937,7 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(to right, transparent, rgba(204,0,0,0.4), rgba(201,162,39,0.3), transparent);
+  background: linear-gradient(to right, transparent, rgba(204,51,51,0.4), rgba(201,162,39,0.3), transparent);
   animation: scan-line 5s ease-in-out 1.5s infinite;
   pointer-events: none;
   z-index: 3;
@@ -1104,9 +1109,13 @@ body {
   left: 0;
   right: 0;
   z-index: var(--z-navbar);
-  background: var(--bg-overlay);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-red-light);
+  background: rgba(10, 0, 16, 0.9);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(204, 51, 51, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .navbar-inner {
@@ -1302,7 +1311,7 @@ body {
 
 .footer-cta-banner {
   border: 1px solid var(--border-red);
-  background: rgba(204, 0, 0, 0.04);
+  background: rgba(204, 51, 51, 0.04);
   border-radius: var(--radius-sm);
   padding: var(--space-10) var(--space-12);
   display: flex;
@@ -1344,7 +1353,7 @@ body {
 .cta-ring-outer {
   width: 600px;
   height: 600px;
-  border: 1px solid rgba(204, 0, 0, 0.06);
+  border: 1px solid rgba(204, 51, 51, 0.06);
 }
 
 .cta-ring-inner {
@@ -1374,7 +1383,7 @@ body {
 .seductive-section {
   position: relative;
   overflow: hidden;
-  background: radial-gradient(ellipse 80% 60% at 100% 50%, rgba(100,0,0,0.08) 0%, transparent 60%), var(--bg-base);
+  background: radial-gradient(ellipse 80% 60% at 100% 50%, rgba(120,30,30,0.08) 0%, transparent 60%), var(--bg-base);
 }
 
 .seductive-image-frame {
@@ -1386,18 +1395,24 @@ body {
 
 .seductive-float-badge {
   position: absolute;
-  background: rgba(16, 0, 22, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: var(--radius-lg);
+  background: rgba(10, 0, 16, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-md);
   text-align: center;
   box-shadow: var(--shadow-card);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+}
+
+.seductive-float-badge:hover {
+  transform: translateY(-2px) scale(1.02);
 }
 
 /* ===================== BENTO SECTION SPECIFIC ===================== */
 .bento-section {
   padding: var(--space-20) 0 var(--space-18);
   position: relative;
-  background: radial-gradient(ellipse 100% 60% at 50% -10%, rgba(100,0,0,0.07) 0%, transparent 60%), var(--bg-base);
+  background: radial-gradient(ellipse 100% 60% at 50% -10%, rgba(120,30,30,0.07) 0%, transparent 60%), var(--bg-base);
   overflow: hidden;
 }
 
@@ -1407,7 +1422,7 @@ body {
   left: 50%;
   width: 1px;
   height: 100px;
-  background: linear-gradient(to bottom, transparent, rgba(204,0,0,0.5), transparent);
+  background: linear-gradient(to bottom, transparent, rgba(204,51,51,0.5), transparent);
 }
 
 /* ===================== HERO SECTION SPECIFIC ===================== */
@@ -1471,7 +1486,7 @@ body {
 .splash-seal-outer {
   width: min(600px, 90vw);
   height: min(600px, 90vw);
-  border: 1px solid rgba(204, 0, 0, 0.15);
+  border: 1px solid rgba(204, 51, 51, 0.15);
   animation: splash-seal-in 1.2s var(--ease-out) both;
 }
 
@@ -1486,7 +1501,7 @@ body {
   position: absolute;
   width: 1px;
   height: min(300px, 40vw);
-  background: linear-gradient(to bottom, transparent, rgba(204, 0, 0, 0.2), transparent);
+  background: linear-gradient(to bottom, transparent, rgba(204, 51, 51, 0.2), transparent);
   pointer-events: none;
 }
 
@@ -1494,7 +1509,7 @@ body {
   position: absolute;
   height: 1px;
   width: min(300px, 40vw);
-  background: linear-gradient(to right, transparent, rgba(204, 0, 0, 0.2), transparent);
+  background: linear-gradient(to right, transparent, rgba(204, 51, 51, 0.2), transparent);
   pointer-events: none;
 }
 
@@ -1520,13 +1535,13 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: rgba(204, 0, 0, 0.08);
+  background: rgba(204, 51, 51, 0.08);
 }
 
 .splash-progress-bar {
   height: 100%;
   background: linear-gradient(to right, var(--red-darker), var(--red), var(--gold));
-  box-shadow: 0 0 8px rgba(204, 0, 0, 0.6);
+  box-shadow: 0 0 8px rgba(204, 51, 51, 0.6);
 }
 
 .splash-stamp {
@@ -1537,7 +1552,7 @@ body {
   font-family: var(--font-serif);
   font-weight: 700;
   letter-spacing: 10px;
-  color: rgba(204, 0, 0, 0.06);
+  color: rgba(204, 51, 51, 0.06);
   user-select: none;
   pointer-events: none;
   white-space: nowrap;
@@ -1549,7 +1564,7 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   letter-spacing: var(--tracking-label);
-  color: rgba(204, 0, 0, 0.2);
+  color: rgba(204, 51, 51, 0.2);
   pointer-events: none;
 }
 
@@ -1635,4 +1650,65 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* 
+ * these are sample colors and none of they will actually get applied
+ * just added these below to update toast styles later.
+ * to actually apply these colors, we'll need to add !important to any style to
+ * be applied.
+ */
+
+ .toast-success {
+  background: #0f5132;
+  color: #d1fae5;
+  border: 1px solid #145a3a;
+}
+
+.toast-error {
+  background: #5b1010;
+  color: #fee2e2;
+  border: 1px solid #6b1515;
+}
+
+.toast-warning {
+  background: #5a3e05;
+  color: #fef3c7;
+  border: 1px solid #6b4a07;
+}
+
+.toast-info {
+  background: #083344;
+  color: #cffafe;
+  border: 1px solid #0e4c5f;
+}
+
+.toast-default {
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+}
+
+.toast-loading {
+  background: #111827;
+  color: #e5e7eb;
+  border: 1px dashed #374151;
+}
+
+/* Override Sonner's default container styling for custom toasts */
+[data-sonner-toast] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Specifically target the toast container wrapper */
+[data-sonner-toast] > div {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }

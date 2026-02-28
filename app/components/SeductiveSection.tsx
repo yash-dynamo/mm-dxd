@@ -7,21 +7,21 @@ const features = [
     icon: "◈",
     title: "Risk Guard",
     desc: "Limits downside fast.",
-    color: "var(--green-muted)",
+    color: "var(--gold)",
     stat: "99.9%",
   },
   {
     icon: "🔥",
     title: "Fast Execution",
     desc: "Low-latency order routing.",
-    color: "var(--orange)",
+    color: "var(--red)",
     stat: "<1ms",
   },
   {
     icon: "⬡",
     title: "Cross-Venue Sync",
     desc: "One strategy, many venues.",
-    color: "var(--blue)",
+    color: "var(--gold)",
     stat: "7 Venues",
   },
   {
@@ -46,7 +46,7 @@ export default function SeductiveSection() {
           <div 
             className="seductive-image-frame"
             style={{
-              boxShadow: "0 0 60px rgba(204,0,0,0.3), 0 0 120px rgba(204,0,0,0.15)",
+              boxShadow: "0 0 60px rgba(204,51,51,0.3), 0 0 120px rgba(204,51,51,0.15)",
             }}
           >
             <AsciiImage
@@ -77,53 +77,54 @@ export default function SeductiveSection() {
             </AsciiImage>
           </div>
 
-          {/* Floating stat badge - bottom */}
+          {/* Floating stat badge - bottom right (outside frame) */}
           <div
             className="animate-float-slow seductive-float-badge"
             style={{
-              bottom: "-20px",
-              right: "-20px",
+              bottom: "-24px",
+              right: "-24px",
               border: "1px solid var(--border-gold-strong)",
-              padding: "var(--space-9) var(--space-10)",
+              padding: "var(--space-7) var(--space-9)",
               zIndex: 10,
-              boxShadow: "0 10px 40px rgba(201,162,39,0.2)",
+              boxShadow: "0 8px 32px rgba(201,162,39,0.25), 0 0 0 1px rgba(201,162,39,0.1)",
             }}
           >
             <div
               className="stat-value"
-              style={{ fontSize: "var(--text-8xl)", color: "var(--gold)" }}
+              style={{ fontSize: "var(--text-6xl)", color: "var(--gold)", marginBottom: "var(--space-1)" }}
             >
               ∞
             </div>
-            <div className="stat-label" style={{ color: "var(--text-dim)" }}>
+            <div className="stat-label" style={{ color: "var(--text-dim)", fontSize: "var(--text-2xs)" }}>
               POWER LEVEL
             </div>
           </div>
 
-          {/* Floating stat badge - top */}
+          {/* Floating stat badge - top right (outside frame) */}
           <div
             className="animate-float-medium seductive-float-badge"
             style={{
-              top: "30px",
-              right: "-30px",
+              top: "24px",
+              right: "-28px",
               border: "1px solid var(--border-red-strong)",
-              padding: "var(--space-6) var(--space-8)",
-              boxShadow: "0 10px 40px rgba(204,0,0,0.15)",
+              padding: "var(--space-5) var(--space-7)",
+              boxShadow: "0 8px 32px rgba(204,51,51,0.2), 0 0 0 1px rgba(204,51,51,0.1)",
               zIndex: 10,
             }}
           >
             <div
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "var(--text-4xl)",
+                fontSize: "var(--text-3xl)",
                 fontWeight: "700",
                 color: "var(--red)",
                 lineHeight: 1,
+                marginBottom: "var(--space-1)",
               }}
             >
               99.9%
             </div>
-            <div className="stat-label">UPTIME</div>
+            <div className="stat-label" style={{ fontSize: "var(--text-2xs)" }}>UPTIME</div>
           </div>
         </div>
 

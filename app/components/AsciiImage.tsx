@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { AsciiArt } from "@/components/ui/ascii-art";
+import { AsciiArt } from "../../components/ui/ascii-art";
 
 type AsciiImageProps = {
   /** Image source path */
@@ -53,7 +53,7 @@ export default function AsciiImage({
   width,
   height,
   aspectRatio = "1/1",
-  color = "#cc0000",
+  color = "#cc3333",
   resolution = 120,
   showImageOnHover = true,
   imageOpacity = 0,

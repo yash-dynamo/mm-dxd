@@ -1,7 +1,7 @@
 "use client";
 
 import Particles from "./Particles";
-import { SparklesCore } from "@/components/ui/sparkles";
+import { SparklesCore } from "../../components/ui/sparkles";
 
 const AIRTABLE_LINK = ""; // TODO: Add Airtable link
 
