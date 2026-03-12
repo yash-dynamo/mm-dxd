@@ -5,19 +5,18 @@ import {
   QRWalletModal,
   QrScanModal,
   RabbyMobileGuideModal,
+  WalletSetupModal,
 } from '@/components/modals';
 import { useActionStore } from '@/stores';
 
 /**
- * ModalProvider — wallet connect modal surface only.
+ * ModalProvider — wallet connect modal surface.
  *
- * Modals included:
- *   connect-wallet      → main connect dialog (email / google / wallets / more)
- *   qr-wallet           → desktop QR code for mobile device linking
- *   qr-scan             → mobile camera scanner for desktop QR
- *   rabby-mobile-guide  → step guide for Rabby mobile users
- *
- * To add more modals for your product UI, import and register them here.
+ *   connect-wallet   → main connect dialog
+ *   qr-wallet        → desktop QR for mobile linking
+ *   qr-scan          → mobile camera scanner
+ *   rabby-mobile-guide → Rabby mobile guide
+ *   wallet-setup     → post-connect broker fee + agent registration
  */
 export function ModalProvider({ children }: { children: React.ReactNode }) {
   const { modal } = useActionStore();
@@ -29,6 +28,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
       {modal === 'qr-wallet' && <QRWalletModal />}
       {modal === 'qr-scan' && <QrScanModal />}
       {modal === 'rabby-mobile-guide' && <RabbyMobileGuideModal />}
+      {modal === 'wallet-setup' && <WalletSetupModal />}
     </>
   );
 }

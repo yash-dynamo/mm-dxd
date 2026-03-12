@@ -1,4 +1,4 @@
-import { SubscriptionClient, WebSocketTransport } from '@0xsyndr/ts-sdk';
+import { SubscriptionClient, WebSocketTransport } from '@hotstuff-labs/ts-sdk';
 import server from '@/config/server';
 import { env } from '@/config';
 

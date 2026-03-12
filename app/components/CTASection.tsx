@@ -1,11 +1,23 @@
 "use client";
 
+import { useCallback } from "react";
 import Particles from "./Particles";
 import { SparklesCore } from "../../components/ui/sparkles";
-
-const AIRTABLE_LINK = ""; // TODO: Add Airtable link
+import { useAccount } from "wagmi";
+import { useActionStore, useAuthStore } from "@/stores";
 
 export default function CTASection() {
+  const { isConnected } = useAccount();
+  const { setModal } = useActionStore();
+  const status = useAuthStore((s) => s.status);
+
+  const handleStart = useCallback(() => {
+    if (!isConnected) {
+      setModal("connect-wallet");
+    } else {
+      setModal("wallet-setup");
+    }
+  }, [isConnected, status, setModal]);
   return (
     <section className="cta-section">
       {/* Aceternity Sparkles Background - subtle gold */}
@@ -94,14 +106,13 @@ export default function CTASection() {
             flexWrap: "wrap",
           }}
         >
-          <a
-            href={AIRTABLE_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={handleStart}
             className="btn btn-primary animate-glow-red"
           >
-            JOIN XD
-          </a>
+            {status === "trading-enabled" ? "TRADING ACTIVE" : "JOIN XD"}
+          </button>
 
           <a href="#platforms" className="btn btn-secondary">
             STACK

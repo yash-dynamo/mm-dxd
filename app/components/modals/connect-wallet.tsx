@@ -11,24 +11,16 @@ import { useMemo, useState } from 'react';
 import { hasExtensionProvider, isProbablyMobile } from '@/utils/device';
 import { cn } from '@/lib/utils';
 
-// Simple spinner component
-const Spinner = ({ className }: { className?: string }) => (
+const Spinner = () => (
   <svg
-    className={cn('animate-spin', className)}
+    className="animate-spin"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
-    width={24}
-    height={24}
+    width={18}
+    height={18}
   >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    />
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
     <path
       className="opacity-75"
       fill="currentColor"
@@ -41,11 +33,8 @@ export const ConnectWalletModal = () => {
   const { setModal } = useActionStore();
   const { connectAsync } = useConnect();
   const connectors = useConnectors();
-
   const { login } = usePrivy();
-
   const [connectingId, setConnectingId] = useState<string | null>(null);
-
   const isMobileLike = useMemo(() => isProbablyMobile(), []);
 
   const hasInjected = useMemo(
@@ -54,68 +43,42 @@ export const ConnectWalletModal = () => {
   );
 
   const CONNECTOR_LIST = useMemo(() => {
-    // Detect if we're inside wallet in-app browsers
     const isInsidePhantomBrowser =
       typeof window !== 'undefined' && !!(window as any).phantom?.ethereum?.isPhantom;
     const isInsideRabbyBrowser =
       typeof window !== 'undefined' && !!(window as any).ethereum?.isRabby;
 
     const mapped = Object.values(WalletConnectors).map((connector) => {
-      if (connector.id === 'io.phantom') {
-        return { ...connector, isInstalled: isInsidePhantomBrowser };
-      }
-
-      if (connector.id === 'io.rabby') {
-        return { ...connector, isInstalled: isInsideRabbyBrowser };
-      }
-
-      return {
-        ...connector,
-        isInstalled: connectors.some((c) => c.id === connector.id),
-      };
+      if (connector.id === 'io.phantom') return { ...connector, isInstalled: isInsidePhantomBrowser };
+      if (connector.id === 'io.rabby') return { ...connector, isInstalled: isInsideRabbyBrowser };
+      return { ...connector, isInstalled: connectors.some((c) => c.id === connector.id) };
     });
 
-    // On mobile, filter out desktop-only wallets
-    // MetaMask stays visible but routes to WalletConnect (see handleConnect)
-    if (isMobileLike) {
-      const hideOnMobile = [
-        'com.mpcvault.console', // MPC Vault is desktop-only
-      ];
-      return mapped.filter((c) => !hideOnMobile.includes(c.id));
-    }
+    if (isMobileLike) return mapped.filter((c) => c.id !== 'com.mpcvault.console');
     return mapped;
   }, [connectors, hasInjected, isMobileLike]);
 
   const handleConnect = async (connector: IWalletConnector) => {
-    // On desktop, if not installed, open download page
     if (!connector.isInstalled && !isMobileLike) {
       window.open(connector.link, '_blank');
       return;
     }
 
-    // On mobile, MetaMask uses AppKit/Reown - opens directly to MetaMask connection
-    // This avoids MetaMask SDK issues and provides a cleaner UX
     if (isMobileLike && connector.id === 'io.metamask') {
-      setModal(null); // Close our modal, AppKit modal will open
-      // Open AppKit with MetaMask connector directly
+      setModal(null);
       appKit?.open({ view: 'Connect' });
       return;
     }
 
-    // On mobile, Phantom needs manual deep linking UNLESS we're already inside Phantom's browser
     const isInsidePhantomBrowser =
       typeof window !== 'undefined' && !!(window as any).phantom?.ethereum?.isPhantom;
     if (isMobileLike && connector.id === 'io.phantom' && !isInsidePhantomBrowser) {
-      // Add autoconnect flag so page auto-connects when opened in Phantom browser
       const url = new URL(window.location.href);
       url.searchParams.set('autoconnect', 'phantom');
-      const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(url.toString())}`;
-      window.location.href = phantomDeepLink;
-      // Don't clear loading - user is leaving the page
+      window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent(url.toString())}`;
       return;
     }
 
-    // On mobile, Rabby doesn't have deep links - educate users
     const isInsideRabbyBrowser =
       typeof window !== 'undefined' && !!(window as any).ethereum?.isRabby;
     if (isMobileLike && connector.id === 'io.rabby' && !isInsideRabbyBrowser) {
@@ -124,146 +87,181 @@ export const ConnectWalletModal = () => {
       return;
     }
 
+    setConnectingId(connector.id);
     try {
       const wagmiConnector =
         connectors.find((c) => c.id === connector.id) ||
         (connector.id === 'io.phantom'
           ? connectors.find((c) => c.name?.toLowerCase() === 'phantom')
           : undefined);
-      const connectorToUse = wagmiConnector || connector.connector;
-      await connectAsync({ connector: connectorToUse });
+      await connectAsync({ connector: wagmiConnector || connector.connector });
       setConnectingId(null);
       setModal(null);
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.name === 'ConnectorAlreadyConnectedError') {
+        setConnectingId(null);
+        setModal(null);
+        return;
+      }
       console.error(error);
       setConnectingId(null);
     }
   };
 
-  const handleOpenAppKit = () => {
-    setModal(null);
-    appKit?.open();
-  };
-
   return (
     <ModalBox
       maxWidth="sm"
-      title={'Connect Wallet'}
-      titleLeftPadding={true}
-      active={'connect-wallet'}
+      title="Connect Wallet"
+      titleLeftPadding
+      active="connect-wallet"
       disableClose={false}
     >
-      <WalletItem
-        onClick={() => {
-          setModal(null);
-          login({
-            loginMethods: ['email'],
-          });
-        }}
-      >
-        <Iconify
-          icon="fluent:mail-32-filled"
-          width={24}
-          height={24}
-          className="text-muted-foreground"
+      {/* Social login */}
+      <div className="flex flex-col gap-2">
+        <WalletRow
+          onClick={() => { setModal(null); login({ loginMethods: ['email'] }); }}
+          icon={<Iconify icon="fluent:mail-32-filled" width={18} height={18} />}
+          label="Email"
         />
-        Email
-      </WalletItem>
-
-      <WalletItem
-        onClick={() => {
-          setModal(null);
-          login({
-            loginMethods: ['google'],
-          });
-        }}
-      >
-        <Iconify icon="logos:google-icon" width={24} height={24} />
-        Google
-      </WalletItem>
-
-      <div className="flex items-center text-center">
-        <div className="flex-1 border-t border-dashed border-border" />
-        <span className="text-xs text-muted-foreground mx-3">OR</span>
-        <div className="flex-1 border-t border-dashed border-border" />
+        <WalletRow
+          onClick={() => { setModal(null); login({ loginMethods: ['google'] }); }}
+          icon={<Iconify icon="logos:google-icon" width={18} height={18} />}
+          label="Google"
+        />
       </div>
 
-      {CONNECTOR_LIST.map((connector) => {
-        const isConnecting = connectingId === connector.id;
-        return (
-          <WalletItem
-            key={`connector-${connector.walletName}`}
-            onClick={() => handleConnect(connector)}
-            disabled={isConnecting}
-          >
-            {isConnecting ? (
-              <Spinner className="text-muted-foreground" />
-            ) : (
-              <Image
-                alt={`${connector.walletName}-icon`}
-                src={connector.icon}
-                width={24}
-                height={24}
-                style={{ objectFit: 'cover' }}
-              />
-            )}
-            {connector.walletName}
-            {isConnecting && (
-              <span className="text-xs text-muted-foreground ml-auto">Connecting...</span>
-            )}
-            {!connector.isInstalled && !isMobileLike && !isConnecting && (
-              <span className="text-xs text-muted-foreground ml-auto">Not Installed</span>
-            )}
-          </WalletItem>
-        );
-      })}
+      {/* Divider */}
+      <div className="flex items-center gap-3">
+        <div style={{ flex: 1, height: 1, background: 'var(--border-red-light)' }} />
+        <span style={{ fontSize: 'var(--text-xs)', letterSpacing: 'var(--tracking-label)', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
+          or wallet
+        </span>
+        <div style={{ flex: 1, height: 1, background: 'var(--border-red-light)' }} />
+      </div>
 
-      {/* More Wallets - Opens AppKit modal with all wallets + QR code */}
-      <WalletItem onClick={handleOpenAppKit}>
-        <Iconify
-          width={24}
-          height={24}
-          icon="solar:wallet-bold"
-          className="text-muted-foreground"
+      {/* Wallet connectors */}
+      <div className="flex flex-col gap-2">
+        {CONNECTOR_LIST.map((connector) => {
+          const isConnecting = connectingId === connector.id;
+          return (
+            <WalletRow
+              key={connector.id}
+              onClick={() => handleConnect(connector)}
+              disabled={isConnecting}
+              icon={
+                isConnecting ? <Spinner /> : (
+                  <Image
+                    alt={connector.walletName}
+                    src={connector.icon}
+                    width={18}
+                    height={18}
+                    style={{ objectFit: 'contain', borderRadius: 4 }}
+                  />
+                )
+              }
+              label={connector.walletName}
+              badge={
+                isConnecting ? 'Connecting...' :
+                !connector.isInstalled && !isMobileLike ? 'Not installed' : undefined
+              }
+            />
+          );
+        })}
+
+        {/* More Wallets */}
+        <WalletRow
+          onClick={() => { setModal(null); appKit?.open(); }}
+          icon={<Iconify icon="solar:wallet-bold" width={18} height={18} />}
+          label="More Wallets"
+          badge="WalletConnect"
         />
-        More Wallets
-      </WalletItem>
 
-      {isMobileLike && (
-        <WalletItem onClick={() => setModal('qr-scan')}>
-          <Iconify
-            width={24}
-            height={24}
-            icon="material-symbols:computer-outline"
-            className="text-muted-foreground"
+        {isMobileLike && (
+          <WalletRow
+            onClick={() => setModal('qr-scan')}
+            icon={<Iconify icon="material-symbols:computer-outline" width={18} height={18} />}
+            label="Link Desktop Wallet"
           />
-          Link Desktop Wallet
-        </WalletItem>
-      )}
+        )}
+      </div>
+
+      <p
+        style={{
+          fontSize: 'var(--text-xs)',
+          color: 'var(--text-dim)',
+          textAlign: 'center',
+          lineHeight: 1.6,
+          paddingTop: 4,
+        }}
+      >
+        By connecting you agree to the{' '}
+        <span style={{ color: 'var(--red)', cursor: 'pointer' }}>Terms of Service</span>
+      </p>
     </ModalBox>
   );
 };
 
-const WalletItem = ({
-  children,
+const WalletRow = ({
+  icon,
+  label,
+  badge,
   onClick,
   disabled,
 }: {
-  children: React.ReactNode;
+  icon: React.ReactNode;
+  label: string;
+  badge?: string;
   onClick?: () => void;
   disabled?: boolean;
 }) => (
   <button
     onClick={onClick}
     disabled={disabled}
-    className={cn(
-      'flex items-center gap-3 w-full p-4 rounded-md h-14',
-      'bg-neutral-900 border-none font-normal justify-start',
-      'text-sm leading-[18px]',
-      'hover:bg-neutral-800 transition-colors',
-      'disabled:opacity-50 disabled:cursor-not-allowed'
-    )}
+    className={cn('flex items-center gap-3 w-full transition-all group')}
+    style={{
+      padding: '10px 14px',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-subtle)',
+      borderRadius: 'var(--radius-md)',
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      opacity: disabled ? 0.5 : 1,
+    }}
+    onMouseEnter={(e) => {
+      if (!disabled) (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-red-medium)';
+    }}
+    onMouseLeave={(e) => {
+      (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-subtle)';
+    }}
   >
-    {children}
+    <span style={{ color: 'var(--text-secondary)', flexShrink: 0, display: 'flex' }}>{icon}</span>
+    <span
+      style={{
+        flex: 1,
+        textAlign: 'left',
+        fontSize: 'var(--text-md)',
+        fontWeight: 500,
+        color: 'var(--text-primary)',
+        letterSpacing: '0.2px',
+      }}
+    >
+      {label}
+    </span>
+    {badge && (
+      <span
+        style={{
+          fontSize: 'var(--text-xs)',
+          color: 'var(--text-dim)',
+          letterSpacing: 'var(--tracking-wide)',
+        }}
+      >
+        {badge}
+      </span>
+    )}
+    <Iconify
+      icon="mingcute:right-line"
+      width={14}
+      height={14}
+      style={{ color: 'var(--text-dim)', flexShrink: 0 }}
+    />
   </button>
 );

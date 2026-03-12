@@ -71,30 +71,60 @@ export const ModalBox = ({
     }
   };
 
+  const titleStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-sans)',
+    fontSize: 'var(--text-lg)',
+    fontWeight: 700,
+    letterSpacing: 'var(--tracking-label)',
+    textTransform: 'uppercase',
+    color: 'var(--text-primary)',
+  };
+
   const CloseButton = () => (
     <button
       onClick={handleClose}
       disabled={disableClose}
-      className={cn(
-        'rounded-sm transition-colors',
-        disableClose
-          ? 'cursor-not-allowed opacity-50 text-muted-foreground'
-          : 'cursor-pointer text-muted-foreground hover:text-foreground'
-      )}
+      style={{
+        background: 'none',
+        border: 'none',
+        cursor: disableClose ? 'not-allowed' : 'pointer',
+        opacity: disableClose ? 0.4 : 1,
+        color: 'var(--text-dim)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 4,
+        borderRadius: 'var(--radius-sm)',
+        transition: 'color 0.15s',
+      }}
+      onMouseEnter={(e) => { if (!disableClose) (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-dim)'; }}
     >
-      <Iconify icon="mingcute:close-line" width={18} height={18} />
+      <Iconify icon="mingcute:close-line" width={16} height={16} />
     </button>
   );
+
+  const headerStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 'var(--space-5)',
+    borderBottom: '1px solid var(--border-red-light)',
+    marginBottom: 0,
+  };
 
   if (isBottomSheet) {
     return (
       <Drawer open={isOpen} onOpenChange={(open) => !open && handleClose()}>
         <DrawerContent className="max-h-[90vh]">
-          <DrawerHeader className="flex flex-row items-center justify-between px-4 py-4">
-            <DrawerTitle className="text-base">{capitalize(title)}</DrawerTitle>
+          {/* Drag handle */}
+          <div style={{ width: 36, height: 3, borderRadius: 99, background: 'var(--border-red-medium)', margin: '12px auto 0' }} />
+          <DrawerHeader style={{ ...headerStyle, padding: '12px 16px 12px' }}>
+            <DrawerTitle style={titleStyle}>{capitalize(title)}</DrawerTitle>
             <CloseButton />
           </DrawerHeader>
-          <div className="flex flex-col gap-4 px-4 pb-4 overflow-auto">
+          <div className="flex flex-col gap-4 px-4 pb-6 overflow-auto">
             {children}
           </div>
         </DrawerContent>
@@ -110,8 +140,8 @@ export const ModalBox = ({
         onEscapeKeyDown={disableClose ? (e) => e.preventDefault() : undefined}
         onPointerDownOutside={disableClose ? (e) => e.preventDefault() : undefined}
       >
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle className={cn('text-base', titleLeftPadding && 'pl-0.5')}>
+        <DialogHeader style={headerStyle}>
+          <DialogTitle style={titleStyle} className={cn(titleLeftPadding && 'pl-0.5')}>
             {capitalize(title)}
           </DialogTitle>
           <CloseButton />

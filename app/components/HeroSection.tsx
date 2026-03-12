@@ -1,10 +1,12 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Particles from "./Particles";
 import { BackgroundBeams } from "../../components/ui/background-beams";
 import { CardContainer, CardBody, CardItem } from "../../components/ui/3d-card";
+import { useAccount } from "wagmi";
+import { useActionStore, useAuthStore } from "@/stores";
 
 /* ─────────────────────────── data ─────────────────────────── */
 const platforms = [
@@ -129,6 +131,20 @@ export default function HeroSection() {
   const vol = useAnimatedNumber(420, 1800, 800);
   const uptime = useAnimatedNumber(999, 1600, 1000);
 
+  const { isConnected } = useAccount();
+  const { setModal } = useActionStore();
+  const status = useAuthStore((s) => s.status);
+
+  const handleStart = useCallback(() => {
+    if (!isConnected) {
+      setModal("connect-wallet");
+    } else {
+      // connected at any stage — open setup modal
+      // (shows progress if still setting up, or "ready" state if trading-enabled)
+      setModal("wallet-setup");
+    }
+  }, [isConnected, status, setModal]);
+
   return (
     <section ref={sectionRef} className="hero-section">
       {/* Animated grid background */}
@@ -200,14 +216,13 @@ export default function HeroSection() {
 
             {/* CTA buttons */}
             <div className="animate-fade-in-left delay-600 hero-cta-row" style={{ display: "flex", gap: "var(--space-6)", flexWrap: "wrap" }}>
-              <a
-                href=""
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={handleStart}
                 className="btn btn-primary animate-glow-red"
               >
-                START
-              </a>
+                {status === "trading-enabled" ? "TRADING ACTIVE" : "START"}
+              </button>
               <a href="#platforms" className="btn btn-secondary">
                 STACK
               </a>

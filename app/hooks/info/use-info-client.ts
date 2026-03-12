@@ -1,4 +1,4 @@
-import { HttpTransport, InfoClient } from '@0xsyndr/ts-sdk';
+import { HttpTransport, InfoClient } from '@hotstuff-labs/ts-sdk';
 import server from '@/config/server';
 import { env } from '@/config';
 

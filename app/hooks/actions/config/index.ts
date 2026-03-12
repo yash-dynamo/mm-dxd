@@ -34,12 +34,33 @@ export const actions: Record<string, config> = {
   ...vaultActions,
 };
 
-import { ACTIONS_OP_CODES } from '@0xsyndr/ts-sdk';
+// NOTE: @hotstuff-labs/ts-sdk@0.0.1-beta.10 does not export op codes from the package root.
+// Keep this local map aligned with the SDK's internal `EXCHANGE_OP_CODES`.
+const EXCHANGE_OP_CODES: Record<string, number> = {
+  addAgent: 1201,
+  revokeAgent: 1211,
+  updatePerpInstrumentLeverage: 1203,
+  approveBrokerFee: 1207,
+  createReferralCode: 1208,
+  setReferrer: 1209,
+  claimReferralRewards: 1210,
+  placeOrder: 1301,
+  cancelByOid: 1302,
+  cancelAll: 1311,
+  cancelByCloid: 1312,
+  accountSpotWithdrawRequest: 1002,
+  accountDerivativeWithdrawRequest: 1003,
+  accountSpotBalanceTransferRequest: 1051,
+  accountDerivativeBalanceTransferRequest: 1052,
+  accountInternalBalanceTransferRequest: 1053,
+  depositToVault: 1401,
+  redeemFromVault: 1402,
+};
 
 export const actionsMapByCode = Object.fromEntries(
-  Object.entries(ACTIONS_OP_CODES).map(([key, value]) => [value, key]),
+  Object.entries(EXCHANGE_OP_CODES).map(([key, value]) => [value, key]),
 );
 
 export const actionNamesByCode = Object.fromEntries(
-  Object.entries(ACTIONS_OP_CODES).map(([key, value]) => [value, camelToTitleCase(key)]),
+  Object.entries(EXCHANGE_OP_CODES).map(([key, value]) => [value, camelToTitleCase(key)]),
 );

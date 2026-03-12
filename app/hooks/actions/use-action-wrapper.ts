@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useExchangeClient } from './use-exchange-client';
-import { ExchangeClient, HttpTransport } from '@0xsyndr/ts-sdk';
+import { ExchangeClient, HttpTransport } from '@hotstuff-labs/ts-sdk';
 import { showToast } from '@/components/ui/toast';
 import { ActionContext, ActionHandler, actions, config } from './config';
 import { ToastParams } from '@/components/ui/toast';

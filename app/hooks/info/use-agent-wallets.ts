@@ -3,7 +3,7 @@ import { useInfoClient } from './use-info-client';
 import { useSubscriptionClient } from './use-subscription-client';
 import { useAuthStore, useUserTradingDataStore } from '@/stores';
 import { AgentWallet } from '@/types/trading';
-import { HttpTransport } from '@0xsyndr/ts-sdk';
+import { HttpTransport } from '@hotstuff-labs/ts-sdk';
 import server from '@/config/server';
 import { showToast } from '@/components/ui/toast';
 import { env } from '@/config';

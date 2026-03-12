@@ -27,7 +27,7 @@ export function useLandingTickers() {
         setIsLoading(true);
         
         // Fetch all tickers
-        const response = await infoClient.getTicker({
+        const response = await infoClient.ticker({
           symbol: 'all',
         });
 

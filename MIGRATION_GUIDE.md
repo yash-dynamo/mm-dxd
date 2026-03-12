@@ -11,7 +11,7 @@ This guide walks you through copying each file/folder from `web-template` into `
 Open `mm-dxd/package.json` and add these to `dependencies`:
 
 ```json
-"@0xsyndr/ts-sdk": "^0.0.5-beta.57",
+"@hotstuff-labs/ts-sdk": "^0.0.1-beta.10",
 "@privy-io/react-auth": "3.8.1",
 "@reown/appkit": "^1.8.16",
 "@reown/appkit-adapter-wagmi": "^1.8.16",
@@ -392,7 +392,7 @@ import { Toaster } from 'sonner'
 
 ## Step 19 — Verify `.npmrc`
 
-Check if `web-template/.npmrc` has any registry overrides (e.g. for `@0xsyndr/ts-sdk`):
+Check if `web-template/.npmrc` has any registry overrides (e.g. for `@0/ts-sdk`):
 
 ```bash
 cat /home/sanatan/web-template/.npmrc

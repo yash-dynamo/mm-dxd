@@ -1,6 +1,6 @@
 import { useAccount } from 'wagmi';
 import { Config, getWalletClient } from '@wagmi/core';
-import { ExchangeClient, HttpTransport } from '@0xsyndr/ts-sdk';
+import { ExchangeClient, HttpTransport } from '@hotstuff-labs/ts-sdk';
 import { useAuthStore } from '@/stores';
 import { createWalletClient, http, custom } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
