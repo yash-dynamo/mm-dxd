@@ -57,8 +57,8 @@ export default function SeductiveSection() {
               contrast={1.8}
               skinToneBoost={true}
               showImageOnHover={true}
-              imageOpacity={0}
-              imageHoverOpacity={0.5}
+              imageOpacity={0.12}
+              imageHoverOpacity={0.72}
               style={{
                 width: "100%",
                 display: "block",

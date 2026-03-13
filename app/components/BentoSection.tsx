@@ -122,8 +122,8 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
         contrast={1.8}
         skinToneBoost={true}
         showImageOnHover={true}
-        imageOpacity={0}
-        imageHoverOpacity={0.4}
+        imageOpacity={0.12}
+        imageHoverOpacity={0.68}
         isHovered={hovered}
         style={{ 
           position: "absolute",

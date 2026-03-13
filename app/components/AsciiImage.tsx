@@ -110,7 +110,8 @@ export default function AsciiImage({
           position: "absolute",
           inset: 0,
           opacity: showImageOnHover ? (hovered ? imageHoverOpacity : imageOpacity) : 0,
-          transition: "opacity 0.6s ease-out",
+          transform: hovered ? "scale(1.07)" : "scale(1)",
+          transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
           zIndex: 0,
         }}
       >
@@ -121,7 +122,7 @@ export default function AsciiImage({
           style={{
             objectFit,
             objectPosition,
-            filter: "brightness(0.7) saturate(0.5)",
+            filter: "brightness(0.88) saturate(0.75)",
           }}
         />
       </div>
