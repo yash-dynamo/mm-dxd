@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAccount, useDisconnect } from "wagmi";
 import { useActionStore } from "@/stores";
 import { Iconify } from "@/components/ui/iconify";
@@ -12,6 +13,7 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const { setModal } = useActionStore();
   const { isConnected, address } = useAccount();
@@ -108,6 +110,32 @@ export default function Navbar() {
             >
               {address.slice(0, 10)}…{address.slice(-8)}
             </div>
+
+            {/* Dashboard */}
+            <button
+              onClick={() => { setDropdownOpen(false); router.push("/dashboard"); }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                width: "100%",
+                padding: "10px 14px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--text-sm)",
+                fontWeight: 600,
+                letterSpacing: "var(--tracking-label)",
+                color: "var(--text-primary)",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.04)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+            >
+              <Iconify icon="mingcute:dashboard-2-line" width={14} height={14} />
+              DASHBOARD
+            </button>
 
             {/* Copy */}
             <button
@@ -221,14 +249,13 @@ export default function Navbar() {
 
           {/* Right side: CTA + Wallet + Hamburger */}
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-5)" }}>
-            <a
-              href=""
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard")}
               className="hidden md:flex btn btn-outline-red"
             >
-              JOIN XD
-            </a>
+              LAUNCH APP
+            </button>
             <WalletButton />
           </div>
         </div>
@@ -265,15 +292,14 @@ export default function Navbar() {
           ))}
         </div>
 
-        <a
-          href=""
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={() => { setMenuOpen(false); router.push("/dashboard"); }}
           className="btn btn-solid-red"
           style={{ width: "100%", padding: "var(--space-6)" }}
         >
-          JOIN XD
-        </a>
+          LAUNCH APP
+        </button>
         {/* Mobile wallet button with its own dropdown ref */}
         <div ref={dropdownRef} style={{ marginTop: "var(--space-4)" }}>
           <WalletButton fullWidth />

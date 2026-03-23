@@ -1,23 +1,18 @@
 "use client";
 
 import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Particles from "./Particles";
 import { SparklesCore } from "../../components/ui/sparkles";
-import { useAccount } from "wagmi";
-import { useActionStore, useAuthStore } from "@/stores";
+import { useAuthStore } from "@/stores";
 
 export default function CTASection() {
-  const { isConnected } = useAccount();
-  const { setModal } = useActionStore();
+  const router = useRouter();
   const status = useAuthStore((s) => s.status);
 
   const handleStart = useCallback(() => {
-    if (!isConnected) {
-      setModal("connect-wallet");
-    } else {
-      setModal("wallet-setup");
-    }
-  }, [isConnected, status, setModal]);
+    router.push("/dashboard");
+  }, [router]);
   return (
     <section className="cta-section">
       {/* Aceternity Sparkles Background - subtle gold */}
@@ -111,7 +106,7 @@ export default function CTASection() {
             onClick={handleStart}
             className="btn btn-primary animate-glow-red"
           >
-            {status === "trading-enabled" ? "TRADING ACTIVE" : "JOIN XD"}
+            LAUNCH APP
           </button>
 
           <a href="#platforms" className="btn btn-secondary">

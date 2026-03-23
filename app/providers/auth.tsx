@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuthStore, useActionStore } from '@/stores';
-import { FC, useEffect, useRef, Suspense, createContext, useContext } from 'react';
+import { FC, useEffect, Suspense, createContext, useContext } from 'react';
 import { useAuthController } from '@/hooks/use-auth-controller';
 import { useSearchParams } from 'next/navigation';
 import { extractLinkParam, recoverFromQrPayload } from '@/utils/qr-recover';
@@ -28,26 +28,6 @@ const QrLinkHandler: FC = () => {
   return null;
 };
 
-// ─── Auto-opens wallet-setup when wallet connects but no agent exists ─────────
-const WalletSetupTrigger: FC = () => {
-  const status = useAuthStore((s) => s.status);
-  const { setModal, modal } = useActionStore();
-  const lastStatusRef = useRef<string>('');
-
-  useEffect(() => {
-    // Only fire when status *transitions* to 'connected' (not on every render)
-    if (status === 'connected' && lastStatusRef.current !== 'connected') {
-      // Don't override an already-open modal
-      if (!modal || modal === 'connect-wallet') {
-        setModal('wallet-setup');
-      }
-    }
-    lastStatusRef.current = status;
-  }, [status, modal, setModal]);
-
-  return null;
-};
-
 // ─── Context ──────────────────────────────────────────────────────────────────
 interface AuthControllerContextValue {
   logout: () => Promise<void>;
@@ -70,7 +50,6 @@ export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
       <Suspense fallback={null}>
         <QrLinkHandler />
       </Suspense>
-      <WalletSetupTrigger />
       {children}
     </AuthControllerContext.Provider>
   );

@@ -19,6 +19,12 @@ const envSchema = zod.object({
 
   // Waitlist countdown — optional (used by countdown hooks)
   NEXT_PUBLIC_COUNTDOWN_END_DATE: zod.string().optional(),
+
+  // DXD market-making API — optional (falls back to localhost)
+  NEXT_PUBLIC_DXD_API_URL: zod.string().url().optional(),
+  // Broker settings for agent/MM order flow — optional
+  NEXT_PUBLIC_BROKER_ADDRESS: zod.string().optional(),
+  NEXT_PUBLIC_MAX_FEE_RATE: zod.string().optional(),
 });
 
 const envVars = {
@@ -29,6 +35,9 @@ const envVars = {
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
   NEXT_PUBLIC_COUNTDOWN_END_DATE: process.env.NEXT_PUBLIC_COUNTDOWN_END_DATE,
+  NEXT_PUBLIC_DXD_API_URL: process.env.NEXT_PUBLIC_DXD_API_URL,
+  NEXT_PUBLIC_BROKER_ADDRESS: process.env.NEXT_PUBLIC_BROKER_ADDRESS,
+  NEXT_PUBLIC_MAX_FEE_RATE: process.env.NEXT_PUBLIC_MAX_FEE_RATE,
 };
 
 const parsedEnv = envSchema.safeParse(envVars);

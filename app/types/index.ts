@@ -1,7 +1,6 @@
 import { Address } from "viem";
 
 export * from "./trading";
-export * from "./referral";
 
 export interface IUserMetadata {
     user_address: Address;

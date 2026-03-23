@@ -47,6 +47,18 @@ async function buildWalletClient(
 ) {
   if (!connector) throw new Error('No connector — wallet not connected');
   const provider = await connector.getProvider();
+
+  // Switch the wallet to mainnet before creating the client — viem v2
+  // validates that the provider's active chainId matches the declared chain.
+  try {
+    await (provider as any).request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x1' }],
+    });
+  } catch {
+    // Wallet may already be on mainnet, or doesn't support programmatic switching
+  }
+
   return createWalletClient({
     account:   address as `0x${string}`,
     chain:     mainnet,

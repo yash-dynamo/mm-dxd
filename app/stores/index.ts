@@ -2,6 +2,11 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import {
+  createDxdAuthSlice, DxdAuthSlice,
+  createDxdSessionsSlice, DxdSessionsSlice,
+  createDxdMetricsSlice, DxdMetricsSlice,
+} from './slices/dxd';
+import {
   createAuthSlice,
   createGlobalSettingsSlice,
   GlobalSettingsStoreState,
@@ -129,6 +134,34 @@ export const useExpeditionDataStore = create<ExpeditionDataStoreState>()(
   immer((...args) => ({
     ...createExpeditionDataSlice(...args),
   })),
+);
+
+// ─── DXD Market-Making Stores ─────────────────────────────────────────────────
+
+export const useDxdAuthStore = create<DxdAuthSlice>()(
+  persist(
+    immer((...args) => ({ ...createDxdAuthSlice(...args) })),
+    {
+      name: 'dxd-auth',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        token: state.token,
+        userId: state.userId,
+        dxdWalletAddress: state.dxdWalletAddress,
+        agentAddress: state.agentAddress,
+        agentName: state.agentName,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    },
+  ),
+);
+
+export const useDxdSessionsStore = create<DxdSessionsSlice>()(
+  immer((...args) => ({ ...createDxdSessionsSlice(...args) })),
+);
+
+export const useDxdMetricsStore = create<DxdMetricsSlice>()(
+  immer((...args) => ({ ...createDxdMetricsSlice(...args) })),
 );
 
 export const migrateAuthData = (fromStorage: Storage, toStorage: Storage) => {

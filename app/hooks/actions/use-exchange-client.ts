@@ -16,7 +16,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function useExchangeClient() {
   const { isConnected } = useAccount();
-  const { getAgents, address, master } = useAuthStore();
+  const { getAgents, address } = useAuthStore();
   const { authenticated } = usePrivy();
   const { wallets } = useWallets();
 
@@ -25,6 +25,19 @@ export function useExchangeClient() {
       let lastError: Error | null = null;
 
       for (let attempt = 0; attempt < maxRetries; attempt++) {
+        // Read master at call time so we always get the latest value
+        // (avoids stale closure when auth store updates after render)
+        const currentMaster = useAuthStore.getState().master;
+
+        if (!currentMaster || currentMaster === '0x0000000000000000000000000000000000000000') {
+          if (attempt < maxRetries - 1) {
+            const delay = initialDelay * Math.pow(2, attempt);
+            await sleep(delay);
+            continue;
+          }
+          return null;
+        }
+
         let walletClient;
 
         // Check if Privy is authenticated and use Privy wallet
@@ -41,10 +54,12 @@ export function useExchangeClient() {
           }
 
           try {
+            await privyWallet.switchChain(mainnetChain.id);
+
             const provider = await privyWallet.getEthereumProvider();
 
             walletClient = createWalletClient({
-              account: master,
+              account: currentMaster,
               chain: mainnetChain,
               transport: custom(provider),
             });
@@ -58,7 +73,18 @@ export function useExchangeClient() {
             return null;
           }
         } else {
-          walletClient = await getWalletClient(wagmiConfig as Config, { account: master });
+          // Switch to mainnet first so getWalletClient returns a mainnet-bound client.
+          try {
+            const { switchChain } = await import('@wagmi/core');
+            await switchChain(wagmiConfig as Config, { chainId: mainnet.id });
+          } catch {
+            // Already on mainnet or wallet doesn't support programmatic switching
+          }
+
+          walletClient = await getWalletClient(wagmiConfig as Config, {
+            account: currentMaster,
+            chainId: mainnet.id,
+          });
           if (!walletClient || !isConnected) {
             if (attempt < maxRetries - 1) {
               const delay = initialDelay * Math.pow(2, attempt);
@@ -74,8 +100,6 @@ export function useExchangeClient() {
             env: env.NEXT_PUBLIC_ENVIRONMENT,
             ...server.http,
           });
-
-          await walletClient.switchChain(mainnet);
 
           return new ExchangeClient({
             transport,
@@ -93,7 +117,7 @@ export function useExchangeClient() {
       console.error('Failed to create user wallet client after retries:', lastError);
       return null;
     },
-    [isConnected, master, authenticated, wallets],
+    [isConnected, authenticated, wallets],
   );
 
   const createL1Client = useCallback(() => {

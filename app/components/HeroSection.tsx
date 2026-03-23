@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Particles from "./Particles";
 import { BackgroundBeams } from "../../components/ui/background-beams";
 import { CardContainer, CardBody, CardItem } from "../../components/ui/3d-card";
-import { useAccount } from "wagmi";
-import { useActionStore, useAuthStore } from "@/stores";
+import { useAuthStore } from "@/stores";
 
 /* ─────────────────────────── data ─────────────────────────── */
 const platforms = [
@@ -131,19 +131,12 @@ export default function HeroSection() {
   const vol = useAnimatedNumber(420, 1800, 800);
   const uptime = useAnimatedNumber(999, 1600, 1000);
 
-  const { isConnected } = useAccount();
-  const { setModal } = useActionStore();
+  const router = useRouter();
   const status = useAuthStore((s) => s.status);
 
   const handleStart = useCallback(() => {
-    if (!isConnected) {
-      setModal("connect-wallet");
-    } else {
-      // connected at any stage — open setup modal
-      // (shows progress if still setting up, or "ready" state if trading-enabled)
-      setModal("wallet-setup");
-    }
-  }, [isConnected, status, setModal]);
+    router.push("/dashboard");
+  }, [router]);
 
   return (
     <section ref={sectionRef} className="hero-section">
@@ -221,7 +214,7 @@ export default function HeroSection() {
                 onClick={handleStart}
                 className="btn btn-primary animate-glow-red"
               >
-                {status === "trading-enabled" ? "TRADING ACTIVE" : "START"}
+                LAUNCH APP
               </button>
               <a href="#platforms" className="btn btn-secondary">
                 STACK

@@ -17,10 +17,4 @@ export const subVaultsToUse = ['0x3212B884EED6D6CFe60742fA0c47326E48b45E25'];
 export const REFERRAL_THRESHOLD = 10000;
 export const SET_REFERRER_THRESHOLD = 25000000;
 
-export * from './portfolio';
-export * from './images';
-export * from './global';
 export * from './expedition';
-export * from './version';
-export * from './referral_tier';
-export * from './affiliate_tier';
