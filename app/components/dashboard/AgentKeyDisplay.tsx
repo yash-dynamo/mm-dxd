@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
+const mono =
+  'var(--font-mono), ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace';
 
 interface AgentKeyDisplayProps {
   privateKey: string;
@@ -12,6 +15,12 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+
+  /** Placeholder matches real key length so layout does not jump when toggling. */
+  const maskedKey = useMemo(
+    () => (privateKey.length > 0 ? '\u2022'.repeat(privateKey.length) : '\u2022\u2022\u2022\u2022\u2022\u2022'),
+    [privateKey],
+  );
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(privateKey);
@@ -31,7 +40,7 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 2.5vw, 18px)' }}>
       {/* Warning */}
       <div
         style={{
@@ -73,14 +82,17 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
         </p>
         <div
           style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-xs)',
+            fontFamily: mono,
+            fontSize: 'clamp(10px, 2.6vw, 12px)',
+            lineHeight: 1.4,
+            fontVariantNumeric: 'tabular-nums',
             color: 'var(--text-secondary)',
             background: 'var(--bg-elevated)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
-            padding: '10px 14px',
+            padding: '8px 12px',
             wordBreak: 'break-all',
+            overflowWrap: 'anywhere',
           }}
         >
           {agentAddress}
@@ -92,38 +104,64 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
         <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-dim)', letterSpacing: 'var(--tracking-label)', marginBottom: 6 }}>
           PRIVATE KEY
         </p>
-        <div style={{ position: 'relative' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'nowrap',
+            alignItems: 'stretch',
+            gap: 0,
+            minWidth: 0,
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            minHeight: 34,
+          }}
+        >
           <div
+            className="secret-inline-scroll"
+            aria-label={revealed ? 'Agent private key' : 'Agent private key (hidden)'}
+            title={revealed ? 'Scroll or swipe to see the full key' : undefined}
             style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-xs)',
+              flex: 1,
+              minWidth: 0,
+              display: 'block',
+              fontFamily: mono,
+              fontSize: 'clamp(8px, 2.15vw, 10px)',
+              lineHeight: 1.35,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: revealed ? '0.015em' : '0.04em',
               color: revealed ? 'var(--text-primary)' : 'var(--text-dim)',
-              background: 'var(--bg-elevated)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              padding: '10px 40px 10px 14px',
-              wordBreak: 'break-all',
-              userSelect: revealed ? 'auto' : 'none',
+              padding: '7px 10px',
+              whiteSpace: 'nowrap',
+              userSelect: revealed ? 'text' : 'none',
+              WebkitUserSelect: revealed ? 'text' : 'none',
+              WebkitOverflowScrolling: 'touch',
             }}
+            spellCheck={false}
           >
-            {revealed
-              ? privateKey
-              : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}
+            {revealed ? privateKey : maskedKey}
           </div>
           <button
+            type="button"
+            aria-label={revealed ? 'Hide private key' : 'Show private key'}
+            aria-pressed={revealed}
             onClick={() => setRevealed((r) => !r)}
             style={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              background: 'none',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 'clamp(38px, 10vw, 44px)',
+              alignSelf: 'stretch',
+              background: 'rgba(255,255,255,0.02)',
               border: 'none',
+              borderLeft: '1px solid var(--border-subtle)',
+              borderRadius: '0 var(--radius-md) var(--radius-md) 0',
               cursor: 'pointer',
               color: 'var(--text-dim)',
-              padding: 4,
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
               {revealed ? (
                 <>
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
@@ -142,7 +180,7 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
       </div>
 
       {/* Action buttons */}
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div className="agent-key-actions" style={{ display: 'flex', gap: 8 }}>
         <button onClick={handleCopy} className="btn btn-outline-red" style={{ flex: 1 }}>
           {copied ? 'COPIED' : 'COPY KEY'}
         </button>
@@ -169,7 +207,7 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
         <span
           style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-sm)',
+            fontSize: 'clamp(10px, 2.8vw, 12px)',
             color: 'var(--text-secondary)',
             lineHeight: 1.5,
           }}

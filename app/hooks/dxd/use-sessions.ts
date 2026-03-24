@@ -52,6 +52,16 @@ export function useSessions() {
     }
   }, [withAuth, setSessions, setLoadingSessions, setSessionsError]);
 
+  // GET /v1/sessions/{id} — used when opening a detail URL with an empty client store (refresh / deep link)
+  const fetchSession = useCallback(
+    async (sessionId: string) => {
+      const session = await withAuth((token) => dxdApi.getSession(token, sessionId));
+      upsertSession(session);
+      return session;
+    },
+    [withAuth, upsertSession],
+  );
+
   // POST /v1/sessions
   // agent_private_key is passed directly and never stored
   const createSession = useCallback(
@@ -108,6 +118,7 @@ export function useSessions() {
   return {
     loadDefaults,
     listSessions,
+    fetchSession,
     createSession,
     stopSession,
     patchConfig,

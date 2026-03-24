@@ -212,6 +212,46 @@ body {
   border-radius: var(--radius-sm);
 }
 
+/* Horizontal bar uses height — keep thin when visible */
+::-webkit-scrollbar:horizontal {
+  height: 4px;
+}
+
+/* Secrets (e.g. agent key): one line, scroll/swipe, no visible bar */
+.secret-inline-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.secret-inline-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Agent setup page: larger card, safe margins on narrow viewports */
+.agent-setup-shell {
+  box-sizing: border-box;
+  width: 100%;
+  padding-left: clamp(12px, 4vw, 28px);
+  padding-right: clamp(12px, 4vw, 28px);
+}
+.agent-setup-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(92vw, 580px);
+  margin-left: auto;
+  margin-right: auto;
+  padding: clamp(20px, 5vw, 44px) clamp(16px, 4vw, 40px);
+}
+@media (max-width: 480px) {
+  .agent-key-actions {
+    flex-direction: column;
+  }
+  .agent-key-actions > button {
+    width: 100%;
+  }
+}
+
 /* ===================== SELECTION ===================== */
 ::selection {
   background: rgba(204, 51, 51, 0.3);

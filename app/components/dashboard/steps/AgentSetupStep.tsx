@@ -34,22 +34,28 @@ export function AgentSetupStep() {
 
   return (
     <div
-      className="flex min-h-screen items-center justify-center"
+      className="agent-setup-shell flex min-h-screen items-center justify-center"
       style={{ background: 'var(--bg-base)' }}
     >
       <div
+        className="agent-setup-card"
         style={{
-          width: '100%',
-          maxWidth: 460,
           background: 'var(--bg-card)',
           border: '1px solid var(--border-red-medium)',
           borderRadius: 'var(--radius-lg)',
-          padding: '40px 36px',
           boxShadow: 'var(--shadow-card)',
         }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'clamp(10px, 3vw, 16px)',
+            marginBottom: 'clamp(20px, 4vw, 28px)',
+            flexWrap: 'wrap',
+          }}
+        >
           <div
             style={{
               width: 48,
@@ -71,11 +77,12 @@ export function AgentSetupStep() {
             <h2
               style={{
                 fontFamily: 'var(--font-serif)',
-                fontSize: 'var(--text-5xl)',
+                fontSize: 'clamp(1.15rem, 4.5vw, 1.5rem)',
                 fontWeight: 500,
                 fontStyle: 'italic',
                 color: 'var(--text-primary)',
                 letterSpacing: 'var(--tracking-normal)',
+                lineHeight: 1.2,
               }}
             >
               Create Agent

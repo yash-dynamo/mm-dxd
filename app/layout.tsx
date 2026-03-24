@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Space_Grotesk } from "next/font/google";
+import { Cormorant_Garamond, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { Providers } from './providers'
 import "./globals.css";
 
@@ -18,6 +18,14 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+/** Monospace for addresses / secrets (agent key UI, etc.) */
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "DXD — High School Market Maker Protocol",
   description:
@@ -31,7 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${cormorant.variable} ${spaceGrotesk.variable} antialiased`}>
+      <body className={`${cormorant.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased`}>
         <Providers>
           {children}
         </Providers>

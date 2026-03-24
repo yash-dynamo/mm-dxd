@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDxdSessionsStore, useDxdMetricsStore } from '@/stores';
 import { useSessions, useMetrics } from '@/hooks/dxd';
+import { DxdApiError } from '@/lib/dxd-api';
 import { MetricsPanel } from '@/components/dashboard/MetricsPanel';
 import { MetricsChart } from '@/components/dashboard/MetricsChart';
 import { WarmupOverlay } from '@/components/dashboard/WarmupOverlay';
@@ -29,7 +30,7 @@ export default function SessionDetailPage() {
   const isWarmingUp = useDxdMetricsStore((s) => s.isWarmingUp[id] ?? false);
   const isRestarting = useDxdMetricsStore((s) => s.isRestarting[id] ?? false);
 
-  const { stopSession, patchConfig, loadSessionConfig } = useSessions();
+  const { stopSession, patchConfig, loadSessionConfig, fetchSession } = useSessions();
   const { stopPolling, handleConfigPatch, fetchHistory } = useMetrics(id);
 
   const session = sessions.find((s) => s.session_id === id);
@@ -39,6 +40,34 @@ export default function SessionDetailPage() {
   const [isStopping, setIsStopping] = useState(false);
   const [stopError, setStopError] = useState<string | null>(null);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
+  /** Empty store on refresh/deep link — fetch GET /sessions/{id} */
+  const [sessionLoadError, setSessionLoadError] = useState<'none' | 'not_found' | 'error'>('none');
+
+  useEffect(() => {
+    if (!id || typeof id !== 'string') return;
+
+    const alreadyHave = useDxdSessionsStore.getState().sessions.some((s) => s.session_id === id);
+    if (alreadyHave) {
+      setSessionLoadError('none');
+      return;
+    }
+
+    let cancelled = false;
+    setSessionLoadError('none');
+    (async () => {
+      try {
+        await fetchSession(id);
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof DxdApiError && err.status === 404) setSessionLoadError('not_found');
+        else setSessionLoadError('error');
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, fetchSession]);
 
   useEffect(() => {
     if (!id) return;
@@ -77,8 +106,39 @@ export default function SessionDetailPage() {
   };
 
   if (!session) {
+    if (sessionLoadError === 'not_found') {
+      return (
+        <div style={{ padding: '48px 0', textAlign: 'center' }}>
+          <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-5xl)', fontStyle: 'italic', color: 'var(--text-secondary)', marginBottom: 8 }}>
+            Session not found
+          </p>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-dim)', marginBottom: 20 }}>
+            This ID does not exist or you no longer have access.
+          </p>
+          <button type="button" className="btn btn-primary" onClick={() => router.push('/dashboard')}>
+            BACK TO SESSIONS
+          </button>
+        </div>
+      );
+    }
+    if (sessionLoadError === 'error') {
+      return (
+        <div style={{ padding: '48px 0', textAlign: 'center' }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--red-light)', marginBottom: 16 }}>
+            Could not load this session. Check your connection and try again.
+          </p>
+          <button type="button" className="btn btn-outline-red" onClick={() => router.refresh()}>
+            RETRY
+          </button>
+        </div>
+      );
+    }
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0', color: 'var(--text-dim)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '80px 0', color: 'var(--text-dim)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)' }}>
+        <svg className="animate-spin" width={18} height={18} viewBox="0 0 24 24" fill="none" aria-hidden>
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
         Loading session…
       </div>
     );
