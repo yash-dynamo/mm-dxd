@@ -36,7 +36,7 @@ export interface ToastParams {
   };
 }
 
-export const defaultToastConfig = {
+const defaultToastConfig = {
   duration: 5000,
   closeButton: true,
   dismissible: true,

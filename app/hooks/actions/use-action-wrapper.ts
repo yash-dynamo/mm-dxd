@@ -15,11 +15,11 @@ type ActionResult<T> = {
   error?: string;
 };
 
-export const getDefaultToastTitle = (name: string, type: 'success' | 'error' | 'loading') => {
+const getDefaultToastTitle = (name: string, type: 'success' | 'error' | 'loading') => {
   return `${capitalize(name)}: ${type}`;
 };
 
-export const getToast = async <T>(
+const getToast = async <T>(
   config: config<T>,
   type: 'success' | 'error' | 'loading',
   context: ActionContext<T> = {},

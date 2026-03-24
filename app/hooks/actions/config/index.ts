@@ -57,10 +57,10 @@ const EXCHANGE_OP_CODES: Record<string, number> = {
   redeemFromVault: 1402,
 };
 
-export const actionsMapByCode = Object.fromEntries(
+const actionsMapByCode = Object.fromEntries(
   Object.entries(EXCHANGE_OP_CODES).map(([key, value]) => [value, key]),
 );
 
-export const actionNamesByCode = Object.fromEntries(
+const actionNamesByCode = Object.fromEntries(
   Object.entries(EXCHANGE_OP_CODES).map(([key, value]) => [value, camelToTitleCase(key)]),
 );

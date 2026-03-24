@@ -48,18 +48,18 @@ function showOfflineToast() {
 
 // ─── Response Types ───────────────────────────────────────────────────────────
 
-export interface NonceResponse {
+interface NonceResponse {
   nonce: string;
   message: string;
 }
 
-export interface LoginResponse {
+interface LoginResponse {
   token: string;
   user_id: string;
   wallet_address: string;
 }
 
-export interface HealthResponse {
+interface HealthResponse {
   status: string;
   active_sessions: number;
 }
@@ -76,7 +76,7 @@ export interface Session {
   error: string | null;
 }
 
-export interface SessionConfig {
+interface SessionConfig {
   session_id: string;
   symbols: string[];
   configs: Record<string, SymbolConfig>;
@@ -137,11 +137,11 @@ export interface CreateSessionRequest {
   broker_config?: BrokerConfig;
 }
 
-export interface CreateSessionResponse extends Session {
+interface CreateSessionResponse extends Session {
   config: Record<string, SymbolConfig>;
 }
 
-export interface SessionsListResponse {
+interface SessionsListResponse {
   sessions: Session[];
 }
 
@@ -169,7 +169,7 @@ export interface SymbolMetrics {
   bn_mid: number;
 }
 
-export interface MetricsResponse {
+interface MetricsResponse {
   session_id: string;
   metrics: Record<string, SymbolMetrics>;
 }
@@ -181,7 +181,7 @@ export interface MetricsHistoryParams {
   limit?: number;
 }
 
-export interface MetricsHistoryResponse {
+interface MetricsHistoryResponse {
   session_id: string;
   rows: Array<{ symbol: string } & SymbolMetrics>;
 }

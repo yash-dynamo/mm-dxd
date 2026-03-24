@@ -26,7 +26,7 @@ export interface UserVaultsActions {
   clearReferralSummary: () => void;
 }
 
-export type UserVaultsSlice = UserVaultsState & UserVaultsActions;
+type UserVaultsSlice = UserVaultsState & UserVaultsActions;
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 

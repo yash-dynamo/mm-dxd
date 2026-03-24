@@ -19,7 +19,7 @@ export interface CollateralActions {
   clearFundingPayments: () => void;
 }
 
-export type CollateralSlice = CollateralState & CollateralActions;
+type CollateralSlice = CollateralState & CollateralActions;
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 

@@ -24,7 +24,7 @@ export interface PositionsActions {
   clearLeverage: () => void;
 }
 
-export type PositionsSlice = PositionsState & PositionsActions;
+type PositionsSlice = PositionsState & PositionsActions;
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 

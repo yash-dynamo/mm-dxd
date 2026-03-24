@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useInfoClient } from './info/use-info-client';
 import { useSubscriptionClient } from './info/use-subscription-client';
 
-export interface LandingTicker {
+interface LandingTicker {
   symbol: string;
   instrument_name: string;
   mark_price: string;

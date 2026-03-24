@@ -1,4 +1,4 @@
-export class DynamicStorage {
+class DynamicStorage {
   private broadcastChannel: BroadcastChannel | null = null;
   private isInitialized = false;
   private storeReloaders: Map<string, () => void> = new Map();

@@ -37,7 +37,7 @@ export interface OrdersActions {
   clearPendingStatusOrders: () => void;
 }
 
-export type OrdersSlice = OrdersState & OrdersActions;
+type OrdersSlice = OrdersState & OrdersActions;
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 

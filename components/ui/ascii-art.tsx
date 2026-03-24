@@ -574,7 +574,7 @@ export const AsciiArt: React.FC<AsciiArtProps> = ({
   );
 };
 
-export const AsciiArtStatic: React.FC<
+const AsciiArtStatic: React.FC<
   Omit<AsciiArtProps, "animated" | "animationStyle">
 > = (props) => {
   return <AsciiArt {...props} animated={false} animationStyle="none" />;

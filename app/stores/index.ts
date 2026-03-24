@@ -17,18 +17,6 @@ import {
   TradingDataStoreState,
   createActionSlice,
   ActionStoreState,
-  createOrderbookDataSlice,
-  OrderbookDataStoreState,
-  createVaultsSlice,
-  VaultsStoreState,
-  createAccountHistorySlice,
-  AccountHistoryStoreState,
-  createNotificationSlice,
-  NotificationStoreState,
-  createTradingPreferencesSlice,
-  TradingPreferencesStoreState,
-  createExpeditionDataSlice,
-  ExpeditionDataStoreState,
 } from './slices';
 
 import { dynamicStorage } from './utils';
@@ -40,18 +28,6 @@ export const useGlobalStore = create<GlobalSettingsStoreState>()(
     })),
     {
       name: 'hotstuff-global-settings',
-      storage: createJSONStorage(() => localStorage),
-    },
-  ),
-);
-
-export const useTradingPreferencesStore = create<TradingPreferencesStoreState>()(
-  persist(
-    immer((...args) => ({
-      ...createTradingPreferencesSlice(...args),
-    })),
-    {
-      name: 'hotstuff-trading-preferences',
       storage: createJSONStorage(() => localStorage),
     },
   ),
@@ -100,39 +76,9 @@ export const useTradingDataStore = create<TradingDataStoreState>()(
   })),
 );
 
-export const useOrderbookDataStore = create<OrderbookDataStoreState>()(
-  immer((...args) => ({
-    ...createOrderbookDataSlice(...args),
-  })),
-);
-
 export const useActionStore = create<ActionStoreState>()(
   immer((...args) => ({
     ...createActionSlice(...args),
-  })),
-);
-
-export const useVaultsStore = create<VaultsStoreState>()(
-  immer((...args) => ({
-    ...createVaultsSlice(...args),
-  })),
-);
-
-export const useAccountHistoryStore = create<AccountHistoryStoreState>()(
-  immer((...args) => ({
-    ...createAccountHistorySlice(...args),
-  })),
-);
-
-export const useNotificationStore = create<NotificationStoreState>()(
-  immer((...args) => ({
-    ...createNotificationSlice(...args),
-  })),
-);
-
-export const useExpeditionDataStore = create<ExpeditionDataStoreState>()(
-  immer((...args) => ({
-    ...createExpeditionDataSlice(...args),
   })),
 );
 
@@ -164,14 +110,3 @@ export const useDxdMetricsStore = create<DxdMetricsSlice>()(
   immer((...args) => ({ ...createDxdMetricsSlice(...args) })),
 );
 
-export const migrateAuthData = (fromStorage: Storage, toStorage: Storage) => {
-  try {
-    const data = fromStorage.getItem('hotstuff-auth');
-    if (data) {
-      toStorage.setItem('hotstuff-auth', data);
-      fromStorage.removeItem('hotstuff-auth');
-    }
-  } catch (error) {
-    console.error('Failed to migrate auth data:', error);
-  }
-};

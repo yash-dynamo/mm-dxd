@@ -42,7 +42,7 @@ const networks: [AppKitNetwork, ...AppKitNetwork[]] = [mainnet,
   zksync,];
 
 // Create wagmi adapter for AppKit
-export const wagmiAdapter = new WagmiAdapter({
+const wagmiAdapter = new WagmiAdapter({
   networks,
   projectId,
   ssr: true,
@@ -63,7 +63,7 @@ let _appKitInitializing = false;
  * Get the AppKit instance (lazy initialization)
  * Returns null on server-side
  */
-export function getAppKit(): AppKit | null {
+function getAppKit(): AppKit | null {
   if (typeof window === 'undefined') {
     return null;
   }

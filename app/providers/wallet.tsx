@@ -193,7 +193,7 @@ const HydrationContext = createContext<HydrationState>({
   isFullyHydrated: false,
 });
 
-export const useHydrationState = () => useContext(HydrationContext);
+const useHydrationState = () => useContext(HydrationContext);
 
 function HydrationGate({ children }: { children: React.ReactNode }) {
   const { isReconnecting } = useAccount();

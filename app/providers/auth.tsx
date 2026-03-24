@@ -35,7 +35,7 @@ interface AuthControllerContextValue {
 
 const AuthControllerContext = createContext<AuthControllerContextValue | null>(null);
 
-export const useLogout = () => {
+const useLogout = () => {
   const context = useContext(AuthControllerContext);
   if (!context) throw new Error('useLogout must be used within AuthProvider');
   return context.logout;

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { getSubdomainHostname } from '@/utils/subdomain-url';
 import { cn } from '@/lib/utils';
 
-export type QrFlowProps = {
+type QrFlowProps = {
   qrDataUrl: string;
   showQr: boolean;
   holdProgress: number;

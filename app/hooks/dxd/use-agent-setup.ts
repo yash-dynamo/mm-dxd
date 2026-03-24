@@ -10,14 +10,14 @@ const AGENT_VALID_DAYS = Number(process.env.NEXT_PUBLIC_AGENT_VALID_DAYS ?? 30);
 const SESSION_KEY = 'dxd_agent_pk';
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export type AgentSetupStatus =
+type AgentSetupStatus =
   | 'idle'
   | 'generated'
   | 'registering'
   | 'done'
   | 'error';
 
-export interface GeneratedAgent {
+interface GeneratedAgent {
   privateKey: string;
   agentAddress: string;
 }

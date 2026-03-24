@@ -47,10 +47,6 @@ import {
   createUserVaultsSlice,
 } from './user-trading';
 
-// ─── Re-exports (backward compat) ────────────────────────────────────────────
-
-export type { Leverage } from './user-trading';
-
 // ─── Loading / Status State ───────────────────────────────────────────────────
 
 const tableKeys = {

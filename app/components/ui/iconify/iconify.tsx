@@ -7,7 +7,7 @@ import { forwardRef } from 'react';
 
 // ----------------------------------------------------------------------
 
-export type IconifyProps = IconProps & {
+type IconifyProps = IconProps & {
   className?: string;
 };
 

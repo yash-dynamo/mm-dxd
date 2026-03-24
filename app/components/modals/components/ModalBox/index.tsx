@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Iconify } from '@/components/ui/iconify';
-import { useActionStore, useAuthStore } from '@/stores';
+import { useActionStore } from '@/stores';
 import useMediaQuery from '@/hooks/use-media-query';
 import {
   Dialog,
@@ -15,7 +15,6 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerClose,
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 

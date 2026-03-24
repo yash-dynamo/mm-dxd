@@ -26,7 +26,7 @@ export interface FeesActions {
   getFeeRates: (tradingType: TradingType, userFees: UserFees, isStableSpot: boolean) => string;
 }
 
-export type FeesSlice = FeesState & FeesActions;
+type FeesSlice = FeesState & FeesActions;
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 

@@ -5,6 +5,13 @@ import { useDxdSessionsStore } from '@/stores';
 import { dxdApi, CreateSessionRequest, ConfigPatch, DxdNetworkError } from '@/lib/dxd-api';
 import { useDxdAuth } from './use-dxd-auth';
 
+const toSessionsErrorMessage = (err: unknown, fallback: string) =>
+  err instanceof DxdNetworkError
+    ? 'Server not responding'
+    : err instanceof Error
+      ? err.message
+      : fallback;
+
 export function useSessions() {
   const { withAuth } = useDxdAuth();
   const {
@@ -38,9 +45,7 @@ export function useSessions() {
       const { sessions } = await withAuth((token) => dxdApi.listSessions(token));
       setSessions(sessions);
     } catch (err) {
-      const msg = err instanceof DxdNetworkError
-        ? 'Server not responding'
-        : err instanceof Error ? err.message : 'Failed to load sessions';
+      const msg = toSessionsErrorMessage(err, 'Failed to load sessions');
       setSessionsError(msg);
     } finally {
       setLoadingSessions(false);
@@ -57,9 +62,7 @@ export function useSessions() {
         upsertSession(session);
         return session;
       } catch (err) {
-        const msg = err instanceof DxdNetworkError
-          ? 'Server not responding'
-          : err instanceof Error ? err.message : 'Failed to create session';
+        const msg = toSessionsErrorMessage(err, 'Failed to create session');
         setSessionsError(msg);
         throw err;
       }
@@ -74,9 +77,7 @@ export function useSessions() {
         await withAuth((token) => dxdApi.stopSession(token, id));
         updateSessionStatus(id, 'stopped');
       } catch (err) {
-        const msg = err instanceof DxdNetworkError
-          ? 'Server not responding'
-          : err instanceof Error ? err.message : 'Failed to stop session';
+        const msg = toSessionsErrorMessage(err, 'Failed to stop session');
         setSessionsError(msg);
         throw err;
       }

@@ -50,7 +50,3 @@ if (!parsedEnv.success) {
 }
 
 export const env = parsedEnv.data;
-
-export const isMainnet = env.NEXT_PUBLIC_ENVIRONMENT === 'mainnet';
-export const isTestnet = env.NEXT_PUBLIC_ENVIRONMENT === 'testnet';
-export const isLocal = env.NEXT_PUBLIC_ENVIRONMENT === 'local';

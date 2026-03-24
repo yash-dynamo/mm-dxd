@@ -254,5 +254,4 @@ export function useAuthController() {
   };
 }
 
-// Export types
-export type { AuthSource, AuthControllerState };
+// Keep AuthSource/AuthControllerState internal to this module.

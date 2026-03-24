@@ -9,7 +9,7 @@ const POLL_INTERVAL_MS = 5_000;
 
 export function useMetrics(sessionId: string | null) {
   const { withAuth } = useDxdAuth();
-  const { setLiveMetrics, setHistory, setWarmingUp, setRestarting, clearMetrics } =
+  const { setLiveMetrics, setHistory, setWarmingUp, setRestarting } =
     useDxdMetricsStore();
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

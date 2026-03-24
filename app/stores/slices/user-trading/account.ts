@@ -29,7 +29,7 @@ export interface AccountActions {
   clearAccountInfo: () => void;
 }
 
-export type AccountSlice = AccountState & AccountActions;
+type AccountSlice = AccountState & AccountActions;
 
 // ─── Initial State ────────────────────────────────────────────────────────────
 
