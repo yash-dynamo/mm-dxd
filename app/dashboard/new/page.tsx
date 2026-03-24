@@ -33,6 +33,8 @@ export default function NewSessionPage() {
     .filter((s) => s.status === 'running' || s.status === 'starting')
     .flatMap((s) => s.symbols);
 
+  const phase: 1 | 2 | 3 = symbols.length === 0 ? 1 : isLoadingDefaults ? 2 : 3;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (symbols.length === 0 || !agentAddress) return;
@@ -72,129 +74,113 @@ export default function NewSessionPage() {
   };
 
   return (
-    <div style={{ maxWidth: 640, margin: '0 auto' }}>
-      {/* Back */}
-      <button
-        onClick={() => router.back()}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-xs)',
-          color: 'var(--text-dim)',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          marginBottom: 20,
-          letterSpacing: 'var(--tracking-wide)',
-        }}
-      >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M19 12H5" /><path d="m12 19-7-7 7-7" />
-        </svg>
-        BACK
-      </button>
-
-      <h1
-        style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: 'var(--text-7xl)',
-          fontWeight: 500,
-          fontStyle: 'italic',
-          color: 'var(--text-primary)',
-          letterSpacing: 'var(--tracking-normal)',
-          marginBottom: 4,
-        }}
-      >
-        New Session
-      </h1>
-      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-dim)', marginBottom: 32 }}>
-        Configure and start a market-making session.
-      </p>
-
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        {/* Symbols */}
-        <div
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-light)',
-            borderRadius: 'var(--radius-lg)',
-            padding: 24,
-          }}
-        >
-          <h2
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'var(--text-3xl)',
-              fontStyle: 'italic',
-              color: 'var(--text-primary)',
-              marginBottom: 16,
-            }}
-          >
-            Symbols
-          </h2>
-          <SymbolSelector value={symbols} onChange={setSymbols} disabledSymbols={conflictSymbols} />
-        </div>
-
-        {/* Config */}
-        <div
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-light)',
-            borderRadius: 'var(--radius-lg)',
-            padding: 24,
-          }}
-        >
-          <h2
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'var(--text-3xl)',
-              fontStyle: 'italic',
-              color: 'var(--text-primary)',
-              marginBottom: 4,
-            }}
-          >
-            Global Config
-          </h2>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-dim)', marginBottom: 16, letterSpacing: 'var(--tracking-wide)' }}>
-            Applied to all symbols. Per-symbol overrides can be set after start.
-          </p>
-          {isLoadingDefaults ? (
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-dim)' }}>Loading defaults…</p>
-          ) : (
-            <ConfigForm
-              value={globalConfig}
-              onChange={setGlobalConfig}
-              defaults={configDefaults?.defaults?.['HYPE-PERP']}
-            />
-          )}
-        </div>
-
-        {error && (
-          <div
-            style={{
-              padding: '12px 16px',
-              background: 'rgba(204,51,51,0.08)',
-              border: '1px solid var(--border-red-medium)',
-              borderRadius: 'var(--radius-md)',
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-sm)',
-              color: 'var(--red-light)',
-            }}
-          >
-            {error}
+    <div className="dash-page dash-page--new">
+      <form onSubmit={handleSubmit} className="dash-new-page">
+        <div className="dash-new-topbar">
+          <button type="button" className="dash-back-btn" onClick={() => router.back()}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <path d="M19 12H5" />
+              <path d="m12 19-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+          <div className="dash-new-topbar-titles">
+            <p className="dash-eyebrow">Composer</p>
+            <h1 className="dash-title">New session</h1>
           </div>
-        )}
+        </div>
 
-        <button
-          type="submit"
-          disabled={symbols.length === 0 || isSubmitting}
-          className="btn btn-primary"
-          style={{ width: '100%', opacity: symbols.length === 0 || isSubmitting ? 0.4 : 1 }}
-        >
-          {isSubmitting ? 'STARTING…' : 'START SESSION'}
-        </button>
+        <p className="dash-new-lede">
+          Choose perpetual symbols, optionally tune global defaults, then start. Conflicting symbols already running elsewhere are
+          disabled automatically.
+        </p>
+
+        <div className="dash-new-shell">
+          <nav className="dash-new-stepper" aria-label="Steps">
+            <div className={`dash-new-step ${phase === 1 ? 'is-active' : ''}`}>
+              <strong>01</strong>
+              Markets
+              <span style={{ display: 'block', fontSize: 'var(--text-2xs)', color: 'var(--text-dim)', marginTop: 2 }}>
+                Symbol set
+              </span>
+            </div>
+            <div className={`dash-new-step ${phase === 2 ? 'is-active' : ''}`}>
+              <strong>02</strong>
+              Parameters
+              <span style={{ display: 'block', fontSize: 'var(--text-2xs)', color: 'var(--text-dim)', marginTop: 2 }}>
+                Global config
+              </span>
+            </div>
+            <div className={`dash-new-step ${phase === 3 ? 'is-active' : ''}`}>
+              <strong>03</strong>
+              Launch
+              <span style={{ display: 'block', fontSize: 'var(--text-2xs)', color: 'var(--text-dim)', marginTop: 2 }}>
+                Start engine
+              </span>
+            </div>
+          </nav>
+
+          <div className="dash-new-main">
+            <section className="dash-panel dash-panel--new">
+              <div className="dash-panel-head dash-panel-head--compact">
+                <span className="dash-panel-num" aria-hidden>
+                  01
+                </span>
+                <div>
+                  <h2 className="dash-panel-title">Symbols</h2>
+                  <p className="dash-panel-desc">Select one or more PERP markets for this session. Active sessions reserve their symbols.</p>
+                </div>
+              </div>
+              <SymbolSelector value={symbols} onChange={setSymbols} disabledSymbols={conflictSymbols} />
+            </section>
+
+            <section className="dash-panel dash-panel--new dash-panel--config-scroll">
+              <div className="dash-panel-head dash-panel-head--compact">
+                <span className="dash-panel-num" aria-hidden>
+                  02
+                </span>
+                <div>
+                  <h2 className="dash-panel-title">Global config</h2>
+                  <p className="dash-panel-desc">
+                    Applied to every selected symbol for this start. You can refine per-symbol settings on the session page after launch.
+                  </p>
+                </div>
+              </div>
+              {isLoadingDefaults ? (
+                <p
+                  style={{
+                    fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',
+                    fontSize: 'var(--text-lg)',
+                    fontWeight: 500,
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  Loading defaults…
+                </p>
+              ) : (
+                <ConfigForm
+                  value={globalConfig}
+                  onChange={setGlobalConfig}
+                  defaults={configDefaults?.defaults?.['HYPE-PERP']}
+                />
+              )}
+            </section>
+          </div>
+        </div>
+
+        <div className="dash-new-footer">
+          {error && <div className="dash-alert">{error}</div>}
+          <button
+            type="submit"
+            disabled={symbols.length === 0 || isSubmitting}
+            className="btn btn-primary"
+            style={{
+              opacity: symbols.length === 0 || isSubmitting ? 0.45 : 1,
+            }}
+          >
+            {isSubmitting ? 'STARTING…' : 'START SESSION'}
+          </button>
+        </div>
       </form>
     </div>
   );

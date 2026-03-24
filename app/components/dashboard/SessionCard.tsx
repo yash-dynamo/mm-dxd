@@ -4,19 +4,37 @@ import Link from 'next/link';
 import { Session } from '@/lib/dxd-api';
 import { useDxdMetricsStore } from '@/stores';
 
-const statusStyles: Record<string, { bg: string; border: string; color: string }> = {
-  running: { bg: 'rgba(0,200,100,0.06)', border: 'rgba(0,200,100,0.25)', color: 'var(--green)' },
-  starting: { bg: 'rgba(201,162,39,0.06)', border: 'var(--border-gold)', color: 'var(--gold)' },
-  stopped: { bg: 'var(--bg-card-alt)', border: 'var(--border-subtle)', color: 'var(--text-dim)' },
-  error: { bg: 'rgba(204,51,51,0.06)', border: 'var(--border-red-medium)', color: 'var(--red-light)' },
+const statusStyles: Record<string, { bg: string; border: string; color: string; rail: string }> = {
+  running: {
+    bg: 'rgba(0,200,100,0.07)',
+    border: 'rgba(0,200,100,0.28)',
+    color: 'var(--green)',
+    rail: 'rgba(0,200,100,0.65)',
+  },
+  starting: {
+    bg: 'rgba(201,162,39,0.08)',
+    border: 'var(--border-gold)',
+    color: 'var(--gold)',
+    rail: 'var(--gold)',
+  },
+  stopped: {
+    bg: 'var(--bg-card-alt)',
+    border: 'var(--border-subtle)',
+    color: 'var(--text-dim)',
+    rail: 'rgba(255,255,255,0.12)',
+  },
+  error: {
+    bg: 'rgba(204,51,51,0.07)',
+    border: 'var(--border-red-medium)',
+    color: 'var(--red-light)',
+    rail: 'var(--red)',
+  },
 };
 
 export function SessionCard({ session }: { session: Session }) {
   const liveMetrics = useDxdMetricsStore((s) => s.liveMetrics[session.session_id]);
 
-  const totalPnl = liveMetrics
-    ? Object.values(liveMetrics).reduce((sum, m) => sum + m.pnl, 0)
-    : null;
+  const totalPnl = liveMetrics ? Object.values(liveMetrics).reduce((sum, m) => sum + m.pnl, 0) : null;
 
   const startedAt = new Date(session.started_at).toLocaleString();
   const st = statusStyles[session.status] ?? statusStyles.stopped;
@@ -24,85 +42,149 @@ export function SessionCard({ session }: { session: Session }) {
   return (
     <Link
       href={`/dashboard/sessions/${session.session_id}`}
-      className="card-interactive"
+      className="card-interactive dash-session-card"
       style={{
         display: 'block',
-        background: 'var(--bg-card)',
+        position: 'relative',
+        background: 'linear-gradient(165deg, rgba(16, 0, 22, 0.96) 0%, rgba(7, 0, 13, 0.99) 100%)',
         border: '1px solid var(--border-light)',
         borderRadius: 'var(--radius-lg)',
-        padding: 20,
+        padding: '26px 26px 26px 22px',
         textDecoration: 'none',
         transition: 'all var(--duration-normal) var(--ease-out)',
+        overflow: 'hidden',
+        boxShadow: '0 14px 44px rgba(0, 0, 0, 0.28)',
       }}
     >
-      {/* Symbols + Status */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 14 }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-          {session.symbols.map((sym) => (
-            <span
-              key={sym}
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-xs)',
-                fontWeight: 700,
-                letterSpacing: 'var(--tracking-label)',
-                color: 'var(--text-secondary)',
-                background: 'var(--bg-elevated)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '3px 8px',
-              }}
-            >
-              {sym}
-            </span>
-          ))}
-        </div>
-        <span
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 4,
+          background: st.rail,
+          opacity: 0.85,
+        }}
+      />
+
+      <div style={{ paddingLeft: 8 }}>
+        <div
           style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-2xs)',
-            fontWeight: 700,
-            letterSpacing: 'var(--tracking-label)',
-            textTransform: 'uppercase',
-            color: st.color,
-            background: st.bg,
-            border: `1px solid ${st.border}`,
-            borderRadius: 'var(--radius-sm)',
-            padding: '3px 8px',
-            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 12,
+            marginBottom: 18,
           }}
         >
-          {session.status}
-        </span>
-      </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, minWidth: 0 }}>
+            {session.symbols.map((sym) => (
+              <span
+                key={sym}
+                style={{
+                  fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 700,
+                  letterSpacing: 'var(--tracking-label)',
+                  color: 'var(--text-primary)',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '7px 12px',
+                }}
+              >
+                {sym}
+              </span>
+            ))}
+          </div>
+          <span
+            style={{
+              fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+              fontSize: 'var(--text-xs)',
+              fontWeight: 700,
+              letterSpacing: 'var(--tracking-label)',
+              textTransform: 'uppercase',
+              color: st.color,
+              background: st.bg,
+              border: `1px solid ${st.border}`,
+              borderRadius: 'var(--radius-sm)',
+              padding: '6px 12px',
+              flexShrink: 0,
+            }}
+          >
+            {session.status}
+          </span>
+        </div>
 
-      {/* PnL */}
-      {totalPnl !== null && (
-        <div style={{ marginBottom: 14 }}>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-dim)', letterSpacing: 'var(--tracking-label)', marginBottom: 2 }}>
-            PNL
+        {totalPnl !== null && (
+          <div style={{ marginBottom: 18 }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',
+                fontSize: 'var(--text-xs)',
+                fontWeight: 700,
+                color: 'var(--text-dim)',
+                letterSpacing: 'var(--tracking-label)',
+                marginBottom: 6,
+                textTransform: 'uppercase',
+              }}
+            >
+              Session PnL
+            </p>
+            <p
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'clamp(1.75rem, 3.5vw, 2.35rem)',
+                fontStyle: 'italic',
+                fontWeight: 500,
+                lineHeight: 1.05,
+                color: totalPnl >= 0 ? 'var(--green)' : 'var(--red)',
+                margin: 0,
+              }}
+            >
+              {totalPnl >= 0 ? '+' : ''}
+              {totalPnl.toFixed(2)}{' '}
+              <span style={{ fontSize: '0.55em', color: 'var(--text-secondary)', fontWeight: 600 }}>USD</span>
+            </p>
+          </div>
+        )}
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            paddingTop: 14,
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 500,
+              color: 'var(--text-secondary)',
+              letterSpacing: '0.02em',
+              margin: 0,
+            }}
+          >
+            Started <time dateTime={session.started_at}>{startedAt}</time>
           </p>
           <p
             style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'var(--text-5xl)',
-              fontStyle: 'italic',
-              fontWeight: 500,
-              color: totalPnl >= 0 ? 'var(--green)' : 'var(--red)',
+              fontFamily: 'var(--font-mono), ui-monospace, monospace',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--text-dim)',
+              margin: 0,
+              letterSpacing: '0.04em',
             }}
           >
-            {totalPnl >= 0 ? '+' : ''}{totalPnl.toFixed(2)} USD
+            {session.session_id.slice(0, 10)}… · Agent {session.agent_address.slice(0, 6)}…{session.agent_address.slice(-4)}
           </p>
         </div>
-      )}
-
-      {/* Meta */}
-      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-dim)', letterSpacing: 'var(--tracking-wide)' }}>
-        Started {startedAt}
-      </p>
-      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-2xs)', color: 'var(--text-ghost)', marginTop: 2 }}>
-        Agent: {session.agent_address.slice(0, 8)}…
-      </p>
+      </div>
     </Link>
   );
 }

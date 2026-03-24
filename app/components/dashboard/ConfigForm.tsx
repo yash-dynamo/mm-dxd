@@ -14,16 +14,33 @@ type Tab = 'simple' | 'advanced';
 
 function Field({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, padding: '8px 0' }}>
-      <div style={{ flex: 1 }}>
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>{label}</p>
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 20, padding: '12px 0' }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p
+          style={{
+            fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+            fontSize: 'var(--text-md)',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+          }}
+        >
+          {label}
+        </p>
         {description && (
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-2xs)', color: 'var(--text-dim)', marginTop: 2 }}>
+          <p
+            style={{
+              fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--text-dim)',
+              marginTop: 4,
+              lineHeight: 1.45,
+            }}
+          >
             {description}
           </p>
         )}
       </div>
-      <div style={{ width: 100, flexShrink: 0 }}>{children}</div>
+      <div style={{ width: 120, flexShrink: 0 }}>{children}</div>
     </div>
   );
 }
@@ -39,13 +56,14 @@ function NumberInput({ value, onChange, min, step = 0.1, disabled }: { value: nu
       disabled={disabled}
       style={{
         width: '100%',
-        fontFamily: 'var(--font-sans)',
-        fontSize: 'var(--text-sm)',
+        fontFamily: 'var(--font-mono), ui-monospace, monospace',
+        fontSize: 'var(--text-md)',
+        fontWeight: 500,
         color: 'var(--text-primary)',
         background: 'var(--bg-elevated)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-md)',
-        padding: '6px 10px',
+        padding: '10px 12px',
         textAlign: 'right',
         outline: 'none',
         opacity: disabled ? 0.4 : 1,
@@ -104,7 +122,16 @@ export function ConfigForm({ value, onChange, defaults, disabled }: ConfigFormPr
   return (
     <div>
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 16, background: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)', padding: 2 }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 0,
+          marginBottom: 20,
+          background: 'var(--bg-elevated)',
+          borderRadius: 'var(--radius-md)',
+          padding: 3,
+        }}
+      >
         {(['simple', 'advanced'] as Tab[]).map((t) => (
           <button
             key={t}
@@ -112,17 +139,17 @@ export function ConfigForm({ value, onChange, defaults, disabled }: ConfigFormPr
             onClick={() => setTab(t)}
             style={{
               flex: 1,
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-xs)',
+              fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+              fontSize: 'var(--text-sm)',
               fontWeight: 700,
               letterSpacing: 'var(--tracking-label)',
               textTransform: 'uppercase',
-              padding: '8px 0',
+              padding: '12px 8px',
               borderRadius: 'var(--radius-sm)',
               border: 'none',
               cursor: 'pointer',
               background: tab === t ? 'var(--red)' : 'transparent',
-              color: tab === t ? '#fff' : 'var(--text-dim)',
+              color: tab === t ? '#fff' : 'var(--text-secondary)',
               transition: 'all var(--duration-fast) var(--ease-out)',
             }}
           >

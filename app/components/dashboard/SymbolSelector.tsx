@@ -18,14 +18,16 @@ export function SymbolSelector({ value, onChange, disabledSymbols = [] }: Symbol
     <div>
       <p
         style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-xs)',
-          color: 'var(--text-dim)',
+          fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 700,
+          color: 'var(--text-secondary)',
           letterSpacing: 'var(--tracking-label)',
-          marginBottom: 10,
+          marginBottom: 14,
+          textTransform: 'uppercase',
         }}
       >
-        SELECT SYMBOLS
+        Select symbols
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {SYMBOLS.map((sym) => {
@@ -39,23 +41,23 @@ export function SymbolSelector({ value, onChange, disabledSymbols = [] }: Symbol
               disabled={disabled}
               title={disabled ? 'Conflict with another running session' : undefined}
               style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-xs)',
+                fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+                fontSize: 'var(--text-md)',
                 fontWeight: 700,
                 letterSpacing: 'var(--tracking-label)',
-                padding: '8px 16px',
+                padding: '12px 20px',
                 borderRadius: 'var(--radius-md)',
                 border: selected
                   ? '1px solid var(--red)'
                   : '1px solid var(--border-subtle)',
                 background: selected
-                  ? 'rgba(204,51,51,0.15)'
-                  : 'var(--bg-elevated)',
+                  ? 'rgba(204,51,51,0.14)'
+                  : 'rgba(255,255,255,0.03)',
                 color: selected
                   ? 'var(--red-light)'
-                  : 'var(--text-secondary)',
+                  : 'var(--text-primary)',
                 cursor: disabled ? 'not-allowed' : 'pointer',
-                opacity: disabled ? 0.3 : 1,
+                opacity: disabled ? 0.35 : 1,
                 transition: 'all var(--duration-fast) var(--ease-out)',
               }}
             >
@@ -65,8 +67,17 @@ export function SymbolSelector({ value, onChange, disabledSymbols = [] }: Symbol
         })}
       </div>
       {value.length === 0 && (
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--red)', marginTop: 6 }}>
-          Select at least one symbol
+        <p
+          style={{
+            fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 600,
+            color: 'var(--gold)',
+            marginTop: 12,
+            lineHeight: 1.45,
+          }}
+        >
+          Select at least one symbol to continue.
         </p>
       )}
     </div>

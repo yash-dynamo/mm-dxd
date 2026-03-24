@@ -81,7 +81,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
+    <div
+      className="dashboard-app"
+      style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)' }}
+    >
       {/* Top nav */}
       <header
         style={{
@@ -97,7 +100,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           style={{
             maxWidth: 1200,
             margin: '0 auto',
-            padding: '14px 24px',
+            padding: '16px clamp(16px, 3vw, 28px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -110,7 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               border: 'none',
               cursor: 'pointer',
               fontFamily: 'var(--font-serif)',
-              fontSize: 'var(--text-4xl)',
+              fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
               fontStyle: 'italic',
               fontWeight: 500,
               color: 'var(--red)',
@@ -124,30 +127,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div
               style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-xs)',
-                color: 'var(--text-dim)',
-                letterSpacing: 'var(--tracking-wide)',
+                fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+                fontSize: 'var(--text-md)',
+                fontWeight: 500,
+                color: 'var(--text-secondary)',
+                letterSpacing: '0.02em',
                 background: 'var(--bg-card)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 'var(--radius-md)',
-                padding: '6px 12px',
+                padding: '8px 16px',
               }}
             >
               Agent: {agentAddress.slice(0, 6)}…{agentAddress.slice(-4)}
             </div>
-            <button
-              onClick={handleLogout}
-              className="btn btn-outline-red"
-              style={{ padding: '5px 12px', fontSize: 'var(--text-xs)' }}
-            >
+            <button onClick={handleLogout} className="btn btn-outline-red">
               DISCONNECT
             </button>
           </div>
         </div>
       </header>
 
-      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
+      <main style={{ maxWidth: 1200, margin: '0 auto', padding: 'clamp(28px, 4vw, 48px) clamp(18px, 3vw, 32px)' }}>
         {children}
       </main>
     </div>
