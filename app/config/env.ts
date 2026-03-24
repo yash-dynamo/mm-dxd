@@ -10,8 +10,7 @@ const envSchema = zod.object({
   NEXT_PUBLIC_PRIVY_CLIENT_ID: zod.string().min(1),
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: zod.string().min(1),
 
-  // Backend / SDK — required
-  NEXT_PUBLIC_ENVIRONMENT: zod.enum(['mainnet', 'testnet', 'local']),
+  // Backend / SDK — required (Hotstuff client is mainnet-only; no testnet toggle)
   NEXT_PUBLIC_API_URL: zod.union([zod.string().url(), zod.literal('')]).optional(),
 
   // Chain / RPC — optional (used by deposit / bridge hooks)
@@ -31,7 +30,6 @@ const envVars = {
   NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
   NEXT_PUBLIC_PRIVY_CLIENT_ID: process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID,
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
-  NEXT_PUBLIC_ENVIRONMENT: process.env.NEXT_PUBLIC_ENVIRONMENT,
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
   NEXT_PUBLIC_COUNTDOWN_END_DATE: process.env.NEXT_PUBLIC_COUNTDOWN_END_DATE,
@@ -50,3 +48,6 @@ if (!parsedEnv.success) {
 }
 
 export const env = parsedEnv.data;
+
+/** Hotstuff ts-sdk `HttpTransport` / `WebSocketTransport` — app is mainnet-only. */
+export const isSdkTestnet = false;

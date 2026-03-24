@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@hotstuff-labs/ts-sdk": "^0.0.1-beta.10",
+    "@hotstuff-labs/ts-sdk": "0.0.1-beta.22",
     "@privy-io/react-auth": "3.8.1",
     "@relayprotocol/relay-kit-ui": "^7.1.0",
     "@relayprotocol/relay-sdk": "^5.1.0",

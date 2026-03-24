@@ -1,9 +1,9 @@
 import { SubscriptionClient, WebSocketTransport } from '@hotstuff-labs/ts-sdk';
 import server from '@/config/server';
-import { env } from '@/config';
+import { isSdkTestnet } from '@/config';
 
 const transport = new WebSocketTransport({
-  env: env.NEXT_PUBLIC_ENVIRONMENT,
+  isTestnet: isSdkTestnet,
   ...server.ws,
 });
 

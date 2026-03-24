@@ -1,9 +1,9 @@
 import { HttpTransport, InfoClient } from '@hotstuff-labs/ts-sdk';
 import server from '@/config/server';
-import { env } from '@/config';
+import { isSdkTestnet } from '@/config';
 
 const transport = new HttpTransport({
-  env: env.NEXT_PUBLIC_ENVIRONMENT,
+  isTestnet: isSdkTestnet,
   ...server.http,
 });
 

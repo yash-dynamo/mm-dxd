@@ -57,50 +57,6 @@ export function useAccountActions() {
     [executeUserAction],
   );
 
-  const createSubAccount = useCallback(
-    async (name: string) => {
-      return executeL1Action('Create SubAccount', (client) => client.createSubAccount({ name }));
-    },
-    [executeL1Action],
-  );
-
-  const updatePerpInstrumentLeverage = useCallback(
-    async (instrumentId: number, leverage: string) => {
-      return executeL1Action(actions.updatePerpInstrumentLeverage, (client) =>
-        client.updatePerpInstrumentLeverage({
-          instrumentId,
-          leverage,
-        }),
-      );
-    },
-    [executeL1Action],
-  );
-
-  const updateIsolatedMargin = useCallback(
-    async (instrumentId: number, side: 'LONG' | 'SHORT' | 'BOTH', ntli: string) => {
-      return executeL1Action(actions.updateIsolatedMargin, (client) =>
-        client.updateIsolatedMargin({
-          instrumentId,
-          side,
-          ntli,
-        }),
-      );
-    },
-    [executeL1Action],
-  );
-
-  const updateMarginMode = useCallback(
-    async (instrumentId: number, mode: 'isolated' | 'cross' | 'portfolio') => {
-      return executeL1Action(actions.updateMarginMode, (client) =>
-        client.updateMarginMode({
-          instrumentId,
-          mode,
-        }),
-      );
-    },
-    [executeL1Action],
-  );
-
   const approveBrokerFee = useCallback(
     async (broker: Address, maxFeeRate: string) => {
       return executeUserAction('Approve Broker Fee', (client) =>
@@ -154,10 +110,6 @@ export function useAccountActions() {
 
   return {
     addAgent,
-    createSubAccount,
-    updatePerpInstrumentLeverage,
-    updateIsolatedMargin,
-    updateMarginMode,
     approveBrokerFee,
     createReferralCode,
     setReferrer,

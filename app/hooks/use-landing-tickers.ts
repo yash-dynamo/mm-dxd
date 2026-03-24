@@ -37,14 +37,22 @@ export function useLandingTickers() {
         const tickerMap: Record<string, LandingTicker> = {};
         if (Array.isArray(response)) {
           for (const ticker of response) {
-            const name = ticker.instrument_name || ticker.symbol;
+            const t = ticker as unknown as {
+              instrument_name?: string;
+              symbol?: string;
+              mark_price?: string;
+              index_price?: string;
+              change_24h?: number | string;
+            };
+            const name = t.instrument_name || t.symbol;
             if (name && name.includes('-PERP')) {
+              const ch = t.change_24h;
               tickerMap[name] = {
-                symbol: ticker.symbol,
+                symbol: t.symbol ?? name,
                 instrument_name: name,
-                mark_price: ticker.mark_price || ticker.index_price || '0',
-                index_price: ticker.index_price || '0',
-                change_24h: ticker.change_24h,
+                mark_price: t.mark_price || t.index_price || '0',
+                index_price: t.index_price || '0',
+                change_24h: typeof ch === 'string' ? parseFloat(ch) : ch,
               };
             }
           }

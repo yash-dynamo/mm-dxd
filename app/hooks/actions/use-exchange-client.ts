@@ -10,7 +10,7 @@ import server from '@/config/server';
 import { useCallback } from 'react';
 import { wagmiConfig } from '@/config/wallet';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
-import { env } from '@/config';
+import { isSdkTestnet } from '@/config';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -97,7 +97,7 @@ export function useExchangeClient() {
 
         try {
           const transport = new HttpTransport({
-            env: env.NEXT_PUBLIC_ENVIRONMENT,
+            isTestnet: isSdkTestnet,
             ...server.http,
           });
 
@@ -133,7 +133,7 @@ export function useExchangeClient() {
       const account = privateKeyToAccount(defaultAgent.privateKey as `0x${string}`);
 
       const transport = new HttpTransport({
-        env: env.NEXT_PUBLIC_ENVIRONMENT,
+        isTestnet: isSdkTestnet,
         ...server.http,
       });
 
