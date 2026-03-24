@@ -30,7 +30,7 @@ export const RabbyMobileGuideModal = () => {
         <div className="text-center mb-4">
           <Image
             alt="Rabby Wallet"
-            src="/imgs/png/wallet-icons/rabby.png"
+            src="/wallet-icons/rabby.png"
             width={64}
             height={64}
             style={{ objectFit: 'cover', borderRadius: 12 }}
