@@ -46,14 +46,10 @@ export function SessionCard({ session }: { session: Session }) {
       style={{
         display: 'block',
         position: 'relative',
-        background: 'linear-gradient(165deg, rgba(16, 0, 22, 0.96) 0%, rgba(7, 0, 13, 0.99) 100%)',
-        border: '1px solid var(--border-light)',
-        borderRadius: 'var(--radius-lg)',
         padding: '26px 26px 26px 22px',
         textDecoration: 'none',
         transition: 'all var(--duration-normal) var(--ease-out)',
         overflow: 'hidden',
-        boxShadow: '0 14px 44px rgba(0, 0, 0, 0.28)',
       }}
     >
       <span
@@ -81,20 +77,7 @@ export function SessionCard({ session }: { session: Session }) {
         >
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, minWidth: 0 }}>
             {session.symbols.map((sym) => (
-              <span
-                key={sym}
-                style={{
-                  fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 700,
-                  letterSpacing: 'var(--tracking-label)',
-                  color: 'var(--text-primary)',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '7px 12px',
-                }}
-              >
+              <span key={sym} className="dash-session-chip">
                 {sym}
               </span>
             ))}
@@ -151,15 +134,7 @@ export function SessionCard({ session }: { session: Session }) {
           </div>
         )}
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
-            paddingTop: 14,
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
+        <div className="dash-session-divider" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <p
             style={{
               fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',

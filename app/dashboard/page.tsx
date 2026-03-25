@@ -56,7 +56,7 @@ export default function DashboardPage() {
       )}
 
       {!isLoadingSessions && sessions.length > 0 && (
-        <section className="dash-stats" aria-label="Session summary">
+        <section className="dash-stats dash-stats--grid" aria-label="Session summary">
           <div className="dash-stat">
             <p className="dash-stat-label">Total</p>
             <p className="dash-stat-value">{stats.total}</p>

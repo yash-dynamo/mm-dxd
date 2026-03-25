@@ -1,184 +1,185 @@
 'use client';
 
-import { SymbolMetrics } from '@/lib/dxd-api';
+import type { SymbolMetrics } from '@/lib/dxd-api';
+import type { HistoryRow } from '@/stores/slices/dxd/metrics';
+import { MksHeatStrip, MksSparkline } from './mks-widgets';
 
 interface MetricsPanelProps {
   metrics: Record<string, SymbolMetrics>;
   isRestarting?: boolean;
+  historyRows?: HistoryRow[];
 }
 
 const Spin = () => (
-  <svg className="animate-spin" width={14} height={14} viewBox="0 0 24 24" fill="none">
+  <svg className="animate-spin" width={14} height={14} viewBox="0 0 24 24" fill="none" aria-hidden>
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
   </svg>
 );
 
-function StatCard({
-  label,
-  value,
-  sub,
-  accent,
+function fmt(n: number, d = 2) {
+  return n.toFixed(d);
+}
+
+function cls(n: number) {
+  return n >= 0 ? 'mks-pos' : 'mks-neg';
+}
+
+function chip(ok: boolean) {
+  return ok ? 'mks-chip mks-chip-ok' : 'mks-chip mks-chip-bad';
+}
+
+function seriesForSymbol(rows: HistoryRow[], symbol: string, pick: keyof SymbolMetrics, limit = 48) {
+  return rows
+    .filter((r) => r.symbol === symbol)
+    .sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime())
+    .slice(-limit)
+    .map((r) => r[pick] as number);
+}
+
+function SymbolCard({
+  symbol,
+  m,
+  historyRows,
 }: {
-  label: string;
-  value: string;
-  sub?: string;
-  accent?: 'green' | 'red' | 'gold' | 'none';
+  symbol: string;
+  m: SymbolMetrics;
+  historyRows: HistoryRow[];
 }) {
-  const colors = {
-    green: 'var(--green)',
-    red: 'var(--red-light)',
-    gold: 'var(--gold)',
-    none: 'var(--text-primary)',
-  };
+  const fairHistory = seriesForSymbol(historyRows, symbol, 'fair_mid', 64);
+  const volHeat = seriesForSymbol(historyRows, symbol, 'vol_bps', 40);
+  const spreadHeat = seriesForSymbol(historyRows, symbol, 'spread_bps', 40);
 
   return (
-    <div
-      style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 'var(--radius-md)',
-        padding: 14,
-      }}
-    >
-      <p
-        style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-2xs)',
-          color: 'var(--text-dim)',
-          letterSpacing: 'var(--tracking-label)',
-          textTransform: 'uppercase',
-          marginBottom: 4,
-        }}
-      >
-        {label}
-      </p>
-      <p
-        style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: 'var(--text-4xl)',
-          fontStyle: 'italic',
-          fontWeight: 500,
-          color: colors[accent ?? 'none'],
-        }}
-      >
-        {value}
-      </p>
-      {sub && (
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-2xs)', color: 'var(--text-ghost)', marginTop: 2 }}>
-          {sub}
-        </p>
-      )}
-    </div>
+    <article className="mks-card mks-symbol-card">
+      <div className="mks-row mks-symbol-head">
+        <div className="mks-symbol-title">
+          <span className="mks-mono">{symbol}</span>
+          <span className="mks-badge">{m.inv_tier != null ? `tier ${m.inv_tier}` : '—'}</span>
+          {m.guard_halted ? (
+            <span className="mks-badge mks-mono" style={{ color: 'var(--mks-neg)' }}>
+              HALTED
+            </span>
+          ) : (
+            <span className="mks-badge mks-mono">live</span>
+          )}
+        </div>
+        <div className="mks-row">
+          <span className="mks-badge mks-mono">α {fmt(m.alpha, 3)}</span>
+          <span className="mks-badge mks-mono">toxic {fmt(m.toxic, 3)}</span>
+        </div>
+      </div>
+
+      <div className="mks-mini-grid">
+        <div className="mks-mini">
+          <div className="mks-k">PnL</div>
+          <div className={`mks-v ${cls(m.pnl)}`}>${fmt(m.pnl)}</div>
+        </div>
+        <div className="mks-mini">
+          <div className="mks-k">Inventory</div>
+          <div className="mks-v mks-mono">{fmt(m.inventory, 4)}</div>
+        </div>
+        <div className="mks-mini">
+          <div className="mks-k">Spread</div>
+          <div className="mks-v mks-mono">{fmt(m.spread_bps, 2)} bps</div>
+        </div>
+        <div className="mks-mini">
+          <div className="mks-k">Volatility</div>
+          <div className="mks-v mks-mono">{fmt(m.vol_bps, 2)} bps</div>
+        </div>
+        <div className="mks-mini">
+          <div className="mks-k">Fills / Vol</div>
+          <div className="mks-v mks-mono">
+            {m.total_fills} / ${fmt(m.total_volume_usd, 0)}
+          </div>
+        </div>
+        <div className="mks-mini">
+          <div className="mks-k">Round trips</div>
+          <div className="mks-v mks-mono">{m.round_trips}</div>
+        </div>
+        <div className="mks-mini">
+          <div className="mks-k">BN / HS / Fair</div>
+          <div className="mks-v mks-mono">
+            {fmt(m.bn_mid, 4)} / {fmt(m.hs_mid, 4)} / {fmt(m.fair_mid, 4)}
+          </div>
+        </div>
+      </div>
+
+      <div className="mks-chips">
+        <span className={chip(!m.guard_halted)}>guard</span>
+        <span className={chip(m.guard_spread_mult <= 1.01)}>spread cap</span>
+        <span className={chip(m.spread_bps > 0)}>spread&gt;0</span>
+        <span className={chip(m.adverse_rate < 0.5)}>adverse</span>
+        <span className={chip(m.toxic < 0.5)}>toxic</span>
+        <span className={chip(m.total_fills > 0)}>fills</span>
+      </div>
+
+      <div className="mks-split">
+        <div className="mks-panel">
+          <div className="mks-muted mks-small">Fair mid (history)</div>
+          <MksSparkline points={fairHistory} />
+          <div className="mks-muted mks-small mks-mono">
+            fair {fmt(m.fair_mid, 4)} | HS {fmt(m.hs_mid, 4)} | BN {fmt(m.bn_mid, 4)}
+          </div>
+        </div>
+        <div className="mks-panel">
+          <div className="mks-muted mks-small">Markouts</div>
+          <div className="mks-line">
+            <span>1s</span>
+            <span className="mks-mono">{fmt(m.avg_markout_1s, 4)}</span>
+          </div>
+          <div className="mks-line">
+            <span>5s</span>
+            <span className="mks-mono">{fmt(m.avg_markout_5s, 4)}</span>
+          </div>
+          <div className="mks-line">
+            <span>Adverse %</span>
+            <span className={`mks-mono ${cls(-m.adverse_rate)}`}>{fmt(m.adverse_rate * 100, 1)}%</span>
+          </div>
+          <div className="mks-line">
+            <span>Equity</span>
+            <span className="mks-mono" style={{ color: 'var(--gold)' }}>
+              ${fmt(m.account_equity, 2)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mks-split">
+        <div className="mks-panel">
+          <div className="mks-muted mks-tiny">Volatility heat (history)</div>
+          <MksHeatStrip values={volHeat} min={0} max={Math.max(0.5, m.vol_bps * 2)} />
+          <div className="mks-muted mks-tiny">Spread heat (history)</div>
+          <MksHeatStrip values={spreadHeat} min={0} max={Math.max(0.05, m.spread_bps * 3)} />
+        </div>
+        <div className="mks-panel">
+          <div className="mks-muted mks-small">Guards</div>
+          <div className="mks-line">
+            <span>Interventions</span>
+            <span className="mks-mono">{m.guard_interventions}</span>
+          </div>
+          <div className="mks-line">
+            <span>Spread mult</span>
+            <span className="mks-mono">{fmt(m.guard_spread_mult, 2)}×</span>
+          </div>
+          <div className="mks-muted mks-tiny">Markout 5s trend</div>
+          <MksSparkline points={seriesForSymbol(historyRows, symbol, 'avg_markout_5s', 48)} />
+        </div>
+      </div>
+    </article>
   );
 }
 
-function SymbolMetricsBlock({ symbol, m }: { symbol: string; m: SymbolMetrics }) {
+export function MetricsPanel({ metrics, isRestarting, historyRows = [] }: MetricsPanelProps) {
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <span
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-xs)',
-            fontWeight: 700,
-            letterSpacing: 'var(--tracking-label)',
-            color: 'var(--text-primary)',
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border-red)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '4px 10px',
-          }}
-        >
-          {symbol}
-        </span>
-        {m.guard_halted && (
-          <span
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-2xs)',
-              fontWeight: 700,
-              letterSpacing: 'var(--tracking-label)',
-              color: 'var(--red)',
-              background: 'rgba(204,51,51,0.08)',
-              border: '1px solid var(--border-red-medium)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '3px 8px',
-            }}
-          >
-            HALTED
-          </span>
-        )}
-        {m.guard_spread_mult > 1 && (
-          <span
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--text-2xs)',
-              fontWeight: 700,
-              letterSpacing: 'var(--tracking-label)',
-              color: 'var(--gold)',
-              background: 'rgba(201,162,39,0.06)',
-              border: '1px solid var(--border-gold)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '3px 8px',
-            }}
-          >
-            SPREAD ×{m.guard_spread_mult.toFixed(1)}
-          </span>
-        )}
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-          gap: 10,
-        }}
-      >
-        <StatCard label="PnL" value={`${m.pnl >= 0 ? '+' : ''}${m.pnl.toFixed(2)}`} accent={m.pnl > 0 ? 'green' : m.pnl < 0 ? 'red' : 'none'} />
-        <StatCard label="Inventory" value={m.inventory.toFixed(4)} sub={`Tier ${m.inv_tier}`} />
-        <StatCard label="Spread" value={`${m.spread_bps.toFixed(2)} bps`} />
-        <StatCard label="Volatility" value={`${m.vol_bps.toFixed(2)} bps`} />
-        <StatCard label="Fills" value={String(m.total_fills)} />
-        <StatCard label="Volume" value={`$${m.total_volume_usd.toFixed(0)}`} />
-        <StatCard label="Round Trips" value={String(m.round_trips)} />
-        <StatCard label="Alpha" value={m.alpha.toFixed(3)} />
-        <StatCard label="Toxic Flow" value={m.toxic.toFixed(3)} accent={m.toxic > 0.7 ? 'red' : 'none'} />
-        <StatCard label="Adverse Rate" value={`${(m.adverse_rate * 100).toFixed(1)}%`} />
-        <StatCard label="Markout 1s" value={`${m.avg_markout_1s.toFixed(3)}`} />
-        <StatCard label="Markout 5s" value={`${m.avg_markout_5s.toFixed(3)}`} />
-        <StatCard label="Equity" value={`$${m.account_equity.toFixed(2)}`} accent="gold" />
-        <StatCard label="Fair Mid" value={m.fair_mid.toFixed(4)} />
-        <StatCard label="HS Mid" value={m.hs_mid.toFixed(4)} />
-        <StatCard label="BN Mid" value={m.bn_mid.toFixed(4)} />
-      </div>
-    </div>
-  );
-}
-
-export function MetricsPanel({ metrics, isRestarting }: MetricsPanelProps) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+    <div className="mks-metrics-stack">
       {isRestarting && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '12px 16px',
-            background: 'rgba(201,162,39,0.06)',
-            border: '1px solid var(--border-gold)',
-            borderRadius: 'var(--radius-md)',
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-sm)',
-            color: 'var(--gold)',
-          }}
-        >
-          <Spin /> Strategy restarting after config change (~2-3s)
+        <div className="mks-restart-banner">
+          <Spin /> Strategy restarting after config change (~2–3s)
         </div>
       )}
       {Object.entries(metrics).map(([symbol, m]) => (
-        <SymbolMetricsBlock key={symbol} symbol={symbol} m={m} />
+        <SymbolCard key={symbol} symbol={symbol} m={m} historyRows={historyRows} />
       ))}
     </div>
   );

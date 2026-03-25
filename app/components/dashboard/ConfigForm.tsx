@@ -45,12 +45,24 @@ function Field({ label, description, children }: { label: string; description?: 
   );
 }
 
-function NumberInput({ value, onChange, min, step = 0.1, disabled }: { value: number | undefined; onChange: (v: number) => void; min?: number; step?: number; disabled?: boolean }) {
+function NumberInput({
+  value,
+  onChange,
+  min,
+  step = 0.1,
+  disabled,
+}: {
+  value: number | undefined;
+  onChange: (v: number) => void;
+  min?: number;
+  step?: number | 'any';
+  disabled?: boolean;
+}) {
   return (
     <input
       type="number"
       min={min}
-      step={step}
+      step={step === 'any' ? 'any' : step}
       value={value ?? ''}
       onChange={(e) => onChange(Number(e.target.value))}
       disabled={disabled}
@@ -171,7 +183,7 @@ export function ConfigForm({ value, onChange, defaults, disabled }: ConfigFormPr
               <NumberInput value={num('level_spacing_bps')} onChange={(v) => set('level_spacing_bps', v)} min={0} disabled={disabled} />
             </Field>
             <Field label="Order Size USD" description="0 = auto-size from equity">
-              <NumberInput value={num('order_size_usd')} onChange={(v) => set('order_size_usd', v)} min={0} step={10} disabled={disabled} />
+              <NumberInput value={num('order_size_usd')} onChange={(v) => set('order_size_usd', v)} min={0} step="any" disabled={disabled} />
             </Field>
             <Field label="Target Exposure" description="Max equity multiple">
               <NumberInput value={num('target_exposure_x')} onChange={(v) => set('target_exposure_x', v)} min={0} disabled={disabled} />

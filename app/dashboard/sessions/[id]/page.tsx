@@ -1,15 +1,34 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDxdSessionsStore, useDxdMetricsStore } from '@/stores';
 import { useSessions, useMetrics } from '@/hooks/dxd';
-import { DxdApiError } from '@/lib/dxd-api';
+import { DxdApiError, type SymbolMetrics, type ConfigPatch, type SymbolConfig } from '@/lib/dxd-api';
 import { MetricsPanel } from '@/components/dashboard/MetricsPanel';
 import { MetricsChart } from '@/components/dashboard/MetricsChart';
 import { WarmupOverlay } from '@/components/dashboard/WarmupOverlay';
 import { ConfigForm } from '@/components/dashboard/ConfigForm';
-import type { ConfigPatch, SymbolConfig } from '@/lib/dxd-api';
+import type { HistoryRow } from '@/stores/slices/dxd/metrics';
+
+function aggregateSessionKpis(metrics: Record<string, SymbolMetrics> | null) {
+  if (!metrics || Object.keys(metrics).length === 0) return null;
+  const vals = Object.values(metrics);
+  const totalPnl = vals.reduce((s, m) => s + m.pnl, 0);
+  const equity = vals[0].account_equity;
+  const fills = vals.reduce((s, m) => s + m.total_fills, 0);
+  const vol = vals.reduce((s, m) => s + m.total_volume_usd, 0);
+  const avgSpread = vals.reduce((s, m) => s + m.spread_bps, 0) / vals.length;
+  return { totalPnl, equity, fills, vol, avgSpread, ts: vals[0].ts };
+}
+
+function fmt(n: number, d = 2) {
+  return n.toFixed(d);
+}
+
+function cls(n: number) {
+  return n >= 0 ? 'mks-pos' : 'mks-neg';
+}
 
 const EMPTY_HISTORY_ROWS: never[] = [];
 
@@ -146,120 +165,113 @@ export default function SessionDetailPage() {
 
   const st = statusStyles[session.status] ?? statusStyles.stopped;
 
+  const kpi = useMemo(() => aggregateSessionKpis(liveMetrics), [liveMetrics]);
+
+  const historyEvents = useMemo(() => {
+    const rows = [...historyRows] as HistoryRow[];
+    rows.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
+    return rows.slice(0, 50).map((r) => ({
+      ts: r.ts,
+      symbol: r.symbol,
+      line: `PnL ${fmt(r.pnl)} · spr ${fmt(r.spread_bps)}bps · vol ${fmt(r.vol_bps)}bps`,
+    }));
+  }, [historyRows]);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      {/* Header */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 16 }}>
-        <button
-          onClick={() => router.push('/dashboard')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--text-xs)',
-            color: 'var(--text-dim)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            letterSpacing: 'var(--tracking-wide)',
-            marginTop: 4,
-          }}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5" /><path d="m12 19-7-7 7-7" />
+    <div className="mks-page">
+      <header className="mks-session-top">
+        <button type="button" className="mks-back-link" onClick={() => router.push('/dashboard')}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M19 12H5" />
+            <path d="m12 19-7-7 7-7" />
           </svg>
-          SESSIONS
+          Sessions
         </button>
-
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
-            {session.symbols.map((sym) => (
-              <span
-                key={sym}
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-xs)',
-                  fontWeight: 700,
-                  letterSpacing: 'var(--tracking-label)',
-                  color: 'var(--text-primary)',
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border-red)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '4px 10px',
-                }}
-              >
-                {sym}
-              </span>
-            ))}
-            <span
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-2xs)',
-                fontWeight: 700,
-                letterSpacing: 'var(--tracking-label)',
-                textTransform: 'uppercase',
-                color: st.color,
-                background: st.bg,
-                border: `1px solid ${st.border}`,
-                borderRadius: 'var(--radius-sm)',
-                padding: '4px 10px',
-              }}
-            >
-              {session.status}
-            </span>
-          </div>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-2xs)', color: 'var(--text-ghost)', marginTop: 6, letterSpacing: 'var(--tracking-wide)' }}>
-            ID: {session.session_id} · Started {new Date(session.started_at).toLocaleString()}
-          </p>
+        <div className="mks-session-brand">
+          <span className="mks-brand-dot" aria-hidden />
+          <span>Live session</span>
         </div>
-
+        <div className="mks-session-badges">
+          {session.symbols.map((sym) => (
+            <span key={sym} className="mks-badge">
+              {sym}
+            </span>
+          ))}
+          <span className="mks-badge mks-mono" style={{ color: st.color, borderColor: st.border }}>
+            {session.status}
+          </span>
+          <span className="mks-badge mks-mono">
+            id: {session.session_id.slice(0, 8)}…
+          </span>
+        </div>
         {isRunning && (
-          <button
-            onClick={handleStop}
-            disabled={isStopping}
-            className="btn btn-outline-red"
-            style={{ opacity: isStopping ? 0.5 : 1 }}
-          >
-            {isStopping ? 'STOPPING…' : 'STOP SESSION'}
+          <button type="button" onClick={handleStop} disabled={isStopping} className="mks-btn-outline" style={{ opacity: isStopping ? 0.5 : 1 }}>
+            {isStopping ? 'Stopping…' : 'Stop session'}
           </button>
         )}
-      </div>
+      </header>
 
-      {stopError && (
-        <div style={{ padding: '12px 16px', background: 'rgba(204,51,51,0.08)', border: '1px solid var(--border-red-medium)', borderRadius: 'var(--radius-md)', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--red-light)' }}>
-          {stopError}
-        </div>
-      )}
+      <p className="mks-session-meta">
+        Started {new Date(session.started_at).toLocaleString()} · {session.symbols.length} symbol{session.symbols.length === 1 ? '' : 's'}
+      </p>
 
-      {/* Warmup or Live Metrics */}
-      {isWarmingUp && isRunning ? (
-        <WarmupOverlay />
-      ) : liveMetrics ? (
-        <MetricsPanel metrics={liveMetrics} isRestarting={isRestarting} />
-      ) : (
-        !isRunning && (
-          <div style={{ padding: '40px 0', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', textAlign: 'center', fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-dim)' }}>
-            Session ended. No live metrics.
+      {kpi && (
+        <section className="mks-kpi-grid" aria-label="Session KPIs">
+          <div className="mks-card mks-kpi">
+            <div className="mks-kpi-k">Session PnL</div>
+            <div className={`mks-kpi-v ${cls(kpi.totalPnl)}`}>${fmt(kpi.totalPnl)}</div>
+            <div className="mks-muted mks-small">aggregate</div>
           </div>
-        )
+          <div className="mks-card mks-kpi">
+            <div className="mks-kpi-k">Equity</div>
+            <div className="mks-kpi-v">${fmt(kpi.equity)}</div>
+            <div className="mks-muted mks-small mks-mono">account</div>
+          </div>
+          <div className="mks-card mks-kpi">
+            <div className="mks-kpi-k">Volume</div>
+            <div className="mks-kpi-v">${fmt(kpi.vol, 0)}</div>
+            <div className="mks-muted mks-small">notional</div>
+          </div>
+          <div className="mks-card mks-kpi">
+            <div className="mks-kpi-k">Fills</div>
+            <div className="mks-kpi-v">{kpi.fills}</div>
+            <div className="mks-muted mks-small">total</div>
+          </div>
+          <div className="mks-card mks-kpi">
+            <div className="mks-kpi-k">Avg spread</div>
+            <div className="mks-kpi-v mks-mono">{fmt(kpi.avgSpread, 2)} bps</div>
+            <div className="mks-muted mks-small">cross-symbol</div>
+          </div>
+          <div className="mks-card mks-kpi">
+            <div className="mks-kpi-k">Last tick</div>
+            <div className="mks-kpi-v mks-small mks-mono" style={{ fontSize: 13, fontWeight: 600 }}>
+              {kpi.ts ?? '—'}
+            </div>
+            <div className="mks-muted mks-small">metrics</div>
+          </div>
+        </section>
       )}
 
-      {/* History chart */}
-      {historyRows.length > 0 && (
-        <MetricsChart rows={historyRows} symbol={selectedSymbol ?? undefined} />
-      )}
+      {stopError && <div className="mks-error">Stop error: {stopError}</div>}
 
-      {/* Live Config Edit */}
-      {isRunning && (
-        <div
-          style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-light)',
-            borderRadius: 'var(--radius-lg)',
-            padding: 24,
-          }}
-        >
+      <div className="mks-layout">
+        <div className="mks-symbols-col">
+          {isWarmingUp && isRunning ? (
+            <WarmupOverlay />
+          ) : liveMetrics ? (
+            <MetricsPanel metrics={liveMetrics} isRestarting={isRestarting} historyRows={historyRows} />
+          ) : (
+            !isRunning && <div className="mks-card mks-muted">Session ended. No live metrics.</div>
+          )}
+
+          {historyRows.length > 0 && (
+            <div className="mks-chart-wrap">
+              <MetricsChart rows={historyRows} symbol={selectedSymbol ?? undefined} />
+            </div>
+          )}
+
+          {isRunning && (
+            <div className="mks-config-card">
           <button
             type="button"
             onClick={() => setShowConfigPanel((v) => !v)}
@@ -364,8 +376,31 @@ export default function SessionDetailPage() {
               </button>
             </div>
           )}
+            </div>
+          )}
         </div>
-      )}
+
+        <aside className="mks-events">
+          <div className="mks-events-title">History snapshots</div>
+          <div className="mks-event-list">
+            {historyEvents.length > 0 ? (
+              historyEvents.map((e, i) => (
+                <div key={`${e.ts}-${i}-${e.symbol}`} className="mks-event-line">
+                  <span className="mks-event-meta mks-mono">{e.ts}</span>
+                  <div className="mks-event-body">
+                    <span className="mks-mono" style={{ color: 'var(--mks-muted)', marginRight: 6 }}>
+                      {e.symbol}
+                    </span>
+                    {e.line}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="mks-muted mks-small">No history rows yet.</div>
+            )}
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
