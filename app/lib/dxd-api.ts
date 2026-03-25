@@ -66,9 +66,28 @@ interface HealthResponse {
 
 export type SessionStatus = 'starting' | 'running' | 'stopped' | 'error';
 
+export type DxdStrategy = 'maker' | 'taker';
+
+/** Canonical PERP list from DXD API. */
+export const DXD_PERP_SYMBOLS = [
+  'HYPE-PERP',
+  'BTC-PERP',
+  'ETH-PERP',
+  'SOL-PERP',
+  'XRP-PERP',
+  'ZEC-PERP',
+  'BNB-PERP',
+  'GOLD-PERP',
+  'SILVER-PERP',
+  'X-PERP',
+] as const;
+
+export type DxdPerpSymbol = (typeof DXD_PERP_SYMBOLS)[number];
+
 export interface Session {
   session_id: string;
   status: SessionStatus;
+  strategy?: DxdStrategy;
   symbols: string[];
   agent_address: string;
   started_at: string;
@@ -76,11 +95,38 @@ export interface Session {
   error: string | null;
 }
 
-interface SessionConfig {
+export interface TakerConfig {
+  min_spread_usd: number;
+  min_spread_bps: number;
+  take_profit_bps: number;
+  close_bps: number;
+  close_timeout_ms: number;
+  order_size_usd: number;
+  target_exposure_x: number;
+  leverage: number;
+  cooldown_s: number;
+  max_loss_usd: number;
+  order_expiry_ms: number;
+  [key: string]: unknown;
+}
+
+export interface MakerSessionConfigResponse {
   session_id: string;
+  strategy?: DxdStrategy;
   symbols: string[];
   configs: Record<string, SymbolConfig>;
 }
+
+export interface TakerSessionConfigResponse {
+  session_id: string;
+  strategy: 'taker';
+  symbols: string[];
+  config: TakerConfig;
+}
+
+export type SessionConfigResponse = MakerSessionConfigResponse | TakerSessionConfigResponse;
+
+export type PatchConfigResponse = MakerSessionConfigResponse | TakerSessionConfigResponse;
 
 export interface SymbolConfig {
   // Simple
@@ -119,6 +165,9 @@ export interface SymbolConfig {
 export interface ConfigDefaultsResponse {
   defaults: Record<string, SymbolConfig>;
   allowed_keys: string[];
+  taker_defaults?: TakerConfig;
+  taker_defaults_by_symbol?: Record<string, Partial<TakerConfig>>;
+  taker_allowed_keys?: string[];
 }
 
 export interface BrokerConfig {
@@ -127,11 +176,13 @@ export interface BrokerConfig {
 }
 
 export interface CreateSessionRequest {
+  strategy?: DxdStrategy;
   agent_address: string;
   agent_private_key: string;
   symbols: string[];
   config?: Partial<SymbolConfig>;
   symbol_config?: Record<string, Partial<SymbolConfig>>;
+  taker_config?: Partial<TakerConfig>;
   // Optional broker routing config used by backend order placement
   broker_address?: string;
   broker_config?: BrokerConfig;
@@ -186,9 +237,20 @@ interface MetricsHistoryResponse {
   rows: Array<{ symbol: string } & SymbolMetrics>;
 }
 
+export type TakerConfigPatch = Partial<TakerConfig>;
+
 export type ConfigPatch =
   | Partial<SymbolConfig>
-  | ({ symbol: string } & Partial<SymbolConfig>);
+  | ({ symbol: string } & Partial<SymbolConfig>)
+  | TakerConfigPatch;
+
+export function isTakerSessionConfigResponse(r: SessionConfigResponse): r is TakerSessionConfigResponse {
+  return 'config' in r && !('configs' in r);
+}
+
+export function isMakerSessionConfigResponse(r: SessionConfigResponse): r is MakerSessionConfigResponse {
+  return 'configs' in r;
+}
 
 // ─── HTTP helper ──────────────────────────────────────────────────────────────
 
@@ -281,12 +343,12 @@ export const dxdApi = {
   },
 
   // GET /v1/sessions/{id}/config
-  getSessionConfig(token: string, id: string): Promise<SessionConfig> {
+  getSessionConfig(token: string, id: string): Promise<SessionConfigResponse> {
     return request(`/sessions/${id}/config`, {}, token);
   },
 
   // PATCH /v1/sessions/{id}/config
-  patchConfig(token: string, id: string, patch: ConfigPatch): Promise<SessionConfig> {
+  patchConfig(token: string, id: string, patch: ConfigPatch): Promise<PatchConfigResponse> {
     return request(`/sessions/${id}/config`, { method: 'PATCH', body: JSON.stringify(patch) }, token);
   },
 

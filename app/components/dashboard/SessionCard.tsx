@@ -76,6 +76,9 @@ export function SessionCard({ session }: { session: Session }) {
           }}
         >
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, minWidth: 0 }}>
+            <span className="dash-session-chip" style={{ borderStyle: 'dashed' }}>
+              {(session.strategy ?? 'maker').toUpperCase()}
+            </span>
             {session.symbols.map((sym) => (
               <span key={sym} className="dash-session-chip">
                 {sym}

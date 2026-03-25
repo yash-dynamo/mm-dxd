@@ -2,7 +2,14 @@
 
 import { useCallback } from 'react';
 import { useDxdSessionsStore } from '@/stores';
-import { dxdApi, CreateSessionRequest, ConfigPatch, DxdNetworkError } from '@/lib/dxd-api';
+import {
+  dxdApi,
+  CreateSessionRequest,
+  ConfigPatch,
+  DxdNetworkError,
+  isMakerSessionConfigResponse,
+  isTakerSessionConfigResponse,
+} from '@/lib/dxd-api';
 import { useDxdAuth } from './use-dxd-auth';
 
 const toSessionsErrorMessage = (err: unknown, fallback: string) =>
@@ -17,9 +24,11 @@ export function useSessions() {
   const {
     setSessions,
     upsertSession,
+    patchSessionRow,
     updateSessionStatus,
     setConfigDefaults,
     setActiveSessionConfig,
+    setActiveTakerConfig,
     setActiveSessionId,
     setLoadingSessions,
     setLoadingDefaults,
@@ -99,20 +108,40 @@ export function useSessions() {
   const patchConfig = useCallback(
     async (id: string, patch: ConfigPatch) => {
       const updated = await withAuth((token) => dxdApi.patchConfig(token, id, patch));
-      setActiveSessionConfig(updated.configs);
+      if (isTakerSessionConfigResponse(updated)) {
+        setActiveTakerConfig(updated.config);
+        setActiveSessionConfig(null);
+        patchSessionRow(id, { strategy: 'taker' });
+      } else {
+        setActiveTakerConfig(null);
+        setActiveSessionConfig(isMakerSessionConfigResponse(updated) ? updated.configs : null);
+        if (isMakerSessionConfigResponse(updated)) {
+          patchSessionRow(id, { strategy: updated.strategy ?? 'maker' });
+        }
+      }
       return updated;
     },
-    [withAuth, setActiveSessionConfig],
+    [withAuth, setActiveSessionConfig, setActiveTakerConfig, patchSessionRow],
   );
 
   // GET /v1/sessions/{id}/config
   const loadSessionConfig = useCallback(
     async (id: string) => {
       const data = await withAuth((token) => dxdApi.getSessionConfig(token, id));
-      setActiveSessionConfig(data.configs);
+      if (isTakerSessionConfigResponse(data)) {
+        setActiveTakerConfig(data.config);
+        setActiveSessionConfig(null);
+        patchSessionRow(id, { strategy: 'taker' });
+      } else {
+        setActiveTakerConfig(null);
+        setActiveSessionConfig(isMakerSessionConfigResponse(data) ? data.configs : null);
+        if (isMakerSessionConfigResponse(data)) {
+          patchSessionRow(id, { strategy: data.strategy ?? 'maker' });
+        }
+      }
       return data;
     },
-    [withAuth, setActiveSessionConfig],
+    [withAuth, setActiveSessionConfig, setActiveTakerConfig, patchSessionRow],
   );
 
   return {

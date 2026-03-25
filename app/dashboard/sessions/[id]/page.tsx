@@ -4,11 +4,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDxdSessionsStore, useDxdMetricsStore } from '@/stores';
 import { useSessions, useMetrics } from '@/hooks/dxd';
-import { DxdApiError, type SymbolMetrics, type ConfigPatch, type SymbolConfig } from '@/lib/dxd-api';
+import {
+  DxdApiError,
+  type SymbolMetrics,
+  type ConfigPatch,
+  type SymbolConfig,
+  type TakerConfig,
+} from '@/lib/dxd-api';
 import { MetricsPanel } from '@/components/dashboard/MetricsPanel';
 import { MetricsChart } from '@/components/dashboard/MetricsChart';
 import { WarmupOverlay } from '@/components/dashboard/WarmupOverlay';
 import { ConfigForm } from '@/components/dashboard/ConfigForm';
+import { TakerConfigForm } from '@/components/dashboard/TakerConfigForm';
 import type { HistoryRow } from '@/stores/slices/dxd/metrics';
 
 function aggregateSessionKpis(metrics: Record<string, SymbolMetrics> | null) {
@@ -43,7 +50,7 @@ export default function SessionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const { sessions, activeSessionConfig } = useDxdSessionsStore();
+  const { sessions, activeSessionConfig, activeTakerConfig } = useDxdSessionsStore();
   const liveMetrics = useDxdMetricsStore((s) => s.liveMetrics[id] ?? null);
   const historyRows = useDxdMetricsStore((s) => s.history[id] ?? EMPTY_HISTORY_ROWS);
   const isWarmingUp = useDxdMetricsStore((s) => s.isWarmingUp[id] ?? false);
@@ -53,8 +60,10 @@ export default function SessionDetailPage() {
   const { stopPolling, handleConfigPatch, fetchHistory } = useMetrics(id);
 
   const session = sessions.find((s) => s.session_id === id);
+  const isTakerSession = (session?.strategy ?? 'maker') === 'taker';
 
   const [configPatch, setConfigPatch] = useState<Partial<SymbolConfig>>({});
+  const [takerPatch, setTakerPatch] = useState<Partial<TakerConfig>>({});
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   const [isStopping, setIsStopping] = useState(false);
   const [stopError, setStopError] = useState<string | null>(null);
@@ -116,7 +125,14 @@ export default function SessionDetailPage() {
   };
 
   const handleSaveConfig = async () => {
-    if (!id || Object.keys(configPatch).length === 0) return;
+    if (!id) return;
+    if (isTakerSession) {
+      if (Object.keys(takerPatch).length === 0) return;
+      await handleConfigPatch(() => patchConfig(id, takerPatch).then(() => {}));
+      setTakerPatch({});
+      return;
+    }
+    if (Object.keys(configPatch).length === 0) return;
     const patch: ConfigPatch = selectedSymbol
       ? { symbol: selectedSymbol, ...configPatch }
       : configPatch;
@@ -192,6 +208,9 @@ export default function SessionDetailPage() {
           <span>Live session</span>
         </div>
         <div className="mks-session-badges">
+          <span className="mks-badge mks-mono" style={{ textTransform: 'uppercase' }}>
+            {session.strategy ?? 'maker'}
+          </span>
           {session.symbols.map((sym) => (
             <span key={sym} className="mks-badge">
               {sym}
@@ -307,10 +326,10 @@ export default function SessionDetailPage() {
             </svg>
           </button>
 
-          {showConfigPanel && (
+              {showConfigPanel && (
             <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Per-symbol selector */}
-              {session.symbols.length > 1 && (
+              {!isTakerSession && session.symbols.length > 1 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   <button
                     type="button"
@@ -354,23 +373,45 @@ export default function SessionDetailPage() {
                 </div>
               )}
 
-              <ConfigForm
-                value={configPatch}
-                onChange={setConfigPatch}
-                defaults={
-                  selectedSymbol
-                    ? activeSessionConfig?.[selectedSymbol]
-                    : activeSessionConfig?.[session.symbols[0]]
-                }
-                disabled={isRestarting}
-              />
+              {isTakerSession ? (
+                <TakerConfigForm
+                  value={takerPatch}
+                  onChange={setTakerPatch}
+                  defaults={activeTakerConfig ?? undefined}
+                  disabled={isRestarting}
+                />
+              ) : (
+                <ConfigForm
+                  value={configPatch}
+                  onChange={setConfigPatch}
+                  defaults={
+                    selectedSymbol
+                      ? activeSessionConfig?.[selectedSymbol]
+                      : activeSessionConfig?.[session.symbols[0]]
+                  }
+                  disabled={isRestarting}
+                />
+              )}
 
               <button
                 type="button"
                 onClick={handleSaveConfig}
-                disabled={Object.keys(configPatch).length === 0 || isRestarting}
+                disabled={
+                  isRestarting ||
+                  (isTakerSession
+                    ? Object.keys(takerPatch).length === 0
+                    : Object.keys(configPatch).length === 0)
+                }
                 className="btn btn-primary"
-                style={{ opacity: Object.keys(configPatch).length === 0 || isRestarting ? 0.3 : 1 }}
+                style={{
+                  opacity:
+                    isRestarting ||
+                    (isTakerSession
+                      ? Object.keys(takerPatch).length === 0
+                      : Object.keys(configPatch).length === 0)
+                      ? 0.3
+                      : 1,
+                }}
               >
                 APPLY CONFIG
               </button>
