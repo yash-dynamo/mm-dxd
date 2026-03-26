@@ -5,6 +5,8 @@ import { useAccount } from 'wagmi';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { useAuthStore, useDxdAuthStore } from '@/stores';
 import { useAccountActions } from '@/hooks/actions';
+import { env } from '@/config/env';
+import { useBrokerApproval } from './use-broker-approval';
 
 const AGENT_VALID_DAYS = Number(process.env.NEXT_PUBLIC_AGENT_VALID_DAYS ?? 30);
 const SESSION_KEY = 'dxd_agent_pk';
@@ -30,6 +32,9 @@ export function useAgentSetup() {
   const { address: wagmiAddress } = useAccount();
   const { setAgentInfo } = useDxdAuthStore();
   const { addAgent } = useAccountActions();
+  const { ensureBrokerApproval } = useBrokerApproval();
+  const brokerAddress = env.NEXT_PUBLIC_BROKER_ADDRESS;
+  const maxFeeRate = env.NEXT_PUBLIC_MAX_FEE_RATE ?? '0.001';
 
   /** Step 1: generate key pair in-browser and surface to UI */
   const generateAgent = useCallback(() => {
@@ -39,7 +44,7 @@ export function useAgentSetup() {
     setSetupStatus('generated');
   }, []);
 
-  /** Step 2: register agent on-chain via the main wallet (EOA popup) */
+  /** Step 2: register agent + approve broker fee on-chain via the main wallet */
   const registerAgent = useCallback(
     async (agentName: string) => {
       if (!generatedAgent) return;
@@ -80,6 +85,11 @@ export function useAgentSetup() {
         if (!result?.success) {
           throw new Error(result?.error || 'Failed to add agent');
         }
+        if (!brokerAddress) {
+          throw new Error('Broker address is not configured. Set NEXT_PUBLIC_BROKER_ADDRESS in .env.');
+        }
+
+        await ensureBrokerApproval({ brokerAddress, maxFeeRate });
 
         // Persist private key to sessionStorage (clears on tab close)
         // Never written to localStorage or any Zustand store
@@ -98,7 +108,7 @@ export function useAgentSetup() {
         setSetupStatus('error');
       }
     },
-    [generatedAgent, wagmiAddress, addAgent, setAgentInfo],
+    [generatedAgent, wagmiAddress, addAgent, brokerAddress, ensureBrokerApproval, maxFeeRate, setAgentInfo],
   );
 
   /** Read the agent private key from sessionStorage (for session creation) */

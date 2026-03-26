@@ -19,7 +19,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     listSessions();
-  }, []);
+  }, [listSessions]);
 
   const stats = useMemo(() => {
     const active = sessions.filter((s) => s.status === 'running' || s.status === 'starting').length;
@@ -27,17 +27,17 @@ export default function DashboardPage() {
   }, [sessions]);
 
   return (
-    <div className="dash-page">
+    <div className="dash-page mks-page mks-home-page">
       <header className="dash-masthead">
-        <div style={{ flex: '1 1 280px', minWidth: 0 }}>
+        <div className="min-w-0 flex-1">
           <p className="dash-eyebrow">Market making</p>
           <h1 className="dash-title">Sessions</h1>
           <p className="dash-subtitle">
             Monitor live PnL and status at a glance. Open a card for spreads, risk, and session controls.
           </p>
         </div>
-        <div style={{ flexShrink: 0 }}>
-          <Link href="/dashboard/new" className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>
+        <div className="w-full sm:w-auto sm:shrink-0">
+          <Link href="/dashboard/new" className="btn btn-primary w-full sm:w-auto" style={{ whiteSpace: 'nowrap' }}>
             + NEW SESSION
           </Link>
         </div>
@@ -98,7 +98,7 @@ export default function DashboardPage() {
             >
               Start your first market-making run — pick symbols, set global defaults, then launch from the composer.
             </p>
-            <Link href="/dashboard/new" className="btn btn-primary">
+            <Link href="/dashboard/new" className="btn btn-primary w-full sm:w-auto">
               START SESSION
             </Link>
           </div>

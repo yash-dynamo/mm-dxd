@@ -75,7 +75,7 @@ export default function CTASection() {
           <span className="heading-display-italic">Go</span>{" "}
           <span className="heading-display-bold">with</span>{" "}
           <span className="animate-glow-gold logo-text" style={{ color: "var(--gold)", letterSpacing: "6px" }}>
-            XD
+            DXD
           </span>
         </h2>
 

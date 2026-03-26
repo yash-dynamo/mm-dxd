@@ -29,7 +29,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "DXD — High School Market Maker Protocol",
   description:
-    "The most XD market maker in DeFi. Powered by Sacred Gear algorithms and the Gremory clan's power.",
+    "The most DXD market maker in DeFi. Powered by Sacred Gear algorithms and the Gremory clan's power.",
 };
 
 export default function RootLayout({

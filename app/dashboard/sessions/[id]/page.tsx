@@ -101,13 +101,13 @@ export default function SessionDetailPage() {
     if (!id) return;
     loadSessionConfig(id);
     fetchHistory();
-  }, [id]);
+  }, [id, loadSessionConfig, fetchHistory]);
 
   useEffect(() => {
     if (session && !selectedSymbol) {
       setSelectedSymbol(session.symbols[0] ?? null);
     }
-  }, [session]);
+  }, [session, selectedSymbol]);
 
   const kpi = useMemo(() => aggregateSessionKpis(liveMetrics), [liveMetrics]);
 
@@ -224,7 +224,13 @@ export default function SessionDetailPage() {
           </span>
         </div>
         {isRunning && (
-          <button type="button" onClick={handleStop} disabled={isStopping} className="mks-btn-outline" style={{ opacity: isStopping ? 0.5 : 1 }}>
+          <button
+            type="button"
+            onClick={handleStop}
+            disabled={isStopping}
+            className="mks-btn-outline w-full sm:w-auto"
+            style={{ opacity: isStopping ? 0.5 : 1 }}
+          >
             {isStopping ? 'Stopping…' : 'Stop session'}
           </button>
         )}
@@ -294,6 +300,7 @@ export default function SessionDetailPage() {
           <button
             type="button"
             onClick={() => setShowConfigPanel((v) => !v)}
+            className="w-full"
             style={{
               display: 'flex',
               alignItems: 'center',

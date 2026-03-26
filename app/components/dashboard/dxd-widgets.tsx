@@ -8,7 +8,7 @@ function cleanSeries(values: Array<number | null | undefined>): number[] {
     .filter((v) => Number.isFinite(v));
 }
 
-export function MksSparkline({ points, className = '' }: { points: Array<number | null | undefined>; className?: string }) {
+export function DxdSparkline({ points, className = '' }: { points: Array<number | null | undefined>; className?: string }) {
   const clean = useMemo(() => cleanSeries(points), [points]);
   if (clean.length < 2) {
     return (
@@ -46,7 +46,7 @@ function asNumber(v: unknown, fallback = 0): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-export function MksHeatStrip({
+export function DxdHeatStrip({
   values,
   min = 0,
   max = 1,

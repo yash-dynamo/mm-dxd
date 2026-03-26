@@ -40,7 +40,7 @@ function Field({ label, description, children }: { label: string; description?: 
           </p>
         )}
       </div>
-      <div style={{ width: 120, flexShrink: 0 }}>{children}</div>
+      <div style={{ width: 120, flexShrink: 0, display: 'flex', justifyContent: 'flex-end' }}>{children}</div>
     </div>
   );
 }
@@ -207,6 +207,9 @@ export function ConfigForm({ value, onChange, defaults, disabled }: ConfigFormPr
             <Field label="Spread Vol Mult" description="Dynamic spread multiplier">
               <NumberInput value={num('spread_vol_mult')} onChange={(v) => set('spread_vol_mult', v)} min={0} disabled={disabled} />
             </Field>
+            <Field label="Close Spread (bps)" description="Spread used in close-only mode">
+              <NumberInput value={num('close_spread_bps')} onChange={(v) => set('close_spread_bps', v)} min={0} step="any" disabled={disabled} />
+            </Field>
             <Field label="Alpha Bps" description="Max alpha shift">
               <NumberInput value={num('alpha_bps')} onChange={(v) => set('alpha_bps', v)} min={0} step={1} disabled={disabled} />
             </Field>
@@ -216,8 +219,23 @@ export function ConfigForm({ value, onChange, defaults, disabled }: ConfigFormPr
             <Field label="Max Inventory" description="Max position (lots)">
               <NumberInput value={num('max_inventory')} onChange={(v) => set('max_inventory', v)} min={0} disabled={disabled} />
             </Field>
+            <Field label="Level Size Scale" description="Geometric level size multiplier">
+              <NumberInput value={num('level_size_scale')} onChange={(v) => set('level_size_scale', v)} min={0} step="any" disabled={disabled} />
+            </Field>
             <Field label="Leverage">
               <NumberInput value={num('leverage')} onChange={(v) => set('leverage', v)} min={1} step={1} disabled={disabled} />
+            </Field>
+            <Field label="Close Threshold USD" description="Flat-position threshold">
+              <NumberInput value={num('close_threshold_usd')} onChange={(v) => set('close_threshold_usd', v)} min={0} step="any" disabled={disabled} />
+            </Field>
+            <Field label="Skew Start %" description="Inventory % to begin skewing quotes">
+              <NumberInput value={num('inv_skew_start_pct')} onChange={(v) => set('inv_skew_start_pct', v)} min={0} step={1} disabled={disabled} />
+            </Field>
+            <Field label="Skip Open %" description="Inventory % to skip opening quotes">
+              <NumberInput value={num('inv_skip_open_pct')} onChange={(v) => set('inv_skip_open_pct', v)} min={0} step={1} disabled={disabled} />
+            </Field>
+            <Field label="Toxic Threshold" description="Defense trigger (0-1)">
+              <NumberInput value={num('toxic_threshold')} onChange={(v) => set('toxic_threshold', v)} min={0} step="any" disabled={disabled} />
             </Field>
             <Field label="Max Loss %" description="Stop at loss %">
               <NumberInput value={num('max_loss_pct')} onChange={(v) => set('max_loss_pct', v)} min={0} disabled={disabled} />

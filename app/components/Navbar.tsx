@@ -233,7 +233,7 @@ export default function Navbar() {
                 textShadow: "0 0 20px rgba(204, 51, 51, 0.4)",
               }}
             >
-              XD
+              DXD
             </div>
             <div className="logo-subtitle">LIQUIDITY</div>
           </div>

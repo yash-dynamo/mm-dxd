@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDxdAuthStore, useDxdSessionsStore } from '@/stores';
 import { useSessions } from '@/hooks/dxd';
 import { useAgentSetup } from '@/hooks/dxd';
+import { useBrokerApproval } from '@/hooks/dxd';
 import { SymbolSelector } from '@/components/dashboard/SymbolSelector';
 import { ConfigForm } from '@/components/dashboard/ConfigForm';
 import { TakerConfigForm } from '@/components/dashboard/TakerConfigForm';
@@ -17,6 +18,7 @@ export default function NewSessionPage() {
   const { configDefaults, sessions, isLoadingDefaults } = useDxdSessionsStore();
   const { loadDefaults, createSession } = useSessions();
   const { getAgentPrivateKey } = useAgentSetup();
+  const { ensureBrokerApproval } = useBrokerApproval();
 
   const [strategy, setStrategy] = useState<DxdStrategy>('maker');
   const [symbols, setSymbols] = useState<string[]>([]);
@@ -30,18 +32,29 @@ export default function NewSessionPage() {
 
   useEffect(() => {
     loadDefaults();
-  }, []);
+  }, [loadDefaults]);
 
   useEffect(() => {
     if (strategy !== 'taker' || !configDefaults?.taker_defaults) return;
+    let cancelled = false;
     const sym = symbols[0];
     if (!sym) {
-      setTakerConfig({});
-      return;
+      queueMicrotask(() => {
+        if (!cancelled) setTakerConfig({});
+      });
+      return () => {
+        cancelled = true;
+      };
     }
     const base = { ...configDefaults.taker_defaults };
     const extra = configDefaults.taker_defaults_by_symbol?.[sym] ?? {};
-    setTakerConfig({ ...base, ...extra });
+    queueMicrotask(() => {
+      if (!cancelled) setTakerConfig({ ...base, ...extra });
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [strategy, symbols, configDefaults]);
 
   const conflictSymbols = sessions
@@ -72,6 +85,8 @@ export default function NewSessionPage() {
     setError(null);
 
     try {
+      await ensureBrokerApproval({ brokerAddress, maxFeeRate });
+
       const payload: CreateSessionRequest = {
         strategy,
         agent_address: agentAddress,
@@ -97,7 +112,7 @@ export default function NewSessionPage() {
   };
 
   return (
-    <div className="dash-page dash-page--new">
+    <div className="dash-page dash-page--new mks-page mks-new-page">
       <form onSubmit={handleSubmit} className="dash-new-page">
         <div className="dash-new-topbar">
           <button type="button" className="dash-back-btn" onClick={() => router.back()}>
@@ -123,21 +138,21 @@ export default function NewSessionPage() {
             <div className={`dash-new-step ${phase === 1 ? 'is-active' : ''}`}>
               <strong>01</strong>
               Markets
-              <span style={{ display: 'block', fontSize: 'var(--text-2xs)', color: 'var(--text-dim)', marginTop: 2 }}>
+              <span className="dash-new-step-sub">
                 Symbol set
               </span>
             </div>
             <div className={`dash-new-step ${phase === 2 ? 'is-active' : ''}`}>
               <strong>02</strong>
               Parameters
-              <span style={{ display: 'block', fontSize: 'var(--text-2xs)', color: 'var(--text-dim)', marginTop: 2 }}>
-                Global config
+              <span className="dash-new-step-sub">
+                {strategy === 'taker' ? 'Taker config' : 'Global config'}
               </span>
             </div>
             <div className={`dash-new-step ${phase === 3 ? 'is-active' : ''}`}>
               <strong>03</strong>
               Launch
-              <span style={{ display: 'block', fontSize: 'var(--text-2xs)', color: 'var(--text-dim)', marginTop: 2 }}>
+              <span className="dash-new-step-sub">
                 Start engine
               </span>
             </div>
@@ -245,7 +260,7 @@ export default function NewSessionPage() {
               isSubmitting ||
               (strategy === 'taker' && symbols.length !== 1)
             }
-            className="btn btn-primary"
+            className="btn btn-primary w-full lg:w-auto"
             style={{
               opacity:
                 symbols.length === 0 || isSubmitting || (strategy === 'taker' && symbols.length !== 1)

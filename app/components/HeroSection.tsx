@@ -173,7 +173,7 @@ export default function HeroSection() {
             {/* Protocol badge */}
             <div className="animate-fade-in-left badge badge-red" style={{ marginBottom: "var(--space-12)" }}>
               <span className="animate-spark" style={{ fontSize: "var(--text-xs)" }}>✦</span>
-              XD · LIVE
+              DXD · LIVE
             </div>
 
             {/* Heading — two words per line */}
@@ -262,7 +262,7 @@ export default function HeroSection() {
                         textShadow: "0 0 30px rgba(204, 51, 51, 0.3)"
                       }}
                     >
-                      XD
+                      DXD
                     </div>
                   </CardItem>
                   <CardItem translateZ="70" className="w-auto">
