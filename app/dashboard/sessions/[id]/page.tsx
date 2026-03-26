@@ -109,6 +109,18 @@ export default function SessionDetailPage() {
     }
   }, [session]);
 
+  const kpi = useMemo(() => aggregateSessionKpis(liveMetrics), [liveMetrics]);
+
+  const historyEvents = useMemo(() => {
+    const rows = [...historyRows] as HistoryRow[];
+    rows.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
+    return rows.slice(0, 50).map((r) => ({
+      ts: r.ts,
+      symbol: r.symbol,
+      line: `PnL ${fmt(r.pnl)} · spr ${fmt(r.spread_bps)}bps · vol ${fmt(r.vol_bps)}bps`,
+    }));
+  }, [historyRows]);
+
   const isRunning = session?.status === 'running' || session?.status === 'starting';
 
   const handleStop = async () => {
@@ -180,18 +192,6 @@ export default function SessionDetailPage() {
   }
 
   const st = statusStyles[session.status] ?? statusStyles.stopped;
-
-  const kpi = useMemo(() => aggregateSessionKpis(liveMetrics), [liveMetrics]);
-
-  const historyEvents = useMemo(() => {
-    const rows = [...historyRows] as HistoryRow[];
-    rows.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
-    return rows.slice(0, 50).map((r) => ({
-      ts: r.ts,
-      symbol: r.symbol,
-      line: `PnL ${fmt(r.pnl)} · spr ${fmt(r.spread_bps)}bps · vol ${fmt(r.vol_bps)}bps`,
-    }));
-  }, [historyRows]);
 
   return (
     <div className="mks-page">
