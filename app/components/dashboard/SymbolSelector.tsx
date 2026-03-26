@@ -1,16 +1,31 @@
 'use client';
 
-const SYMBOLS = ['HYPE-PERP', 'BTC-PERP', 'ETH-PERP', 'SOL-PERP', 'XRP-PERP', 'ZEC-PERP'];
+import { DXD_PERP_SYMBOLS } from '@/lib/dxd-api';
+
+export type SymbolSelectionMode = 'multi' | 'single';
 
 interface SymbolSelectorProps {
   value: string[];
   onChange: (symbols: string[]) => void;
   disabledSymbols?: string[];
+  /** Symbols to show; defaults to full DXD PERP list. */
+  symbols?: readonly string[];
+  selectionMode?: SymbolSelectionMode;
 }
 
-export function SymbolSelector({ value, onChange, disabledSymbols = [] }: SymbolSelectorProps) {
+export function SymbolSelector({
+  value,
+  onChange,
+  disabledSymbols = [],
+  symbols = DXD_PERP_SYMBOLS,
+  selectionMode = 'multi',
+}: SymbolSelectorProps) {
   const toggle = (sym: string) => {
     if (disabledSymbols.includes(sym)) return;
+    if (selectionMode === 'single') {
+      onChange(value.includes(sym) ? [] : [sym]);
+      return;
+    }
     onChange(value.includes(sym) ? value.filter((s) => s !== sym) : [...value, sym]);
   };
 
@@ -27,10 +42,10 @@ export function SymbolSelector({ value, onChange, disabledSymbols = [] }: Symbol
           textTransform: 'uppercase',
         }}
       >
-        Select symbols
+        {selectionMode === 'single' ? 'Select symbol' : 'Select symbols'}
       </p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {SYMBOLS.map((sym) => {
+        {symbols.map((sym) => {
           const selected = value.includes(sym);
           const disabled = disabledSymbols.includes(sym);
           return (
@@ -77,7 +92,7 @@ export function SymbolSelector({ value, onChange, disabledSymbols = [] }: Symbol
             lineHeight: 1.45,
           }}
         >
-          Select at least one symbol to continue.
+          {selectionMode === 'single' ? 'Select one market to continue.' : 'Select at least one symbol to continue.'}
         </p>
       )}
     </div>

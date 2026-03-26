@@ -9,6 +9,10 @@ import { ConnectStep } from '@/components/dashboard/steps/ConnectStep';
 import { SignInStep } from '@/components/dashboard/steps/SignInStep';
 import { AgentSetupStep } from '@/components/dashboard/steps/AgentSetupStep';
 
+const MKS_THEME_KEY = 'mks_dashboard_theme';
+
+type MksTheme = 'dark' | 'light';
+
 export function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isConnected, address: wagmiAddress } = useAccount();
@@ -16,9 +20,27 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
   const { token, isAuthenticated, agentAddress, clearDxdAuth } = useDxdAuthStore();
   const [authHydrated, setAuthHydrated] = useState(false);
   const [sessionValidated, setSessionValidated] = useState(false);
+  const [mksTheme, setMksTheme] = useState<MksTheme>('dark');
 
   const walletConnected = isConnected && !!wagmiAddress;
   const hasDxdSession = isAuthenticated && !!token;
+
+  useEffect(() => {
+    try {
+      const t = localStorage.getItem(MKS_THEME_KEY);
+      if (t === 'light' || t === 'dark') setMksTheme(t);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(MKS_THEME_KEY, mksTheme);
+    } catch {
+      /* ignore */
+    }
+  }, [mksTheme]);
 
   useEffect(() => {
     const persist = useDxdAuthStore.persist;
@@ -81,74 +103,32 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
   };
 
   return (
-    <div
-      className="dashboard-app"
-      style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)' }}
-    >
-      <header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 'var(--z-navbar)',
-          background: 'var(--bg-overlay)',
-          borderBottom: '1px solid var(--border-red-light)',
-          backdropFilter: 'blur(12px)',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: '0 auto',
-            padding: '16px clamp(16px, 3vw, 28px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <button
-            onClick={() => router.push('/dashboard')}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(1.35rem, 2.8vw, 1.85rem)',
-              fontStyle: 'italic',
-              fontWeight: 500,
-              color: 'var(--red)',
-              letterSpacing: 'var(--tracking-logo)',
-              textShadow: '0 0 20px rgba(204,51,51,0.4)',
-            }}
-          >
+    <div className="dashboard-app dash-shell mks-dashboard" data-mks-theme={mksTheme}>
+      <header className="dash-topbar">
+        <div className="dash-topbar-inner">
+          <button type="button" className="dash-brand-btn" onClick={() => router.push('/dashboard')} aria-label="Dashboard home">
+            <span className="dash-brand-dot" aria-hidden />
             XD
           </button>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div
-              style={{
-                fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
-                fontSize: 'var(--text-md)',
-                fontWeight: 500,
-                color: 'var(--text-secondary)',
-                letterSpacing: '0.02em',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                padding: '8px 16px',
-              }}
-            >
+          <div className="dash-topbar-actions">
+            <div className="dash-agent-pill">
               Agent: {agentAddress.slice(0, 6)}…{agentAddress.slice(-4)}
             </div>
-            <button onClick={handleLogout} className="btn btn-outline-red">
+            <button
+              type="button"
+              className="mks-theme-toggle"
+              onClick={() => setMksTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+            >
+              {mksTheme === 'dark' ? 'Light' : 'Dark'}
+            </button>
+            <button type="button" onClick={handleLogout} className="btn btn-outline-red">
               DISCONNECT
             </button>
           </div>
         </div>
       </header>
 
-      <main style={{ maxWidth: 1200, margin: '0 auto', padding: 'clamp(28px, 4vw, 48px) clamp(18px, 3vw, 32px)' }}>
-        {children}
-      </main>
+      <main className="dash-main">{children}</main>
     </div>
   );
 }

@@ -7,6 +7,8 @@ interface MetricsChartProps {
   symbol?: string;
 }
 
+const rawColors = ['#cc3333', '#c9a227', '#00c864', '#2a5aaa', '#7b00c8', '#cc4400'];
+
 export function MetricsChart({ rows, symbol }: MetricsChartProps) {
   const filtered = symbol ? rows.filter((r) => r.symbol === symbol) : rows;
 
@@ -23,21 +25,9 @@ export function MetricsChart({ rows, symbol }: MetricsChartProps) {
 
   if (symbols.length === 0 || filtered.length === 0) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '48px 0',
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-lg)',
-          fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-sm)',
-          color: 'var(--text-dim)',
-        }}
-      >
-        No history data yet
+      <div className="mks-history-chart mks-history-chart--empty">
+        <p className="mks-history-chart-title">PnL over time</p>
+        <p className="mks-history-chart-empty-msg">No history data yet</p>
       </div>
     );
   }
@@ -47,12 +37,9 @@ export function MetricsChart({ rows, symbol }: MetricsChartProps) {
   const maxPnl = Math.max(...allPnl);
   const range = maxPnl - minPnl || 1;
 
-  const W = 600;
-  const H = 160;
-  const PAD = 10;
-
-  const colors = ['var(--red)', 'var(--gold)', 'var(--green)', 'var(--blue)', 'var(--purple)', 'var(--orange)'];
-  const rawColors = ['#cc3333', '#c9a227', '#00c864', '#2a5aaa', '#7b00c8', '#cc4400'];
+  const W = 720;
+  const H = 260;
+  const PAD = 12;
 
   function buildPath(symRows: HistoryRow[]): string {
     const total = symRows.length;
@@ -68,70 +55,39 @@ export function MetricsChart({ rows, symbol }: MetricsChartProps) {
   const zeroY = H - PAD - ((0 - minPnl) / range) * (H - PAD * 2);
 
   return (
-    <div
-      style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 20,
-      }}
-    >
-      <p
-        style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: 'var(--text-xs)',
-          color: 'var(--text-dim)',
-          letterSpacing: 'var(--tracking-label)',
-          marginBottom: 14,
-        }}
-      >
-        PNL OVER TIME
-      </p>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%' }} preserveAspectRatio="none">
-        {zeroY >= PAD && zeroY <= H - PAD && (
-          <line
-            x1={PAD}
-            y1={zeroY}
-            x2={W - PAD}
-            y2={zeroY}
-            stroke="rgba(255,255,255,0.06)"
-            strokeDasharray="4 4"
-          />
-        )}
-        {symbols.map((sym, idx) => (
-          <path
-            key={sym}
-            d={buildPath(bySymbol[sym])}
-            fill="none"
-            stroke={rawColors[idx % rawColors.length]}
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-        ))}
-      </svg>
+    <div className="mks-history-chart">
+      <p className="mks-history-chart-title">PnL over time</p>
+      <div className="mks-history-chart-svg-wrap">
+        <svg viewBox={`0 0 ${W} ${H}`} className="mks-history-chart-svg" preserveAspectRatio="xMidYMid meet">
+          {zeroY >= PAD && zeroY <= H - PAD && (
+            <line
+              className="mks-chart-zero-line"
+              x1={PAD}
+              y1={zeroY}
+              x2={W - PAD}
+              y2={zeroY}
+              strokeDasharray="4 4"
+            />
+          )}
+          {symbols.map((sym, idx) => (
+            <path
+              key={sym}
+              d={buildPath(bySymbol[sym])}
+              fill="none"
+              stroke={rawColors[idx % rawColors.length]}
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+          ))}
+        </svg>
+      </div>
 
       {symbols.length > 1 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 14 }}>
+        <div className="mks-history-chart-legend">
           {symbols.map((sym, idx) => (
-            <div key={sym} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span
-                style={{
-                  width: 16,
-                  height: 3,
-                  borderRadius: 2,
-                  background: rawColors[idx % rawColors.length],
-                }}
-              />
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-2xs)',
-                  color: 'var(--text-dim)',
-                  letterSpacing: 'var(--tracking-wide)',
-                }}
-              >
-                {sym}
-              </span>
+            <div key={sym} className="mks-history-chart-legend-item">
+              <span className="mks-history-chart-swatch" style={{ background: rawColors[idx % rawColors.length] }} />
+              <span className="mks-history-chart-legend-label">{sym}</span>
             </div>
           ))}
         </div>

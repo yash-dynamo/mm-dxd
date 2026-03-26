@@ -7,8 +7,9 @@ import { useSessions } from '@/hooks/dxd';
 import { useAgentSetup } from '@/hooks/dxd';
 import { SymbolSelector } from '@/components/dashboard/SymbolSelector';
 import { ConfigForm } from '@/components/dashboard/ConfigForm';
+import { TakerConfigForm } from '@/components/dashboard/TakerConfigForm';
 import { env } from '@/config/env';
-import type { CreateSessionRequest, SymbolConfig } from '@/lib/dxd-api';
+import type { CreateSessionRequest, DxdStrategy, SymbolConfig, TakerConfig } from '@/lib/dxd-api';
 
 export default function NewSessionPage() {
   const router = useRouter();
@@ -17,8 +18,10 @@ export default function NewSessionPage() {
   const { loadDefaults, createSession } = useSessions();
   const { getAgentPrivateKey } = useAgentSetup();
 
+  const [strategy, setStrategy] = useState<DxdStrategy>('maker');
   const [symbols, setSymbols] = useState<string[]>([]);
   const [globalConfig, setGlobalConfig] = useState<Partial<SymbolConfig>>({});
+  const [takerConfig, setTakerConfig] = useState<Partial<TakerConfig>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +32,18 @@ export default function NewSessionPage() {
     loadDefaults();
   }, []);
 
+  useEffect(() => {
+    if (strategy !== 'taker' || !configDefaults?.taker_defaults) return;
+    const sym = symbols[0];
+    if (!sym) {
+      setTakerConfig({});
+      return;
+    }
+    const base = { ...configDefaults.taker_defaults };
+    const extra = configDefaults.taker_defaults_by_symbol?.[sym] ?? {};
+    setTakerConfig({ ...base, ...extra });
+  }, [strategy, symbols, configDefaults]);
+
   const conflictSymbols = sessions
     .filter((s) => s.status === 'running' || s.status === 'starting')
     .flatMap((s) => s.symbols);
@@ -38,6 +53,10 @@ export default function NewSessionPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (symbols.length === 0 || !agentAddress) return;
+    if (strategy === 'taker' && symbols.length !== 1) {
+      setError('Taker mode requires exactly one symbol.');
+      return;
+    }
 
     const pk = getAgentPrivateKey();
     if (!pk) {
@@ -54,10 +73,14 @@ export default function NewSessionPage() {
 
     try {
       const payload: CreateSessionRequest = {
+        strategy,
         agent_address: agentAddress,
         agent_private_key: pk,
         symbols,
-        config: Object.keys(globalConfig).length > 0 ? globalConfig : undefined,
+        config:
+          strategy === 'maker' && Object.keys(globalConfig).length > 0 ? globalConfig : undefined,
+        taker_config:
+          strategy === 'taker' && Object.keys(takerConfig).length > 0 ? takerConfig : undefined,
         broker_address: brokerAddress,
         broker_config: {
           broker_address: brokerAddress,
@@ -91,8 +114,8 @@ export default function NewSessionPage() {
         </div>
 
         <p className="dash-new-lede">
-          Choose perpetual symbols, optionally tune global defaults, then start. Conflicting symbols already running elsewhere are
-          disabled automatically.
+          Choose maker (multi-symbol quoting) or taker (single symbol), pick markets, tune parameters, then start. Conflicting
+          symbols already running elsewhere are disabled automatically.
         </p>
 
         <div className="dash-new-shell">
@@ -127,11 +150,46 @@ export default function NewSessionPage() {
                   01
                 </span>
                 <div>
-                  <h2 className="dash-panel-title">Symbols</h2>
-                  <p className="dash-panel-desc">Select one or more PERP markets for this session. Active sessions reserve their symbols.</p>
+                  <h2 className="dash-panel-title">Strategy and symbols</h2>
+                  <p className="dash-panel-desc">
+                    Maker quotes multiple PERPs; taker runs on exactly one. Active sessions reserve their symbols.
+                  </p>
                 </div>
               </div>
-              <SymbolSelector value={symbols} onChange={setSymbols} disabledSymbols={conflictSymbols} />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                {(['maker', 'taker'] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => {
+                      setStrategy(s);
+                      setSymbols((prev) => (s === 'taker' && prev.length > 1 ? [prev[0]].filter(Boolean) : prev));
+                    }}
+                    style={{
+                      fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 700,
+                      letterSpacing: 'var(--tracking-label)',
+                      textTransform: 'uppercase',
+                      padding: '12px 20px',
+                      borderRadius: 'var(--radius-md)',
+                      border: strategy === s ? '1px solid var(--red)' : '1px solid var(--border-subtle)',
+                      background: strategy === s ? 'rgba(204,51,51,0.14)' : 'rgba(255,255,255,0.03)',
+                      color: strategy === s ? 'var(--red-light)' : 'var(--text-primary)',
+                      cursor: 'pointer',
+                      transition: 'all var(--duration-fast) var(--ease-out)',
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              <SymbolSelector
+                value={symbols}
+                onChange={setSymbols}
+                disabledSymbols={conflictSymbols}
+                selectionMode={strategy === 'taker' ? 'single' : 'multi'}
+              />
             </section>
 
             <section className="dash-panel dash-panel--new dash-panel--config-scroll">
@@ -140,9 +198,11 @@ export default function NewSessionPage() {
                   02
                 </span>
                 <div>
-                  <h2 className="dash-panel-title">Global config</h2>
+                  <h2 className="dash-panel-title">{strategy === 'taker' ? 'Taker config' : 'Global config'}</h2>
                   <p className="dash-panel-desc">
-                    Applied to every selected symbol for this start. You can refine per-symbol settings on the session page after launch.
+                    {strategy === 'taker'
+                      ? 'Parameters for the one-account taker worker. Defaults refresh when you change the symbol.'
+                      : 'Applied to every selected symbol for this start. Refine per-symbol settings on the session page after launch.'}
                   </p>
                 </div>
               </div>
@@ -157,11 +217,19 @@ export default function NewSessionPage() {
                 >
                   Loading defaults…
                 </p>
+              ) : strategy === 'taker' ? (
+                <TakerConfigForm
+                  value={takerConfig}
+                  onChange={setTakerConfig}
+                  defaults={configDefaults?.taker_defaults}
+                />
               ) : (
                 <ConfigForm
                   value={globalConfig}
                   onChange={setGlobalConfig}
-                  defaults={configDefaults?.defaults?.['HYPE-PERP']}
+                  defaults={
+                    configDefaults?.defaults?.[symbols[0] ?? 'HYPE-PERP'] ?? configDefaults?.defaults?.['HYPE-PERP']
+                  }
                 />
               )}
             </section>
@@ -172,10 +240,17 @@ export default function NewSessionPage() {
           {error && <div className="dash-alert">{error}</div>}
           <button
             type="submit"
-            disabled={symbols.length === 0 || isSubmitting}
+            disabled={
+              symbols.length === 0 ||
+              isSubmitting ||
+              (strategy === 'taker' && symbols.length !== 1)
+            }
             className="btn btn-primary"
             style={{
-              opacity: symbols.length === 0 || isSubmitting ? 0.45 : 1,
+              opacity:
+                symbols.length === 0 || isSubmitting || (strategy === 'taker' && symbols.length !== 1)
+                  ? 0.45
+                  : 1,
             }}
           >
             {isSubmitting ? 'STARTING…' : 'START SESSION'}
