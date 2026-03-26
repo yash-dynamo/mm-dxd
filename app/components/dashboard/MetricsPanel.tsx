@@ -2,7 +2,7 @@
 
 import type { SymbolMetrics } from '@/lib/dxd-api';
 import type { HistoryRow } from '@/stores/slices/dxd/metrics';
-import { MksHeatStrip, MksSparkline } from './mks-widgets';
+import { DxdHeatStrip, DxdSparkline } from './dxd-widgets';
 
 interface MetricsPanelProps {
   metrics: Record<string, SymbolMetrics>;
@@ -117,7 +117,7 @@ function SymbolCard({
       <div className="mks-split">
         <div className="mks-panel">
           <div className="mks-muted mks-small">Fair mid (history)</div>
-          <MksSparkline points={fairHistory} />
+          <DxdSparkline points={fairHistory} />
           <div className="mks-muted mks-small mks-mono">
             fair {fmt(m.fair_mid, 4)} | HS {fmt(m.hs_mid, 4)} | BN {fmt(m.bn_mid, 4)}
           </div>
@@ -148,9 +148,9 @@ function SymbolCard({
       <div className="mks-split">
         <div className="mks-panel">
           <div className="mks-muted mks-tiny">Volatility heat (history)</div>
-          <MksHeatStrip values={volHeat} min={0} max={Math.max(0.5, m.vol_bps * 2)} />
+          <DxdHeatStrip values={volHeat} min={0} max={Math.max(0.5, m.vol_bps * 2)} />
           <div className="mks-muted mks-tiny">Spread heat (history)</div>
-          <MksHeatStrip values={spreadHeat} min={0} max={Math.max(0.05, m.spread_bps * 3)} />
+          <DxdHeatStrip values={spreadHeat} min={0} max={Math.max(0.05, m.spread_bps * 3)} />
         </div>
         <div className="mks-panel">
           <div className="mks-muted mks-small">Guards</div>
@@ -163,7 +163,7 @@ function SymbolCard({
             <span className="mks-mono">{fmt(m.guard_spread_mult, 2)}×</span>
           </div>
           <div className="mks-muted mks-tiny">Markout 5s trend</div>
-          <MksSparkline points={seriesForSymbol(historyRows, symbol, 'avg_markout_5s', 48)} />
+          <DxdSparkline points={seriesForSymbol(historyRows, symbol, 'avg_markout_5s', 48)} />
         </div>
       </div>
     </article>

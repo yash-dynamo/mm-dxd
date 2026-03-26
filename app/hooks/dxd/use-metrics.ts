@@ -9,7 +9,7 @@ const POLL_INTERVAL_MS = 5_000;
 
 export function useMetrics(sessionId: string | null) {
   const { withAuth } = useDxdAuth();
-  const { setLiveMetrics, setHistory, setWarmingUp, setRestarting } =
+  const { setLiveMetrics, setHistory, upsertHistoryRows, setWarmingUp, setRestarting } =
     useDxdMetricsStore();
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -30,6 +30,9 @@ export function useMetrics(sessionId: string | null) {
       if (!isMountedRef.current) return;
       setWarmingUp(sessionId, false);
       setLiveMetrics(sessionId, data.metrics);
+      // Keep chart/history realtime by upserting each live snapshot tick.
+      const liveRows = Object.entries(data.metrics).map(([symbol, metrics]) => ({ symbol, ...metrics }));
+      upsertHistoryRows(sessionId, liveRows);
     } catch (err) {
       if (!isMountedRef.current) return;
       if (err instanceof DxdApiError && err.status === 404) {
@@ -37,7 +40,7 @@ export function useMetrics(sessionId: string | null) {
         setWarmingUp(sessionId, true);
       }
     }
-  }, [sessionId, withAuth, setLiveMetrics, setWarmingUp]);
+  }, [sessionId, withAuth, setLiveMetrics, upsertHistoryRows, setWarmingUp]);
 
   const startPolling = useCallback(() => {
     stopPolling();
@@ -56,7 +59,7 @@ export function useMetrics(sessionId: string | null) {
       isMountedRef.current = false;
       stopPolling();
     };
-  }, [sessionId]);
+  }, [sessionId, setWarmingUp, startPolling, stopPolling]);
 
   /**
    * Call after PATCH /config. Pauses polling ~3s to let the subprocess restart,

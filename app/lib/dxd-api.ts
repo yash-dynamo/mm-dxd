@@ -189,7 +189,10 @@ export interface CreateSessionRequest {
 }
 
 interface CreateSessionResponse extends Session {
-  config: Record<string, SymbolConfig>;
+  /** maker response shape */
+  config?: Record<string, SymbolConfig>;
+  /** taker response shape */
+  taker_config?: TakerConfig;
 }
 
 interface SessionsListResponse {
@@ -199,12 +202,15 @@ interface SessionsListResponse {
 export interface SymbolMetrics {
   ts: string;
   pnl: number;
+  pnl_realized?: number;
+  pnl_unrealized?: number;
   inventory: number;
   inv_tier: number;
   total_fills: number;
   total_volume_usd: number;
   round_trips: number;
   spread_bps: number;
+  quote_mode?: string;
   vol_bps: number;
   alpha: number;
   toxic: number;

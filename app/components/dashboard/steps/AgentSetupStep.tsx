@@ -177,7 +177,7 @@ export function AgentSetupStep() {
                   Waiting for wallet confirmation…
                 </p>
                 <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-dim)', marginTop: 6 }}>
-                  Your main wallet will prompt you to sign the addAgent transaction.
+                  You may see two wallet prompts: addAgent first, then broker fee approval.
                 </p>
               </>
             )}

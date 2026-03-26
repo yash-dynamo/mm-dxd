@@ -99,7 +99,7 @@ export default function SplashScreen() {
           }}
         >
           <span style={{ display: "inline-block", width: "40px", height: "1px", background: "linear-gradient(to right, transparent, var(--red))" }} />
-          ✦ XD PROTOCOL · SACRED BLOOD CONTRACT ✦
+          ✦ DXD PROTOCOL · SACRED BLOOD CONTRACT ✦
           <span style={{ display: "inline-block", width: "40px", height: "1px", background: "linear-gradient(to left, transparent, var(--red))" }} />
         </div>
 
@@ -231,15 +231,15 @@ export default function SplashScreen() {
 
       {/* ── Bottom DXD stamp ── */}
       <div className="splash-stamp" style={{ fontSize: "clamp(32px, 4vw, 52px)" }}>
-        XD
+        DXD
       </div>
 
       {/* ── Corner runes ── */}
       {[
-        { top: "20px", left: "24px", text: "✦ XD" },
-        { top: "20px", right: "24px", text: "XD ✦" },
-        { bottom: "24px", left: "24px", text: "✦ XD" },
-        { bottom: "24px", right: "24px", text: "XD ✦" },
+        { top: "20px", left: "24px", text: "✦ DXD" },
+        { top: "20px", right: "24px", text: "DXD ✦" },
+        { bottom: "24px", left: "24px", text: "✦ DXD" },
+        { bottom: "24px", right: "24px", text: "DXD ✦" },
       ].map((pos, i) => (
         <div
           key={i}

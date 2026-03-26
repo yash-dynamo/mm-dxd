@@ -21,7 +21,7 @@ export default function Footer() {
           <div>
             <div style={{ marginBottom: "var(--space-7)" }}>
               <div className="logo-text" style={{ fontSize: "var(--text-7xl)" }}>
-                XD
+                DXD
               </div>
               <div className="logo-subtitle">LIQUIDITY</div>
             </div>
@@ -78,7 +78,7 @@ export default function Footer() {
                 marginTop: "var(--space-1)",
               }}
             >
-              Join XD.
+              Join DXD.
             </div>
           </div>
           <a
@@ -88,7 +88,7 @@ export default function Footer() {
             className="btn btn-outline-red"
             style={{ whiteSpace: "nowrap" }}
           >
-            JOIN XD
+            JOIN DXD
           </a>
         </div>
 
@@ -102,7 +102,7 @@ export default function Footer() {
               letterSpacing: "var(--tracking-wider)",
             }}
           >
-            © 2026 XD Protocol.
+            © 2026 DXD Protocol.
           </div>
           <div
             style={{

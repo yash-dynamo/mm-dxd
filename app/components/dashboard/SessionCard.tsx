@@ -6,28 +6,28 @@ import { useDxdMetricsStore } from '@/stores';
 
 const statusStyles: Record<string, { bg: string; border: string; color: string; rail: string }> = {
   running: {
-    bg: 'rgba(0,200,100,0.07)',
-    border: 'rgba(0,200,100,0.28)',
-    color: 'var(--green)',
-    rail: 'rgba(0,200,100,0.65)',
+    bg: 'color-mix(in srgb, var(--mks-pos, var(--green)) 14%, transparent)',
+    border: 'color-mix(in srgb, var(--mks-pos, var(--green)) 38%, var(--mks-border, transparent) 62%)',
+    color: 'var(--mks-pos, var(--green))',
+    rail: 'color-mix(in srgb, var(--mks-pos, var(--green)) 72%, transparent)',
   },
   starting: {
-    bg: 'rgba(201,162,39,0.08)',
-    border: 'var(--border-gold)',
+    bg: 'color-mix(in srgb, var(--gold) 14%, transparent)',
+    border: 'color-mix(in srgb, var(--gold) 45%, var(--mks-border, transparent) 55%)',
     color: 'var(--gold)',
-    rail: 'var(--gold)',
+    rail: 'color-mix(in srgb, var(--gold) 72%, transparent)',
   },
   stopped: {
-    bg: 'var(--bg-card-alt)',
-    border: 'var(--border-subtle)',
-    color: 'var(--text-dim)',
-    rail: 'rgba(255,255,255,0.12)',
+    bg: 'var(--mks-panel-soft, var(--bg-card-alt))',
+    border: 'var(--mks-border, var(--border-subtle))',
+    color: 'var(--mks-muted, var(--text-dim))',
+    rail: 'var(--mks-border, rgba(255,255,255,0.12))',
   },
   error: {
-    bg: 'rgba(204,51,51,0.07)',
-    border: 'var(--border-red-medium)',
-    color: 'var(--red-light)',
-    rail: 'var(--red)',
+    bg: 'color-mix(in srgb, var(--mks-neg, var(--red-light)) 14%, transparent)',
+    border: 'color-mix(in srgb, var(--mks-neg, var(--red-light)) 45%, var(--mks-border, transparent) 55%)',
+    color: 'var(--mks-neg, var(--red-light))',
+    rail: 'color-mix(in srgb, var(--mks-neg, var(--red-light)) 72%, transparent)',
   },
 };
 
