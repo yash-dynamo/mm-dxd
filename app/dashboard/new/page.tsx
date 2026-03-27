@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDxdAuthStore, useDxdSessionsStore } from '@/stores';
 import { useSessions } from '@/hooks/dxd';
@@ -14,7 +15,7 @@ import type { CreateSessionRequest, DxdStrategy, SymbolConfig, TakerConfig } fro
 
 export default function NewSessionPage() {
   const router = useRouter();
-  const { agentAddress } = useDxdAuthStore();
+  const { agentAddress, agentName } = useDxdAuthStore();
   const { configDefaults, sessions, isLoadingDefaults } = useDxdSessionsStore();
   const { loadDefaults, createSession } = useSessions();
   const { getAgentPrivateKey } = useAgentSetup();
@@ -26,9 +27,17 @@ export default function NewSessionPage() {
   const [takerConfig, setTakerConfig] = useState<Partial<TakerConfig>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const agentPrivateKey = getAgentPrivateKey();
+  const hasAgentForSession = Boolean(agentAddress && agentPrivateKey);
 
   const brokerAddress = env.NEXT_PUBLIC_BROKER_ADDRESS;
   const maxFeeRate = env.NEXT_PUBLIC_MAX_FEE_RATE ?? '0.001';
+
+  useEffect(() => {
+    if (!hasAgentForSession) {
+      router.replace('/dashboard/agent?next=/dashboard/new');
+    }
+  }, [hasAgentForSession, router]);
 
   useEffect(() => {
     loadDefaults();
@@ -65,17 +74,12 @@ export default function NewSessionPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (symbols.length === 0 || !agentAddress) return;
+    if (symbols.length === 0 || !agentAddress || !agentPrivateKey) return;
     if (strategy === 'taker' && symbols.length !== 1) {
       setError('Taker mode requires exactly one symbol.');
       return;
     }
 
-    const pk = getAgentPrivateKey();
-    if (!pk) {
-      setError('Agent private key not found in session. Please set up your agent wallet again.');
-      return;
-    }
     if (!brokerAddress) {
       setError('Broker address is not configured. Set NEXT_PUBLIC_BROKER_ADDRESS in .env.');
       return;
@@ -90,7 +94,7 @@ export default function NewSessionPage() {
       const payload: CreateSessionRequest = {
         strategy,
         agent_address: agentAddress,
-        agent_private_key: pk,
+        agent_private_key: agentPrivateKey,
         symbols,
         config:
           strategy === 'maker' && Object.keys(globalConfig).length > 0 ? globalConfig : undefined,
@@ -110,6 +114,14 @@ export default function NewSessionPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (!hasAgentForSession || !agentAddress) {
+    return (
+      <div className="dash-loading">
+        Redirecting to agent setup…
+      </div>
+    );
+  }
 
   return (
     <div className="dash-page dash-page--new mks-page mks-new-page">
@@ -132,6 +144,14 @@ export default function NewSessionPage() {
           Choose maker (multi-symbol quoting) or taker (single symbol), pick markets, tune parameters, then start. Conflicting
           symbols already running elsewhere are disabled automatically.
         </p>
+
+        <div className="dash-alert" style={{ marginBottom: 24 }}>
+          Using agent {agentName ? `"${agentName}"` : ''}{' '}
+          ({agentAddress.slice(0, 6)}…{agentAddress.slice(-4)}).
+          <Link href="/dashboard/agent?next=/dashboard/new" className="btn btn-outline-red" style={{ marginLeft: 12 }}>
+            CREATE NEW AGENT
+          </Link>
+        </div>
 
         <div className="dash-new-shell">
           <nav className="dash-new-stepper" aria-label="Steps">

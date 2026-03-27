@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useAgentSetup } from '@/hooks/dxd';
 import { AgentKeyDisplay } from '../AgentKeyDisplay';
@@ -14,12 +14,22 @@ const Spin = ({ size = 16 }: { size?: number }) => (
 
 type Phase = 'form' | 'key-display' | 'registering';
 
-export function AgentSetupStep() {
+interface AgentSetupStepProps {
+  onComplete?: () => void;
+}
+
+export function AgentSetupStep({ onComplete }: AgentSetupStepProps) {
   const [phase, setPhase] = useState<Phase>('form');
   const [agentName, setAgentName] = useState('');
 
   const { address } = useAccount();
   const { setupStatus, generatedAgent, setupError, generateAgent, registerAgent } = useAgentSetup();
+
+  useEffect(() => {
+    if (setupStatus === 'done') {
+      onComplete?.();
+    }
+  }, [setupStatus, onComplete]);
 
   const handleGenerate = () => {
     if (!agentName.trim()) return;
@@ -211,6 +221,17 @@ export function AgentSetupStep() {
                   Back
                 </button>
               </>
+            )}
+            {setupStatus === 'done' && (
+              <p
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--green)',
+                }}
+              >
+                Agent created successfully.
+              </p>
             )}
           </div>
         )}

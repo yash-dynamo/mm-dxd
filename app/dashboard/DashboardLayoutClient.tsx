@@ -7,7 +7,6 @@ import { useDxdAuthStore } from '@/stores';
 import { dxdApi, DxdApiError } from '@/lib/dxd-api';
 import { ConnectStep } from '@/components/dashboard/steps/ConnectStep';
 import { SignInStep } from '@/components/dashboard/steps/SignInStep';
-import { AgentSetupStep } from '@/components/dashboard/steps/AgentSetupStep';
 
 const MKS_THEME_KEY = 'mks_dashboard_theme';
 
@@ -95,7 +94,6 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
   if (!hasDxdSession) return <SignInStep />;
 
   if (!agentAddress && !walletConnected) return <ConnectStep />;
-  if (!agentAddress) return <AgentSetupStep />;
 
   const handleLogout = () => {
     clearDxdAuth();
@@ -161,9 +159,19 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
             DXD
           </button>
           <div className="dash-topbar-actions ml-auto w-full sm:w-auto">
-            <div className="dash-agent-pill hidden md:inline-flex">
-              Agent: {agentAddress.slice(0, 6)}…{agentAddress.slice(-4)}
-            </div>
+            {agentAddress ? (
+              <div className="dash-agent-pill hidden md:inline-flex">
+                Agent: {agentAddress.slice(0, 6)}…{agentAddress.slice(-4)}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard/agent?next=/dashboard')}
+                className="dash-top-action-btn min-w-[120px]"
+              >
+                SET UP AGENT
+              </button>
+            )}
             <button
               type="button"
               className={`mks-theme-switch${mksTheme === 'light' ? ' is-light' : ''}`}

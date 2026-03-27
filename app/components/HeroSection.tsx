@@ -20,10 +20,10 @@ const platforms = [
   },
   {
     name: "Hyperliquid",
-    type: "PERP DEX · LIVE",
+    type: "PERP DEX · COMING SOON",
     volume: "$198M",
     pairs: "189 pairs",
-    logo: "/logos/hyperliquid.svg",
+    logo: "/exchanges/hyperliquid.png",
     bars: [0.4, 0.65, 0.85, 0.6, 0.9, 0.7, 0.95],
   },
   {
@@ -216,9 +216,6 @@ export default function HeroSection() {
               >
                 LAUNCH APP
               </button>
-              <a href="#platforms" className="btn btn-secondary">
-                STACK
-              </a>
             </div>
           </div>
 
