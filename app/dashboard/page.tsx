@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useDxdSessionsStore } from '@/stores';
+import { useDxdAuthStore, useDxdSessionsStore } from '@/stores';
 import { useSessions } from '@/hooks/dxd';
 import { SessionCard } from '@/components/dashboard/SessionCard';
 
@@ -14,8 +14,16 @@ const Spin = () => (
 );
 
 export default function DashboardPage() {
+  const { agentAddress } = useDxdAuthStore();
   const { sessions, isLoadingSessions, sessionsError } = useDxdSessionsStore();
   const { listSessions } = useSessions();
+  const inferredAgentAddress = useMemo(
+    () => agentAddress ?? sessions.find((s) => Boolean(s.agent_address))?.agent_address ?? null,
+    [agentAddress, sessions],
+  );
+  const hasAgent = Boolean(inferredAgentAddress);
+  const actionHref = hasAgent ? '/dashboard/new' : '/dashboard/agent?next=/dashboard/new';
+  const actionLabel = hasAgent ? '+ NEW SESSION' : 'CREATE AGENT';
 
   useEffect(() => {
     listSessions();
@@ -27,7 +35,7 @@ export default function DashboardPage() {
   }, [sessions]);
 
   return (
-    <div className="dash-page mks-page mks-home-page">
+    <div className="dash-page dxd-page dxd-home-page">
       <header className="dash-masthead">
         <div className="min-w-0 flex-1">
           <p className="dash-eyebrow">Market making</p>
@@ -37,11 +45,20 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="w-full sm:w-auto sm:shrink-0">
-          <Link href="/dashboard/new" className="btn btn-primary w-full sm:w-auto" style={{ whiteSpace: 'nowrap' }}>
-            + NEW SESSION
+          <Link href={actionHref} className="btn btn-primary w-full sm:w-auto" style={{ whiteSpace: 'nowrap' }}>
+            {actionLabel}
           </Link>
         </div>
       </header>
+
+      {!isLoadingSessions && !hasAgent && (
+        <div className="dash-alert" style={{ marginBottom: 24 }}>
+          No agent configured yet. Create an agent first, then launch your session.
+          <Link href="/dashboard/agent?next=/dashboard/new" className="btn btn-outline-red" style={{ marginLeft: 12 }}>
+            CREATE AGENT
+          </Link>
+        </div>
+      )}
 
       {isLoadingSessions && (
         <div className="dash-loading">
@@ -96,10 +113,12 @@ export default function DashboardPage() {
                 maxWidth: '44ch',
               }}
             >
-              Start your first market-making run — pick symbols, set global defaults, then launch from the composer.
+              {hasAgent
+                ? 'Start your first market-making run — pick symbols, set global defaults, then launch from the composer.'
+                : 'Create your first agent from dashboard, then launch a market-making session.'}
             </p>
-            <Link href="/dashboard/new" className="btn btn-primary w-full sm:w-auto">
-              START SESSION
+            <Link href={actionHref} className="btn btn-primary w-full sm:w-auto">
+              {hasAgent ? 'START SESSION' : 'CREATE AGENT'}
             </Link>
           </div>
         </div>

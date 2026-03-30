@@ -108,10 +108,6 @@ export default function CTASection() {
           >
             LAUNCH APP
           </button>
-
-          <a href="#platforms" className="btn btn-secondary">
-            STACK
-          </a>
         </div>
 
         {/* Stats row - cleaner dividers */}

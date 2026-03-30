@@ -5,11 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useDxdAuthStore, useDxdSessionsStore } from '@/stores';
 import { useSessions } from '@/hooks/dxd';
 import { useAgentSetup } from '@/hooks/dxd';
-import { useBrokerApproval } from '@/hooks/dxd';
 import { SymbolSelector } from '@/components/dashboard/SymbolSelector';
 import { ConfigForm } from '@/components/dashboard/ConfigForm';
 import { TakerConfigForm } from '@/components/dashboard/TakerConfigForm';
-import { env } from '@/config/env';
 import type { CreateSessionRequest, DxdStrategy, SymbolConfig, TakerConfig } from '@/lib/dxd-api';
 
 export default function NewSessionPage() {
@@ -18,7 +16,6 @@ export default function NewSessionPage() {
   const { configDefaults, sessions, isLoadingDefaults } = useDxdSessionsStore();
   const { loadDefaults, createSession } = useSessions();
   const { getAgentPrivateKey } = useAgentSetup();
-  const { ensureBrokerApproval } = useBrokerApproval();
 
   const [strategy, setStrategy] = useState<DxdStrategy>('maker');
   const [symbols, setSymbols] = useState<string[]>([]);
@@ -26,9 +23,15 @@ export default function NewSessionPage() {
   const [takerConfig, setTakerConfig] = useState<Partial<TakerConfig>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const agentPrivateKey = getAgentPrivateKey();
+  const effectiveAgentAddress = agentAddress ?? sessions.find((s) => Boolean(s.agent_address))?.agent_address ?? null;
+  const hasAgentForSession = Boolean(effectiveAgentAddress && agentPrivateKey);
 
-  const brokerAddress = env.NEXT_PUBLIC_BROKER_ADDRESS;
-  const maxFeeRate = env.NEXT_PUBLIC_MAX_FEE_RATE ?? '0.001';
+  useEffect(() => {
+    if (!hasAgentForSession) {
+      router.replace('/dashboard/agent?next=/dashboard/new');
+    }
+  }, [hasAgentForSession, router]);
 
   useEffect(() => {
     loadDefaults();
@@ -65,19 +68,9 @@ export default function NewSessionPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (symbols.length === 0 || !agentAddress) return;
+    if (symbols.length === 0 || !effectiveAgentAddress || !agentPrivateKey) return;
     if (strategy === 'taker' && symbols.length !== 1) {
       setError('Taker mode requires exactly one symbol.');
-      return;
-    }
-
-    const pk = getAgentPrivateKey();
-    if (!pk) {
-      setError('Agent private key not found in session. Please set up your agent wallet again.');
-      return;
-    }
-    if (!brokerAddress) {
-      setError('Broker address is not configured. Set NEXT_PUBLIC_BROKER_ADDRESS in .env.');
       return;
     }
 
@@ -85,22 +78,15 @@ export default function NewSessionPage() {
     setError(null);
 
     try {
-      await ensureBrokerApproval({ brokerAddress, maxFeeRate });
-
       const payload: CreateSessionRequest = {
         strategy,
-        agent_address: agentAddress,
-        agent_private_key: pk,
+        agent_address: effectiveAgentAddress,
+        agent_private_key: agentPrivateKey,
         symbols,
         config:
           strategy === 'maker' && Object.keys(globalConfig).length > 0 ? globalConfig : undefined,
         taker_config:
           strategy === 'taker' && Object.keys(takerConfig).length > 0 ? takerConfig : undefined,
-        broker_address: brokerAddress,
-        broker_config: {
-          broker_address: brokerAddress,
-          max_fee_rate: maxFeeRate,
-        },
       };
 
       const session = await createSession(payload);
@@ -111,8 +97,16 @@ export default function NewSessionPage() {
     }
   };
 
+  if (!hasAgentForSession || !effectiveAgentAddress) {
+    return (
+      <div className="dash-loading">
+        Redirecting to agent setup…
+      </div>
+    );
+  }
+
   return (
-    <div className="dash-page dash-page--new mks-page mks-new-page">
+    <div className="dash-page dash-page--new dxd-page dxd-new-page">
       <form onSubmit={handleSubmit} className="dash-new-page">
         <div className="dash-new-topbar">
           <button type="button" className="dash-back-btn" onClick={() => router.back()}>

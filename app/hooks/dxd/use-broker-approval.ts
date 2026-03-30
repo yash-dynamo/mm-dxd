@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import type { Address } from 'viem';
-import { useAuthStore } from '@/stores';
+import { useAuthStore, useDxdAuthStore } from '@/stores';
 import { useAccountActions } from '@/hooks/actions';
 
 const APPROVAL_KEY_PREFIX = 'dxd_broker_approved_v1';
@@ -57,6 +57,14 @@ export function useBrokerApproval() {
       const walletAddress = getConnectedWalletAddress(wagmiAddress);
       if (!walletAddress) {
         throw new Error('No wallet connected for broker approval');
+      }
+      const { isAuthenticated, dxdWalletAddress } = useDxdAuthStore.getState();
+      if (
+        isAuthenticated &&
+        dxdWalletAddress &&
+        toLower(dxdWalletAddress) !== toLower(walletAddress)
+      ) {
+        throw new Error('Connected wallet does not match your DXD sign-in wallet');
       }
 
       const broker = brokerAddress?.trim();

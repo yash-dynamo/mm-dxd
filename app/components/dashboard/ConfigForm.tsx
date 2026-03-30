@@ -188,6 +188,9 @@ export function ConfigForm({ value, onChange, defaults, disabled }: ConfigFormPr
             <Field label="Target Exposure" description="Max equity multiple">
               <NumberInput value={num('target_exposure_x')} onChange={(v) => set('target_exposure_x', v)} min={0} disabled={disabled} />
             </Field>
+            <Field label="Market Bias" description="-1.0 short, 0.0 neutral, 1.0 long">
+              <NumberInput value={num('market_bias')} onChange={(v) => set('market_bias', v)} min={-1} step="any" disabled={disabled} />
+            </Field>
             <Field label="Alpha Signals">
               <Toggle value={bool('use_alpha')} onChange={(v) => set('use_alpha', v)} disabled={disabled} />
             </Field>

@@ -6,30 +6,34 @@ import { useDxdMetricsStore } from '@/stores';
 
 const statusStyles: Record<string, { bg: string; border: string; color: string; rail: string }> = {
   running: {
-    bg: 'color-mix(in srgb, var(--mks-pos, var(--green)) 14%, transparent)',
-    border: 'color-mix(in srgb, var(--mks-pos, var(--green)) 38%, var(--mks-border, transparent) 62%)',
-    color: 'var(--mks-pos, var(--green))',
-    rail: 'color-mix(in srgb, var(--mks-pos, var(--green)) 72%, transparent)',
+    bg: 'color-mix(in srgb, var(--dxd-pos, var(--green)) 14%, transparent)',
+    border: 'color-mix(in srgb, var(--dxd-pos, var(--green)) 38%, var(--dxd-border, transparent) 62%)',
+    color: 'var(--dxd-pos, var(--green))',
+    rail: 'color-mix(in srgb, var(--dxd-pos, var(--green)) 72%, transparent)',
   },
   starting: {
     bg: 'color-mix(in srgb, var(--gold) 14%, transparent)',
-    border: 'color-mix(in srgb, var(--gold) 45%, var(--mks-border, transparent) 55%)',
+    border: 'color-mix(in srgb, var(--gold) 45%, var(--dxd-border, transparent) 55%)',
     color: 'var(--gold)',
     rail: 'color-mix(in srgb, var(--gold) 72%, transparent)',
   },
   stopped: {
-    bg: 'var(--mks-panel-soft, var(--bg-card-alt))',
-    border: 'var(--mks-border, var(--border-subtle))',
-    color: 'var(--mks-muted, var(--text-dim))',
-    rail: 'var(--mks-border, rgba(255,255,255,0.12))',
+    bg: 'var(--dxd-panel-soft, var(--bg-card-alt))',
+    border: 'var(--dxd-border, var(--border-subtle))',
+    color: 'var(--dxd-muted, var(--text-dim))',
+    rail: 'var(--dxd-border, rgba(255,255,255,0.12))',
   },
   error: {
-    bg: 'color-mix(in srgb, var(--mks-neg, var(--red-light)) 14%, transparent)',
-    border: 'color-mix(in srgb, var(--mks-neg, var(--red-light)) 45%, var(--mks-border, transparent) 55%)',
-    color: 'var(--mks-neg, var(--red-light))',
-    rail: 'color-mix(in srgb, var(--mks-neg, var(--red-light)) 72%, transparent)',
+    bg: 'color-mix(in srgb, var(--dxd-neg, var(--red-light)) 14%, transparent)',
+    border: 'color-mix(in srgb, var(--dxd-neg, var(--red-light)) 45%, var(--dxd-border, transparent) 55%)',
+    color: 'var(--dxd-neg, var(--red-light))',
+    rail: 'color-mix(in srgb, var(--dxd-neg, var(--red-light)) 72%, transparent)',
   },
 };
+
+function fmtSignedUsd(n: number, d = 2) {
+  return `${n < 0 ? '-' : '+'}$${Math.abs(n).toFixed(d)}`;
+}
 
 export function SessionCard({ session }: { session: Session }) {
   const liveMetrics = useDxdMetricsStore((s) => s.liveMetrics[session.session_id]);
@@ -77,7 +81,7 @@ export function SessionCard({ session }: { session: Session }) {
         >
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, minWidth: 0 }}>
             <span className="dash-session-chip" style={{ borderStyle: 'dashed' }}>
-              {(session.strategy ?? 'maker').toUpperCase()}
+              {(session.strategy ?? 'unknown').toUpperCase()}
             </span>
             {session.symbols.map((sym) => (
               <span key={sym} className="dash-session-chip">
@@ -130,8 +134,7 @@ export function SessionCard({ session }: { session: Session }) {
                 margin: 0,
               }}
             >
-              {totalPnl >= 0 ? '+' : ''}
-              {totalPnl.toFixed(2)}{' '}
+              {fmtSignedUsd(totalPnl)}{' '}
               <span style={{ fontSize: '0.55em', color: 'var(--text-secondary)', fontWeight: 600 }}>USD</span>
             </p>
           </div>

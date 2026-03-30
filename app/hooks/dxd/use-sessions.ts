@@ -115,8 +115,8 @@ export function useSessions() {
       } else {
         setActiveTakerConfig(null);
         setActiveSessionConfig(isMakerSessionConfigResponse(updated) ? updated.configs : null);
-        if (isMakerSessionConfigResponse(updated)) {
-          patchSessionRow(id, { strategy: updated.strategy ?? 'maker' });
+        if (isMakerSessionConfigResponse(updated) && updated.strategy) {
+          patchSessionRow(id, { strategy: updated.strategy });
         }
       }
       return updated;
@@ -135,8 +135,8 @@ export function useSessions() {
       } else {
         setActiveTakerConfig(null);
         setActiveSessionConfig(isMakerSessionConfigResponse(data) ? data.configs : null);
-        if (isMakerSessionConfigResponse(data)) {
-          patchSessionRow(id, { strategy: data.strategy ?? 'maker' });
+        if (isMakerSessionConfigResponse(data) && data.strategy) {
+          patchSessionRow(id, { strategy: data.strategy });
         }
       }
       return data;

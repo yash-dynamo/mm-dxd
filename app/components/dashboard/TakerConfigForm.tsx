@@ -109,6 +109,9 @@ export function TakerConfigForm({ value, onChange, defaults, disabled }: TakerCo
       <Field label="Target exposure ×">
         <NumberInput value={num('target_exposure_x')} onChange={(v) => set('target_exposure_x', v)} min={0} step="any" disabled={disabled} />
       </Field>
+      <Field label="Market bias" description="-1.0 short, 0.0 neutral, 1.0 long">
+        <NumberInput value={num('market_bias')} onChange={(v) => set('market_bias', v)} min={-1} step="any" disabled={disabled} />
+      </Field>
       <Field label="Leverage">
         <NumberInput value={num('leverage')} onChange={(v) => set('leverage', v)} min={1} step={1} disabled={disabled} />
       </Field>

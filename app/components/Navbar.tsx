@@ -3,14 +3,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount, useDisconnect } from "wagmi";
+import Image from "next/image";
 import { useActionStore } from "@/stores";
 import { Iconify } from "@/components/ui/iconify";
 
-const links = ["MARKETS", "STACK", "JOIN", "DOCS"];
+const navLinks = ["MARKETS", "JOIN"];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [docsOpen, setDocsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -36,6 +38,20 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handler);
   }, [dropdownOpen]);
 
+  useEffect(() => {
+    if (!docsOpen) return;
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDocsOpen(false);
+    };
+    document.addEventListener("keydown", onEsc);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onEsc);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [docsOpen]);
+
   const handleCopy = () => {
     if (!address) return;
     navigator.clipboard.writeText(address);
@@ -46,6 +62,11 @@ export default function Navbar() {
   const handleDisconnect = () => {
     disconnect();
     setDropdownOpen(false);
+  };
+
+  const openDocs = () => {
+    setMenuOpen(false);
+    setDocsOpen(true);
   };
 
   // The wallet button: opens connect modal when disconnected, dropdown when connected
@@ -240,11 +261,19 @@ export default function Navbar() {
 
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-8">
-            {links.map((link) => (
+            {navLinks.map((link) => (
               <a key={link} href="#" className="nav-link">
                 {link}
               </a>
             ))}
+            <button
+              type="button"
+              className="nav-link"
+              onClick={openDocs}
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            >
+              DOCS
+            </button>
           </div>
 
           {/* Right side: CTA + Wallet + Hamburger */}
@@ -273,7 +302,7 @@ export default function Navbar() {
             marginBottom: "var(--space-10)",
           }}
         >
-          {links.map((link, i) => (
+          {navLinks.map((link, i) => (
             <a
               key={link}
               href="#"
@@ -290,6 +319,23 @@ export default function Navbar() {
               {link}
             </a>
           ))}
+          <button
+            type="button"
+            onClick={openDocs}
+            className="nav-link"
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              marginTop: "var(--space-6)",
+              textAlign: "left",
+              fontSize: "var(--text-md)",
+              letterSpacing: "var(--tracking-label-wider)",
+            }}
+          >
+            DOCS
+          </button>
         </div>
 
         <button
@@ -305,6 +351,75 @@ export default function Navbar() {
           <WalletButton fullWidth />
         </div>
       </div>
+
+      {docsOpen && (
+        <div
+          onClick={() => setDocsOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 240,
+            background: "rgba(8, 7, 12, 0.75)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "24px",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: 460,
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-red-medium)",
+              borderRadius: "var(--radius-lg)",
+              overflow: "hidden",
+              boxShadow: "0 18px 60px rgba(0,0,0,0.65)",
+            }}
+          >
+            <div style={{ position: "relative", width: "100%", height: 220 }}>
+              <Image src="/seductive/5.png" alt="Coming soon" fill style={{ objectFit: "cover" }} />
+              <button
+                type="button"
+                onClick={() => setDocsOpen(false)}
+                aria-label="Close docs modal"
+                style={{
+                  position: "absolute",
+                  top: 10,
+                  right: 10,
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  background: "rgba(0,0,0,0.5)",
+                  color: "var(--text-primary)",
+                  cursor: "pointer",
+                  fontSize: "16px",
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ padding: "20px 20px 22px" }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontFamily: "var(--font-serif)",
+                  fontSize: "clamp(1.05rem, 2.6vw, 1.35rem)",
+                  fontStyle: "italic",
+                  color: "var(--text-primary)",
+                  lineHeight: 1.45,
+                }}
+              >
+                thanks for showing love baby, coming soon
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Backdrop when menu open */}
       {menuOpen && (
