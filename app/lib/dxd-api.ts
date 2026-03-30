@@ -107,6 +107,7 @@ export interface TakerConfig {
   cooldown_s: number;
   max_loss_usd: number;
   order_expiry_ms: number;
+  market_bias: number;
   [key: string]: unknown;
 }
 
@@ -138,6 +139,7 @@ export interface SymbolConfig {
   use_alpha: boolean;
   fixed_tp_enabled: boolean;
   fixed_tp_bps: number;
+  market_bias: number;
   // Advanced
   spread_vol_mult: number;
   close_spread_bps: number;

@@ -16,9 +16,10 @@ type Phase = 'form' | 'key-display' | 'registering';
 
 interface AgentSetupStepProps {
   onComplete?: () => void;
+  onClose?: () => void;
 }
 
-export function AgentSetupStep({ onComplete }: AgentSetupStepProps) {
+export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
   const [phase, setPhase] = useState<Phase>('form');
   const [agentName, setAgentName] = useState('');
 
@@ -54,10 +55,26 @@ export function AgentSetupStep({ onComplete }: AgentSetupStepProps) {
           border: '1px solid var(--border-red-medium)',
           borderRadius: 'var(--radius-lg)',
           boxShadow: 'var(--shadow-card)',
+          position: 'relative',
         }}
       >
+        {onClose && (
+          <button
+            type="button"
+            className="agent-setup-close-btn"
+            onClick={onClose}
+            aria-label="Close agent setup"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        )}
+
         {/* Header */}
         <div
+          className="agent-setup-header"
           style={{
             display: 'flex',
             alignItems: 'center',

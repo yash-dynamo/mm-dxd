@@ -12,8 +12,8 @@ export function DxdSparkline({ points, className = '' }: { points: Array<number 
   const clean = useMemo(() => cleanSeries(points), [points]);
   if (clean.length < 2) {
     return (
-      <svg viewBox="0 0 240 72" className={`mks-spark ${className}`} preserveAspectRatio="none">
-        <line x1="0" y1="36" x2="240" y2="36" className="mks-grid-line" />
+      <svg viewBox="0 0 240 72" className={`dxd-spark ${className}`} preserveAspectRatio="none">
+        <line x1="0" y1="36" x2="240" y2="36" className="dxd-grid-line" />
       </svg>
     );
   }
@@ -34,9 +34,9 @@ export function DxdSparkline({ points, className = '' }: { points: Array<number 
     .join(' ');
 
   return (
-    <svg viewBox="0 0 240 72" className={`mks-spark ${className}`} preserveAspectRatio="none">
-      <line x1="0" y1="36" x2="240" y2="36" className="mks-grid-line" />
-      <path d={d} className="mks-spark-line" />
+    <svg viewBox="0 0 240 72" className={`dxd-spark ${className}`} preserveAspectRatio="none">
+      <line x1="0" y1="36" x2="240" y2="36" className="dxd-grid-line" />
+      <path d={d} className="dxd-spark-line" />
     </svg>
   );
 }
@@ -60,13 +60,13 @@ export function DxdHeatStrip({
   const safeMax = Math.max(min + 1e-9, max);
 
   return (
-    <div className={`mks-heat-strip ${className}`}>
+    <div className={`dxd-heat-strip ${className}`}>
       {values.map((v, idx) => {
         const n = v == null ? NaN : asNumber(v, NaN);
         const t = Number.isFinite(n) ? Math.min(1, Math.max(0, (n - min) / (safeMax - min))) : 0;
         const hue = 210 - 210 * t;
         const alpha = 0.2 + 0.65 * t;
-        return <span key={idx} className="mks-heat-cell" style={{ background: `hsla(${hue}, 95%, 60%, ${alpha})` }} />;
+        return <span key={idx} className="dxd-heat-cell" style={{ background: `hsla(${hue}, 95%, 60%, ${alpha})` }} />;
       })}
     </div>
   );

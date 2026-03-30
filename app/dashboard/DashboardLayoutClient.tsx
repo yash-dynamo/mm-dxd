@@ -8,9 +8,9 @@ import { dxdApi, DxdApiError } from '@/lib/dxd-api';
 import { ConnectStep } from '@/components/dashboard/steps/ConnectStep';
 import { SignInStep } from '@/components/dashboard/steps/SignInStep';
 
-const MKS_THEME_KEY = 'mks_dashboard_theme';
+const DXD_THEME_KEY = 'dxd_dashboard_theme';
 
-type MksTheme = 'dark' | 'light';
+type DxdTheme = 'dark' | 'light';
 
 export function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -19,16 +19,18 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
   const { token, isAuthenticated, agentAddress, clearDxdAuth } = useDxdAuthStore();
   const [authHydrated, setAuthHydrated] = useState(false);
   const [sessionValidated, setSessionValidated] = useState(false);
-  const [mksTheme, setMksTheme] = useState<MksTheme>('dark');
+  const [inferredAgentAddress, setInferredAgentAddress] = useState<string | null>(null);
+  const [dxdTheme, setDxdTheme] = useState<DxdTheme>('dark');
   const themeThumbRef = useRef<HTMLSpanElement | null>(null);
 
   const walletConnected = isConnected && !!wagmiAddress;
   const hasDxdSession = isAuthenticated && !!token;
+  const effectiveAgentAddress = agentAddress ?? inferredAgentAddress;
 
   useEffect(() => {
     try {
-      const t = localStorage.getItem(MKS_THEME_KEY);
-      if (t === 'light' || t === 'dark') setMksTheme(t);
+      const t = localStorage.getItem(DXD_THEME_KEY);
+      if (t === 'light' || t === 'dark') setDxdTheme(t);
     } catch {
       /* ignore */
     }
@@ -36,11 +38,11 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     try {
-      localStorage.setItem(MKS_THEME_KEY, mksTheme);
+      localStorage.setItem(DXD_THEME_KEY, dxdTheme);
     } catch {
       /* ignore */
     }
-  }, [mksTheme]);
+  }, [dxdTheme]);
 
   useEffect(() => {
     const persist = useDxdAuthStore.persist;
@@ -64,6 +66,7 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
     }
 
     if (!token) {
+      setInferredAgentAddress(null);
       setSessionValidated(true);
       return;
     }
@@ -73,7 +76,10 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
 
     (async () => {
       try {
-        await dxdApi.listSessions(token);
+        const { sessions } = await dxdApi.listSessions(token);
+        if (!agentAddress) {
+          setInferredAgentAddress(sessions.find((s) => Boolean(s.agent_address))?.agent_address ?? null);
+        }
       } catch (err) {
         if (err instanceof DxdApiError && err.status === 401) {
           clearDxdAuth();
@@ -86,14 +92,14 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
     return () => {
       cancelled = true;
     };
-  }, [authHydrated, token, clearDxdAuth]);
+  }, [authHydrated, token, clearDxdAuth, agentAddress]);
 
   if (!authHydrated || !sessionValidated) return null;
 
   if (!hasDxdSession && !walletConnected) return <ConnectStep />;
   if (!hasDxdSession) return <SignInStep />;
 
-  if (!agentAddress && !walletConnected) return <ConnectStep />;
+  if (!effectiveAgentAddress && !walletConnected) return <ConnectStep />;
 
   const handleLogout = () => {
     clearDxdAuth();
@@ -102,8 +108,8 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
   };
 
   const toggleTheme = async () => {
-    const nextTheme: MksTheme = mksTheme === 'dark' ? 'light' : 'dark';
-    const applyTheme = () => setMksTheme(nextTheme);
+    const nextTheme: DxdTheme = dxdTheme === 'dark' ? 'light' : 'dark';
+    const applyTheme = () => setDxdTheme(nextTheme);
 
     if (typeof window === 'undefined') {
       applyTheme();
@@ -151,17 +157,17 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
   };
 
   return (
-    <div className="dashboard-app dash-shell mks-dashboard" data-mks-theme={mksTheme}>
+    <div className="dashboard-app dash-shell dxd-dashboard" data-dxd-theme={dxdTheme}>
       <header className="dash-topbar">
         <div className="dash-topbar-inner w-full max-w-none">
-          <button type="button" className="dash-brand-btn" onClick={() => router.push('/dashboard')} aria-label="Dashboard home">
+          <button type="button" className="dash-brand-btn" onClick={() => router.push('/')} aria-label="Go to landing page">
             <span className="dash-brand-dot" aria-hidden />
             DXD
           </button>
           <div className="dash-topbar-actions ml-auto w-full sm:w-auto">
-            {agentAddress ? (
+            {effectiveAgentAddress ? (
               <div className="dash-agent-pill hidden md:inline-flex">
-                Agent: {agentAddress.slice(0, 6)}…{agentAddress.slice(-4)}
+                Agent: {effectiveAgentAddress.slice(0, 6)}…{effectiveAgentAddress.slice(-4)}
               </div>
             ) : (
               <button
@@ -174,18 +180,18 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
             )}
             <button
               type="button"
-              className={`mks-theme-switch${mksTheme === 'light' ? ' is-light' : ''}`}
+              className={`dxd-theme-switch${dxdTheme === 'light' ? ' is-light' : ''}`}
               onClick={toggleTheme}
-              aria-label={`Switch to ${mksTheme === 'dark' ? 'light' : 'dark'} mode`}
-              aria-pressed={mksTheme === 'light'}
+              aria-label={`Switch to ${dxdTheme === 'dark' ? 'light' : 'dark'} mode`}
+              aria-pressed={dxdTheme === 'light'}
             >
-              <span className="mks-theme-switch__thumb" ref={themeThumbRef} aria-hidden>
-                <span className="mks-theme-switch__thumb-icon mks-theme-switch__thumb-icon--dark">
+              <span className="dxd-theme-switch__thumb" ref={themeThumbRef} aria-hidden>
+                <span className="dxd-theme-switch__thumb-icon dxd-theme-switch__thumb-icon--dark">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8z" />
                   </svg>
                 </span>
-                <span className="mks-theme-switch__thumb-icon mks-theme-switch__thumb-icon--light">
+                <span className="dxd-theme-switch__thumb-icon dxd-theme-switch__thumb-icon--light">
                   <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="4" />
                     <path d="M12 2v2" />

@@ -17,7 +17,11 @@ export default function DashboardPage() {
   const { agentAddress } = useDxdAuthStore();
   const { sessions, isLoadingSessions, sessionsError } = useDxdSessionsStore();
   const { listSessions } = useSessions();
-  const hasAgent = Boolean(agentAddress);
+  const inferredAgentAddress = useMemo(
+    () => agentAddress ?? sessions.find((s) => Boolean(s.agent_address))?.agent_address ?? null,
+    [agentAddress, sessions],
+  );
+  const hasAgent = Boolean(inferredAgentAddress);
   const actionHref = hasAgent ? '/dashboard/new' : '/dashboard/agent?next=/dashboard/new';
   const actionLabel = hasAgent ? '+ NEW SESSION' : 'CREATE AGENT';
 
@@ -31,7 +35,7 @@ export default function DashboardPage() {
   }, [sessions]);
 
   return (
-    <div className="dash-page mks-page mks-home-page">
+    <div className="dash-page dxd-page dxd-home-page">
       <header className="dash-masthead">
         <div className="min-w-0 flex-1">
           <p className="dash-eyebrow">Market making</p>
@@ -47,7 +51,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {!hasAgent && (
+      {!isLoadingSessions && !hasAgent && (
         <div className="dash-alert" style={{ marginBottom: 24 }}>
           No agent configured yet. Create an agent first, then launch your session.
           <Link href="/dashboard/agent?next=/dashboard/new" className="btn btn-outline-red" style={{ marginLeft: 12 }}>

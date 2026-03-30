@@ -22,5 +22,9 @@ export default function AgentSetupPage() {
     router.push(nextPath);
   }, [router, nextPath]);
 
-  return <AgentSetupStep onComplete={handleComplete} />;
+  const handleClose = useCallback(() => {
+    router.push(nextPath);
+  }, [router, nextPath]);
+
+  return <AgentSetupStep onComplete={handleComplete} onClose={handleClose} />;
 }
