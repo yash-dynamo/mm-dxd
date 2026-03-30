@@ -5,13 +5,27 @@ import { useState, useEffect } from "react";
 const DRIP_POSITIONS = [8, 22, 37, 51, 64, 78, 91];
 const DRIP_DELAYS = [0.2, 0.8, 0.4, 1.1, 0.6, 1.4, 0.3];
 const DRIP_DURATIONS = [2.4, 1.8, 2.9, 2.1, 2.6, 1.9, 2.3];
+const SPLASH_SEEN_KEY = "dxd_splash_seen_this_tab";
+type SplashPhase = "checking" | "in" | "hold" | "out" | "gone";
 
 export default function SplashScreen() {
-  const [phase, setPhase] = useState<"in" | "hold" | "out" | "gone">("in");
+  const [phase, setPhase] = useState<SplashPhase>("checking");
   const [barWidth, setBarWidth] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hasSeen = sessionStorage.getItem(SPLASH_SEEN_KEY) === "1";
+    if (hasSeen) {
+      setPhase("gone");
+      return;
+    }
+    sessionStorage.setItem(SPLASH_SEEN_KEY, "1");
+    setPhase("in");
+  }, []);
 
   // Auto-progress timeline
   useEffect(() => {
+    if (phase !== "in") return;
     // Seal + first elements appear at 0
     // Bar starts filling at 400ms
     const barTimer = setTimeout(() => {
@@ -21,7 +35,12 @@ export default function SplashScreen() {
     // Auto-dismiss after 4.2s (bar fills in ~3.5s)
     const holdTimer = setTimeout(() => setPhase("hold"), 500);
     const outTimer = setTimeout(() => setPhase("out"), 4200);
-    const goneTimer = setTimeout(() => setPhase("gone"), 5100);
+    const goneTimer = setTimeout(() => {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(SPLASH_SEEN_KEY, "1");
+      }
+      setPhase("gone");
+    }, 5100);
 
     return () => {
       clearTimeout(barTimer);
@@ -29,15 +48,18 @@ export default function SplashScreen() {
       clearTimeout(outTimer);
       clearTimeout(goneTimer);
     };
-  }, []);
+  }, [phase]);
 
   const dismiss = () => {
-    if (phase === "gone") return;
+    if (phase === "gone" || phase === "checking") return;
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(SPLASH_SEEN_KEY, "1");
+    }
     setPhase("out");
     setTimeout(() => setPhase("gone"), 900);
   };
 
-  if (phase === "gone") return null;
+  if (phase === "checking" || phase === "gone") return null;
 
   const leaving = phase === "out";
 

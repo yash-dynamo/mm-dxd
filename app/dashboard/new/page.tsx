@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDxdAuthStore, useDxdSessionsStore } from '@/stores';
 import { useSessions } from '@/hooks/dxd';
@@ -14,7 +14,7 @@ export default function NewSessionPage() {
   const router = useRouter();
   const { agentAddress } = useDxdAuthStore();
   const { configDefaults, sessions, isLoadingDefaults } = useDxdSessionsStore();
-  const { loadDefaults, createSession } = useSessions();
+  const { loadDefaults, createSession, listSessions } = useSessions();
   const { getAgentPrivateKey } = useAgentSetup();
 
   const [strategy, setStrategy] = useState<DxdStrategy>('maker');
@@ -36,6 +36,10 @@ export default function NewSessionPage() {
   useEffect(() => {
     loadDefaults();
   }, [loadDefaults]);
+
+  useEffect(() => {
+    listSessions();
+  }, [listSessions]);
 
   useEffect(() => {
     if (strategy !== 'taker' || !configDefaults?.taker_defaults) return;
@@ -60,9 +64,18 @@ export default function NewSessionPage() {
     };
   }, [strategy, symbols, configDefaults]);
 
-  const conflictSymbols = sessions
-    .filter((s) => s.status === 'running' || s.status === 'starting')
-    .flatMap((s) => s.symbols);
+  const conflictSymbols = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          sessions
+            .filter((s) => s.status === 'running' || s.status === 'starting')
+            .flatMap((s) => s.symbols)
+            .map((sym) => sym.trim().toUpperCase()),
+        ),
+      ),
+    [sessions],
+  );
 
   const phase: 1 | 2 | 3 = symbols.length === 0 ? 1 : isLoadingDefaults ? 2 : 3;
 
@@ -109,7 +122,7 @@ export default function NewSessionPage() {
     <div className="dash-page dash-page--new dxd-page dxd-new-page">
       <form onSubmit={handleSubmit} className="dash-new-page">
         <div className="dash-new-topbar">
-          <button type="button" className="dash-back-btn" onClick={() => router.back()}>
+          <button type="button" className="dash-back-btn" onClick={() => router.push('/dashboard')}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
               <path d="M19 12H5" />
               <path d="m12 19-7-7 7-7" />

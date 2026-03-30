@@ -1,35 +1,36 @@
 "use client";
 
 import AsciiImage from "./AsciiImage";
+import { Iconify } from "@/components/ui/iconify";
 
 const features = [
   {
-    icon: "◈",
-    title: "Risk Guard",
-    desc: "Limits downside fast.",
+    icon: "mingcute:chart-line-line",
+    title: "Strategy Engine",
+    desc: "Compose maker and taker runs per symbol with shared controls.",
     color: "var(--gold)",
-    stat: "99.9%",
+    stat: "MAKE",
   },
   {
-    icon: "🔥",
-    title: "Fast Execution",
-    desc: "Low-latency order routing.",
+    icon: "mingcute:target-line",
+    title: "Delta Manager",
+    desc: "Inventory skew and tier logic keep exposure aligned.",
     color: "var(--red)",
-    stat: "<1ms",
+    stat: "DELTA",
   },
   {
-    icon: "⬡",
-    title: "Cross-Venue Sync",
-    desc: "One strategy, many venues.",
+    icon: "mingcute:flash-line",
+    title: "Execution Loop",
+    desc: "Event-driven requotes with controlled cadence.",
     color: "var(--gold)",
-    stat: "7 Venues",
+    stat: "EXEC",
   },
   {
-    icon: "✕",
-    title: "Adaptive Engine",
-    desc: "Auto-tunes to market flow.",
+    icon: "mingcute:shield-check-line",
+    title: "Risk Guardrails",
+    desc: "Loss caps and cooldown rules stop runaway sessions.",
     color: "var(--red)",
-    stat: "∞ Power",
+    stat: "GUARD",
   },
 ];
 
@@ -93,10 +94,10 @@ export default function SeductiveSection() {
               className="stat-value"
               style={{ fontSize: "var(--text-6xl)", color: "var(--gold)", marginBottom: "var(--space-1)" }}
             >
-              ∞
+              200ms
             </div>
             <div className="stat-label" style={{ color: "var(--text-dim)", fontSize: "var(--text-2xs)" }}>
-              POWER LEVEL
+              REQUOTE FLOOR
             </div>
           </div>
 
@@ -122,9 +123,9 @@ export default function SeductiveSection() {
                 marginBottom: "var(--space-1)",
               }}
             >
-              99.9%
+              5-10s
             </div>
-            <div className="stat-label" style={{ fontSize: "var(--text-2xs)" }}>UPTIME</div>
+            <div className="stat-label" style={{ fontSize: "var(--text-2xs)" }}>METRICS LOOP</div>
           </div>
         </div>
 
@@ -144,8 +145,8 @@ export default function SeductiveSection() {
                 fontSize: "clamp(38px, 4.5vw, 60px)",
               }}
             >
-              <span className="heading-display-italic">Clean</span>{" "}
-              <span className="heading-display-bold">Design.</span>
+              <span className="heading-display-italic">Strategy</span>{" "}
+              <span className="heading-display-bold">Stack.</span>
             </span>
             <span
               className="animate-glow-gold heading-display-gold"
@@ -154,12 +155,12 @@ export default function SeductiveSection() {
                 fontSize: "clamp(38px, 4.5vw, 60px)",
               }}
             >
-              Real Edge.
+              Execution Control.
             </span>
           </h2>
 
           <p className="text-body" style={{ marginBottom: "var(--space-14)", maxWidth: "440px" }}>
-            Minimal surface. Maximum execution.
+            Build, run, and tune live market-making workflows from one control surface.
           </p>
 
           {/* ── Sacred Arsenal — infinite vertical scroll ── */}
@@ -193,7 +194,7 @@ export default function SeductiveSection() {
                       border: `1px solid color-mix(in srgb, ${f.color} 20%, transparent)`,
                     }}
                   >
-                    {f.icon}
+                    <Iconify icon={f.icon} width={16} height={16} style={{ color: f.color }} />
                   </div>
 
                   {/* Text */}

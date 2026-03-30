@@ -1,18 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
-import { useRouter } from "next/navigation";
 import Particles from "./Particles";
 import { SparklesCore } from "../../components/ui/sparkles";
-import { useAuthStore } from "@/stores";
 
 export default function CTASection() {
-  const router = useRouter();
-  const status = useAuthStore((s) => s.status);
-
-  const handleStart = useCallback(() => {
-    router.push("/dashboard");
-  }, [router]);
   return (
     <section className="cta-section">
       {/* Aceternity Sparkles Background - subtle gold */}
@@ -90,25 +81,6 @@ export default function CTASection() {
         >
           Live liquidity. Minimal friction.
         </p>
-
-        {/* CTA Buttons - matching hero style */}
-        <div
-          className="animate-fade-in-up delay-300"
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "var(--space-6)",
-            flexWrap: "wrap",
-          }}
-        >
-          <button
-            type="button"
-            onClick={handleStart}
-            className="btn btn-primary animate-glow-red"
-          >
-            LAUNCH APP
-          </button>
-        </div>
 
         {/* Stats row - cleaner dividers */}
         <div 

@@ -1438,6 +1438,11 @@ body {
   flex-shrink: 0;
 }
 
+.feature-row .icon-circle-lg svg {
+  width: 16px;
+  height: 16px;
+}
+
 .feature-row:hover {
   background: rgba(255, 255, 255, 0.04);
 }
@@ -1649,7 +1654,8 @@ body {
 }
 
 .arsenal-track {
-  animation: arsenal-scroll 12s linear infinite;
+  animation: arsenal-scroll 18s linear infinite;
+  will-change: transform;
 }
 .arsenal-track:hover {
   animation-play-state: paused;
@@ -3717,4 +3723,38 @@ body {
   word-break: break-word;
   overflow-wrap: anywhere;
   color: var(--dxd-text);
+}
+
+.dxd-number-input::-webkit-outer-spin-button,
+.dxd-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.dxd-number-input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.dxd-config-tab-panel {
+  animation: dxd-config-tab-in 240ms var(--ease-out);
+  will-change: transform, opacity;
+}
+
+@keyframes dxd-config-tab-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dxd-config-tab-panel {
+    animation: none;
+  }
 }
