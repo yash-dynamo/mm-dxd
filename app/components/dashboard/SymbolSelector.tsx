@@ -20,8 +20,10 @@ export function SymbolSelector({
   symbols = DXD_PERP_SYMBOLS,
   selectionMode = 'multi',
 }: SymbolSelectorProps) {
+  const disabledSet = new Set(disabledSymbols.map((sym) => sym.trim().toUpperCase()));
+
   const toggle = (sym: string) => {
-    if (disabledSymbols.includes(sym)) return;
+    if (disabledSet.has(sym.trim().toUpperCase())) return;
     if (selectionMode === 'single') {
       onChange(value.includes(sym) ? [] : [sym]);
       return;
@@ -47,7 +49,7 @@ export function SymbolSelector({
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {symbols.map((sym) => {
           const selected = value.includes(sym);
-          const disabled = disabledSymbols.includes(sym);
+          const disabled = disabledSet.has(sym.trim().toUpperCase());
           return (
             <button
               key={sym}

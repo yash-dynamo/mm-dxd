@@ -55,29 +55,100 @@ function NumberInput({
   step?: number | 'any';
   disabled?: boolean;
 }) {
+  const resolvedStep = step === 'any' ? 0.1 : step;
+  const stepDecimals = String(resolvedStep).includes('.') ? String(resolvedStep).split('.')[1]?.length ?? 0 : 0;
+
+  const handleManualChange = (rawValue: string) => {
+    const trimmed = rawValue.trim();
+    if (trimmed === '') {
+      onChange(typeof min === 'number' ? min : 0);
+      return;
+    }
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed)) return;
+    const clamped = typeof min === 'number' ? Math.max(min, parsed) : parsed;
+    onChange(clamped);
+  };
+
+  const bump = (direction: 1 | -1) => {
+    const current = Number.isFinite(value) ? (value as number) : (min ?? 0);
+    const next = current + (resolvedStep * direction);
+    const rounded = Number(next.toFixed(stepDecimals));
+    const clamped = typeof min === 'number' ? Math.max(min, rounded) : rounded;
+    onChange(clamped);
+  };
+
   return (
-    <input
-      type="number"
-      min={min}
-      step={step === 'any' ? 'any' : step}
-      value={value ?? ''}
-      onChange={(e) => onChange(Number(e.target.value))}
-      disabled={disabled}
-      style={{
-        width: '100%',
-        fontFamily: 'var(--font-mono), ui-monospace, monospace',
-        fontSize: 'var(--text-md)',
-        fontWeight: 500,
-        color: 'var(--text-primary)',
-        background: 'var(--bg-elevated)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 'var(--radius-md)',
-        padding: '10px 12px',
-        textAlign: 'right',
-        outline: 'none',
-        opacity: disabled ? 0.4 : 1,
-      }}
-    />
+    <div style={{ width: '100%', display: 'flex', gap: 6, alignItems: 'stretch', opacity: disabled ? 0.4 : 1 }}>
+      <input
+        type="text"
+        inputMode={step === 'any' ? 'decimal' : 'numeric'}
+        className="dxd-number-input"
+        value={value ?? ''}
+        onChange={(e) => handleManualChange(e.target.value)}
+        disabled={disabled}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          fontFamily: 'var(--font-mono), ui-monospace, monospace',
+          fontSize: 'var(--text-md)',
+          fontWeight: 500,
+          color: 'var(--text-primary)',
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: 'var(--radius-md)',
+          padding: '10px 12px',
+          textAlign: 'right',
+          outline: 'none',
+        }}
+      />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <button
+          type="button"
+          onClick={() => bump(1)}
+          disabled={disabled}
+          aria-label="Increase value"
+          style={{
+            width: 24,
+            height: 18,
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border-subtle)',
+            background: 'color-mix(in srgb, var(--bg-elevated) 82%, transparent)',
+            color: 'var(--text-secondary)',
+            fontSize: 11,
+            lineHeight: 1,
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          ▲
+        </button>
+        <button
+          type="button"
+          onClick={() => bump(-1)}
+          disabled={disabled}
+          aria-label="Decrease value"
+          style={{
+            width: 24,
+            height: 18,
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border-subtle)',
+            background: 'color-mix(in srgb, var(--bg-elevated) 82%, transparent)',
+            color: 'var(--text-secondary)',
+            fontSize: 11,
+            lineHeight: 1,
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          ▼
+        </button>
+      </div>
+    </div>
   );
 }
 

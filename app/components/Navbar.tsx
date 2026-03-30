@@ -7,12 +7,23 @@ import Image from "next/image";
 import { useActionStore } from "@/stores";
 import { Iconify } from "@/components/ui/iconify";
 
-const navLinks = ["MARKETS", "JOIN"];
+const navLinks = ["JOIN"];
+const comingSoonContent = {
+  docs: {
+    label: "DOCS",
+    message: "DXD docs are being prepared with API guides, session flows, and config references.",
+  },
+  markets: {
+    label: "MARKETS",
+    message: "Markets board is being tuned for live spreads, depth, and cross-symbol monitoring.",
+  },
+} as const;
+type ComingSoonKey = keyof typeof comingSoonContent;
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [docsOpen, setDocsOpen] = useState(false);
+  const [comingSoonOpen, setComingSoonOpen] = useState<ComingSoonKey | null>(null);
   const [copied, setCopied] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -39,9 +50,9 @@ export default function Navbar() {
   }, [dropdownOpen]);
 
   useEffect(() => {
-    if (!docsOpen) return;
+    if (!comingSoonOpen) return;
     const onEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setDocsOpen(false);
+      if (e.key === "Escape") setComingSoonOpen(null);
     };
     document.addEventListener("keydown", onEsc);
     const prevOverflow = document.body.style.overflow;
@@ -50,7 +61,7 @@ export default function Navbar() {
       document.removeEventListener("keydown", onEsc);
       document.body.style.overflow = prevOverflow;
     };
-  }, [docsOpen]);
+  }, [comingSoonOpen]);
 
   const handleCopy = () => {
     if (!address) return;
@@ -64,9 +75,9 @@ export default function Navbar() {
     setDropdownOpen(false);
   };
 
-  const openDocs = () => {
+  const openComingSoon = (kind: ComingSoonKey) => {
     setMenuOpen(false);
-    setDocsOpen(true);
+    setComingSoonOpen(kind);
   };
 
   // The wallet button: opens connect modal when disconnected, dropdown when connected
@@ -261,6 +272,14 @@ export default function Navbar() {
 
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-8">
+            <button
+              type="button"
+              className="nav-link"
+              onClick={() => openComingSoon("markets")}
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            >
+              MARKETS
+            </button>
             {navLinks.map((link) => (
               <a key={link} href="#" className="nav-link">
                 {link}
@@ -269,7 +288,7 @@ export default function Navbar() {
             <button
               type="button"
               className="nav-link"
-              onClick={openDocs}
+              onClick={() => openComingSoon("docs")}
               style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
             >
               DOCS
@@ -321,7 +340,24 @@ export default function Navbar() {
           ))}
           <button
             type="button"
-            onClick={openDocs}
+            onClick={() => openComingSoon("markets")}
+            className="nav-link"
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              marginTop: "var(--space-6)",
+              textAlign: "left",
+              fontSize: "var(--text-md)",
+              letterSpacing: "var(--tracking-label-wider)",
+            }}
+          >
+            MARKETS
+          </button>
+          <button
+            type="button"
+            onClick={() => openComingSoon("docs")}
             className="nav-link"
             style={{
               background: "none",
@@ -352,9 +388,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {docsOpen && (
+      {comingSoonOpen && (
         <div
-          onClick={() => setDocsOpen(false)}
+          onClick={() => setComingSoonOpen(null)}
           style={{
             position: "fixed",
             inset: 0,
@@ -381,10 +417,36 @@ export default function Navbar() {
           >
             <div style={{ position: "relative", width: "100%", height: 220 }}>
               <Image src="/seductive/5.png" alt="Coming soon" fill style={{ objectFit: "cover" }} />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to top, rgba(6, 2, 10, 0.78), rgba(6, 2, 10, 0.16))",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  left: 14,
+                  bottom: 12,
+                  padding: "6px 10px",
+                  borderRadius: 999,
+                  border: "1px solid rgba(201,162,39,0.35)",
+                  background: "rgba(9, 6, 16, 0.72)",
+                  color: "var(--gold)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  letterSpacing: "2px",
+                  textTransform: "uppercase",
+                }}
+              >
+                {comingSoonContent[comingSoonOpen].label}
+              </div>
               <button
                 type="button"
-                onClick={() => setDocsOpen(false)}
-                aria-label="Close docs modal"
+                onClick={() => setComingSoonOpen(null)}
+                aria-label="Close coming soon modal"
                 style={{
                   position: "absolute",
                   top: 10,
@@ -406,6 +468,19 @@ export default function Navbar() {
             <div style={{ padding: "20px 20px 22px" }}>
               <p
                 style={{
+                  margin: "0 0 8px",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "10px",
+                  letterSpacing: "2.5px",
+                  textTransform: "uppercase",
+                  color: "var(--text-dim)",
+                  fontWeight: 700,
+                }}
+              >
+                Coming soon
+              </p>
+              <p
+                style={{
                   margin: 0,
                   fontFamily: "var(--font-serif)",
                   fontSize: "clamp(1.05rem, 2.6vw, 1.35rem)",
@@ -414,7 +489,7 @@ export default function Navbar() {
                   lineHeight: 1.45,
                 }}
               >
-                thanks for showing love baby, coming soon
+                {comingSoonContent[comingSoonOpen].message}
               </p>
             </div>
           </div>
