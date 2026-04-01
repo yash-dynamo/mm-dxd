@@ -80,6 +80,9 @@ export const DXD_PERP_SYMBOLS = [
   'GOLD-PERP',
   'SILVER-PERP',
   'X-PERP',
+  'WTIOIL-PERP',
+  'BRENTOIL-PERP',
+  'NATGAS-PERP',
 ] as const;
 
 export type DxdPerpSymbol = (typeof DXD_PERP_SYMBOLS)[number];
