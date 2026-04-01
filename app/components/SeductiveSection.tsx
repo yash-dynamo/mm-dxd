@@ -165,9 +165,9 @@ export default function SeductiveSection() {
 
           {/* ── Sacred Arsenal — infinite vertical scroll ── */}
           <div
+            className="seductive-arsenal-scroll"
             style={{
               position: "relative",
-              height: "340px",
               overflow: "hidden",
               maskImage:
                 "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",

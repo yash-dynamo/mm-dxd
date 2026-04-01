@@ -6,7 +6,6 @@ import Image from "next/image";
 import Particles from "./Particles";
 import { BackgroundBeams } from "../../components/ui/background-beams";
 import { CardContainer, CardBody, CardItem } from "../../components/ui/3d-card";
-import { useAuthStore } from "@/stores";
 
 /* ─────────────────────────── data ─────────────────────────── */
 const platforms = [
@@ -128,18 +127,16 @@ function StatBlock({ value, label, delay }: { value: string; label: string; dela
 /* ─────────────────────────── main component ─────────────────────────── */
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const vol = useAnimatedNumber(420, 1800, 800);
   const uptime = useAnimatedNumber(999, 1600, 1000);
 
   const router = useRouter();
-  const status = useAuthStore((s) => s.status);
 
   const handleStart = useCallback(() => {
     router.push("/dashboard");
   }, [router]);
 
   return (
-    <section ref={sectionRef} className="hero-section">
+    <section ref={sectionRef} className="hero-section home-hero">
       {/* Animated grid background */}
       <div className="hero-bg-grid" />
 
@@ -349,17 +346,15 @@ export default function HeroSection() {
                 {/* Stats row */}
                 <CardItem translateZ="60" className="w-full">
                   <div
+                    className="hero-stats-grid"
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr 1fr",
                       borderTop: "1px solid rgba(255, 255, 255, 0.08)",
                       paddingTop: "var(--space-9)",
                       marginTop: "var(--space-2)",
-                      gap: "var(--space-4)",
                     }}
                   >
-                    <StatBlock value={`$${vol}M+`} label="DAILY VOLUME" delay={1000} />
-                    <StatBlock value="0.008%" label="AVG SPREAD" delay={1100} />
+                    <StatBlock value="$50k+" label="DAILY VOLUME" delay={1000} />
+                    <StatBlock value="0.001%" label="AVG SPREAD" delay={1100} />
                     <StatBlock value={`${Math.floor(uptime / 10)}.${uptime % 10}%`} label="UPTIME" delay={1200} />
                   </div>
                 </CardItem>
