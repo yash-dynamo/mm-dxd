@@ -78,6 +78,18 @@ export default function NewSessionPage() {
   );
 
   const phase: 1 | 2 | 3 = symbols.length === 0 ? 1 : isLoadingDefaults ? 2 : 3;
+  const makerDefaults = useMemo(() => {
+    const defaultsBySymbol = configDefaults?.defaults;
+    if (!defaultsBySymbol) return undefined;
+
+    const selectedSymbol = symbols[0];
+    if (selectedSymbol && defaultsBySymbol[selectedSymbol]) {
+      return defaultsBySymbol[selectedSymbol];
+    }
+
+    const firstAvailableSymbol = Object.keys(defaultsBySymbol)[0];
+    return firstAvailableSymbol ? defaultsBySymbol[firstAvailableSymbol] : undefined;
+  }, [configDefaults?.defaults, symbols]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,9 +261,7 @@ export default function NewSessionPage() {
                 <ConfigForm
                   value={globalConfig}
                   onChange={setGlobalConfig}
-                  defaults={
-                    configDefaults?.defaults?.[symbols[0] ?? 'HYPE-PERP'] ?? configDefaults?.defaults?.['HYPE-PERP']
-                  }
+                  defaults={makerDefaults}
                 />
               )}
             </section>
