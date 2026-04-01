@@ -244,27 +244,20 @@ export default function Navbar() {
       <nav className="navbar animate-slide-down">
         {/* Gradient accent line at bottom */}
         <div
+          className="navbar-accent-line"
           style={{
             position: "absolute",
             bottom: 0,
-            left: "10%",
-            right: "10%",
+            left: "8%",
+            right: "8%",
             height: "1px",
-            background: "linear-gradient(to right, transparent, var(--red), var(--gold), var(--red), transparent)",
-            opacity: 0.5,
             borderRadius: "1px",
           }}
         />
         <div className="navbar-inner">
           {/* Logo */}
           <div style={{ flexShrink: 0 }}>
-            <div
-              className="logo-text"
-              style={{
-                fontSize: "28px",
-                textShadow: "0 0 20px rgba(204, 51, 51, 0.4)",
-              }}
-            >
+            <div className="logo-text navbar-logo-mark" style={{ fontSize: "28px" }}>
               DXD
             </div>
             <div className="logo-subtitle">LIQUIDITY</div>

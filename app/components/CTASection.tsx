@@ -82,29 +82,19 @@ export default function CTASection() {
           Live liquidity. Minimal friction.
         </p>
 
-        {/* Stats row - cleaner dividers */}
-        <div 
-          className="animate-fade-in-up delay-400" 
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "0",
-            marginTop: "64px",
-            flexWrap: "wrap",
-          }}
-        >
+        {/* Stats — responsive grid; borders via .cta-stat-cell */}
+        <div className="animate-fade-in-up delay-400 cta-stats-grid">
           {[
-            { label: "$420M+", sub: "Volume" },
+            { label: "$50k+", sub: "Volume" },
             { label: "99.9%", sub: "Uptime" },
-            { label: "0.008%", sub: "Spread" },
+            { label: "0.001%", sub: "Spread" },
             { label: "2+", sub: "DEXes" },
           ].map((item, i) => (
             <div 
               key={i} 
+              className="cta-stat-cell"
               style={{
                 textAlign: "center",
-                padding: "0 32px",
-                borderLeft: i > 0 ? "1px solid rgba(201, 162, 39, 0.15)" : "none",
               }}
             >
               <div 

@@ -93,26 +93,15 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
 
   return (
     <div
-      className={`animate-fade-in-up delay-${(index + 1) * 100}`}
-      style={{
-        position: "relative",
-        borderRadius: "4px",
-        overflow: "hidden",
-        cursor: "pointer",
-        aspectRatio: "3/4",
-        background: "#06000e",
-        transition: "all 0.45s var(--ease-out)",
-        border: hovered
-          ? "1px solid rgba(204,51,51,0.4)"
-          : "1px solid rgba(255,255,255,0.06)",
-        boxShadow: hovered
-          ? "0 24px 80px rgba(204,51,51,0.2), 0 0 0 1px rgba(204,51,51,0.15)"
-          : "none",
-        transform: hovered ? "translateY(-8px) scale(1.02)" : "translateY(0) scale(1)",
-      }}
+      className={`core-stack-card animate-fade-in-up delay-${(index + 1) * 100} ${hovered ? "core-stack-card--hover" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      <div className="core-stack-card__hover-tint" aria-hidden />
+      <div className="core-stack-card__bar" aria-hidden />
+      <div className="core-stack-card__focus-badge" aria-hidden>
+        In focus
+      </div>
       {/* ── ASCII Image ── */}
       <AsciiImage
         src={card.img}
@@ -162,22 +151,9 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
         }}
       />
 
-      {/* ── Top red accent bar ── */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: hovered ? "3px" : "2px",
-          background: "linear-gradient(to right, var(--red), transparent 70%)",
-          transition: "height 0.3s",
-          zIndex: 5,
-        }}
-      />
-
       {/* ── Tag pill ── */}
       <div
+        className="core-stack-card__tag"
         style={{
           position: "absolute",
           top: "12px",
@@ -191,7 +167,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           fontFamily: "var(--font-sans)",
           color: "var(--red)",
           fontWeight: "700",
-          zIndex: 5,
+          zIndex: 6,
           transition: "all 0.3s",
           transform: hovered ? "translateY(-2px)" : "translateY(0)",
         }}
@@ -200,61 +176,13 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
       </div>
 
       {/* ── Bottom content ── */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: "16px",
-          zIndex: 5,
-          transform: hovered ? "translateY(-4px)" : "translateY(0)",
-          transition: "transform 0.4s var(--ease-out)",
-        }}
-      >
-        {/* Description — reveals on hover */}
-        <p
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "11px",
-            color: "var(--text-secondary)",
-            lineHeight: 1.5,
-            marginBottom: "10px",
-            opacity: hovered ? 1 : 0,
-            transform: hovered ? "translateY(0)" : "translateY(8px)",
-            transition: "all 0.35s var(--ease-out) 0.05s",
-          }}
-        >
-          {card.desc}
-        </p>
+      <div className="core-stack-card__bottom">
+        {/* Description — reveals on hover; CSS handles visibility */}
+        <p className="core-stack-card__desc">{card.desc}</p>
 
-        {/* Name */}
-        <div
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontSize: "18px",
-            fontWeight: "700",
-            color: "var(--text-primary)",
-            marginBottom: "2px",
-            letterSpacing: "0.5px",
-          }}
-        >
-          {card.name}
-        </div>
+        <div className="core-stack-card__name">{card.name}</div>
 
-        {/* Role */}
-        <div
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "9px",
-            letterSpacing: "2px",
-            color: "var(--gold)",
-            marginBottom: "12px",
-            fontWeight: "600",
-          }}
-        >
-          {card.role.toUpperCase()}
-        </div>
+        <div className="core-stack-card__role">{card.role.toUpperCase()}</div>
 
         {/* Power bar - unified gold */}
         <PowerBar power={card.power} />
@@ -294,12 +222,12 @@ export default function BentoSection() {
   return (
     <section
       id="platforms"
+      className="bento-section-home"
       style={{
-        padding: "100px 0 80px",
         position: "relative",
         background:
           "radial-gradient(ellipse 100% 60% at 50% -10%, rgba(120,30,30,0.07) 0%, transparent 60%), var(--bg-base)",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       {/* Vertical divider from top */}
@@ -314,7 +242,7 @@ export default function BentoSection() {
         }}
       />
 
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 24px" }}>
+      <div className="bento-section-inner">
         {/* Section header */}
         <div style={{ marginBottom: "56px" }}>
           <div
@@ -368,14 +296,8 @@ export default function BentoSection() {
           </p>
         </div>
 
-        {/* Bento grid - 4 columns, taller cards */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "16px",
-          }}
-        >
+        {/* Bento grid — responsive: see .home-bento-grid in globals.css */}
+        <div className="home-bento-grid">
           {cards.map((card, i) => (
             <BentoCard key={i} card={card} index={i} />
           ))}
