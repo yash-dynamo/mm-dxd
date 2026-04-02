@@ -16,7 +16,7 @@ interface HoverPoint {
   y: number;
 }
 
-const rawColors = ['#cc3333', '#c9a227', '#00c864', '#2a5aaa', '#7b00c8', '#cc4400'];
+const rawColors = ['#ff2f4f', '#ff5a72', '#00c864', '#2a5aaa', '#7b00c8', '#ff7f90'];
 
 function fmt(n: number, d = 2) {
   return n.toFixed(d);

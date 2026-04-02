@@ -81,7 +81,7 @@ function MiniBarChart({ bars, delay = 0, muted = false }: { bars: number[]; dela
               left: 0,
               right: 0,
               borderRadius: "var(--radius-xs)",
-              background: muted ? "var(--text-dim)" : "var(--gold)",
+              background: muted ? "var(--text-dim)" : "var(--red)",
               transformOrigin: "bottom",
               transform: ready ? `scaleY(${h})` : "scaleY(0)",
               height: "100%",
@@ -152,7 +152,7 @@ export default function HeroSection() {
           left: "-80px",
           width: "520px",
           height: "520px",
-          background: "radial-gradient(circle, rgba(204,51,51,0.05) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(200, 16, 46,0.05) 0%, transparent 70%)",
           pointerEvents: "none",
         }}
       />
@@ -179,8 +179,9 @@ export default function HeroSection() {
                 className="animate-fade-in-left delay-100"
                 style={{
                   display: "block",
-                  fontSize: "clamp(44px, 5.5vw, 72px)",
-                  letterSpacing: "var(--tracking-normal)",
+                  fontSize: "clamp(56px, 7vw, 100px)",
+                  letterSpacing: "var(--tracking-tight)",
+                  lineHeight: 0.95,
                 }}
               >
                 <span className="heading-display-italic">Pure</span>{" "}
@@ -190,11 +191,12 @@ export default function HeroSection() {
                 className="animate-fade-in-left delay-200"
                 style={{
                   display: "block",
-                  fontSize: "clamp(44px, 5.5vw, 72px)",
-                  letterSpacing: "var(--tracking-normal)",
+                  fontSize: "clamp(56px, 7vw, 100px)",
+                  letterSpacing: "var(--tracking-tight)",
+                  lineHeight: 0.95,
                 }}
               >
-                <span className="animate-glow-gold heading-display-gold">Market</span>{" "}
+                <span className="animate-glow-red heading-display-gold">Market</span>{" "}
                 <span className="heading-display-bold">Liquidity</span>
               </span>
             </h1>
@@ -205,13 +207,14 @@ export default function HeroSection() {
             </p>
 
             {/* CTA buttons */}
-            <div className="animate-fade-in-left delay-600 hero-cta-row" style={{ display: "flex", gap: "var(--space-6)", flexWrap: "wrap" }}>
+            <div className="animate-fade-in-left delay-600 hero-cta-row" style={{ display: "flex", gap: "var(--space-6)", flexWrap: "wrap", alignItems: "center" }}>
               <button
                 type="button"
                 onClick={handleStart}
-                className="btn btn-primary animate-glow-red"
+                className="btn-cube"
+                aria-label="Launch App"
               >
-                LAUNCH APP
+                <span className="btn-cube-inner">LAUNCH APP</span>
               </button>
             </div>
           </div>
@@ -253,7 +256,7 @@ export default function HeroSection() {
                         fontSize: "clamp(36px, 4vw, 48px)", 
                         color: "var(--red)", 
                         letterSpacing: "8px",
-                        textShadow: "0 0 30px rgba(204, 51, 51, 0.3)"
+                        textShadow: "0 0 30px rgba(200, 16, 46, 0.3)"
                       }}
                     >
                       DXD
@@ -273,7 +276,7 @@ export default function HeroSection() {
                           height: "6px", 
                           borderRadius: "50%", 
                           background: "var(--red)",
-                          boxShadow: "0 0 8px rgba(204, 51, 51, 0.6)"
+                          boxShadow: "0 0 8px rgba(200, 16, 46, 0.6)"
                         }} 
                       />
                       LIVE
@@ -288,7 +291,7 @@ export default function HeroSection() {
                       key={i}
                       className={`platform-row ${p.soon ? "platform-row-disabled" : ""}`}
                       style={{ 
-                        borderLeft: p.soon ? "none" : "2px solid rgba(201, 162, 39, 0.25)",
+                        borderLeft: p.soon ? "none" : "2px solid rgba(200, 16, 46, 0.35)",
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-5)" }}>
@@ -331,7 +334,7 @@ export default function HeroSection() {
                       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-6)" }}>
                         <MiniBarChart bars={p.bars} delay={i * 120} muted={p.soon} />
                         <div style={{ textAlign: "right", minWidth: "70px" }}>
-                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-2xl)", fontWeight: "700", color: p.soon ? "var(--text-dim)" : "var(--gold)" }}>
+                          <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-2xl)", fontWeight: "700", color: p.soon ? "var(--text-dim)" : "var(--red-light)" }}>
                             {p.volume}
                           </div>
                           <div style={{ fontFamily: "var(--font-sans)", fontSize: "var(--text-xs)", color: "var(--text-dim)", marginTop: "2px", letterSpacing: "var(--tracking-wide)" }}>

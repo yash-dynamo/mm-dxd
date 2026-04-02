@@ -77,8 +77,9 @@ function PowerBar({ power }: { power: number }) {
           style={{
             height: "100%",
             width: `${power}%`,
-            background: "linear-gradient(to right, rgba(255,255,255,0.4), rgba(255,255,255,0.9))",
+            background: "linear-gradient(to right, rgba(255,47,79,0.6), var(--red-light))",
             borderRadius: "1px",
+            boxShadow: "0 0 6px rgba(255,47,79,0.5)",
             transition: "width 0.8s var(--ease-out)",
           }}
         />
@@ -93,7 +94,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
 
   return (
     <div
-      className={`core-stack-card animate-fade-in-up delay-${(index + 1) * 100} ${hovered ? "core-stack-card--hover" : ""}`}
+      className={`core-stack-card reveal reveal-delay-${Math.min(index + 1, 5)} ${hovered ? "core-stack-card--hover" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -107,12 +108,12 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
         src={card.img}
         alt={card.name}
         aspectRatio="3/4"
-        resolution={120}
-        contrast={1.8}
+        resolution={140}
+        contrast={2.1}
         skinToneBoost={true}
         showImageOnHover={true}
-        imageOpacity={0.12}
-        imageHoverOpacity={0.68}
+        imageOpacity={0.55}
+        imageHoverOpacity={0.88}
         isHovered={hovered}
         style={{ 
           position: "absolute",
@@ -160,7 +161,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           left: "12px",
           background: "rgba(6,0,14,0.85)",
           backdropFilter: "blur(10px)",
-          border: "1px solid rgba(204,51,51,0.3)",
+          border: "1px solid rgba(200, 16, 46,0.3)",
           padding: "4px 10px",
           fontSize: "8px",
           letterSpacing: "2px",
@@ -184,7 +185,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
 
         <div className="core-stack-card__role">{card.role.toUpperCase()}</div>
 
-        {/* Power bar - unified gold */}
+        {/* Power bar */}
         <PowerBar power={card.power} />
       </div>
 
@@ -196,7 +197,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           right: 0,
           width: hovered ? "40px" : "24px",
           height: "1px",
-          background: "linear-gradient(to left, rgba(204,51,51,0.5), transparent)",
+          background: "linear-gradient(to left, rgba(200, 16, 46,0.5), transparent)",
           transition: "width 0.4s",
           zIndex: 5,
         }}
@@ -208,7 +209,7 @@ function BentoCard({ card, index }: { card: (typeof cards)[0]; index: number }) 
           right: 0,
           width: "1px",
           height: hovered ? "40px" : "24px",
-          background: "linear-gradient(to top, rgba(204,51,51,0.5), transparent)",
+          background: "linear-gradient(to top, rgba(200, 16, 46,0.5), transparent)",
           transition: "height 0.4s",
           zIndex: 5,
         }}
@@ -238,24 +239,23 @@ export default function BentoSection() {
           left: "50%",
           width: "1px",
           height: "100px",
-          background: "linear-gradient(to bottom, transparent, rgba(204,51,51,0.5), transparent)",
+          background: "linear-gradient(to bottom, transparent, rgba(200, 16, 46,0.5), transparent)",
         }}
       />
 
       <div className="bento-section-inner">
         {/* Section header */}
-        <div style={{ marginBottom: "56px" }}>
+        <div className="reveal" style={{ marginBottom: "64px" }}>
           <div
-            className="animate-fade-in-up"
             style={{
               display: "inline-flex",
               alignItems: "center",
               gap: "8px",
-              marginBottom: "16px",
+              marginBottom: "20px",
               fontFamily: "var(--font-sans)",
               fontSize: "9px",
               letterSpacing: "3px",
-              color: "var(--gold)",
+              color: "var(--red)",
               fontWeight: "700",
             }}
           >
@@ -264,35 +264,36 @@ export default function BentoSection() {
                 width: "6px",
                 height: "6px",
                 borderRadius: "50%",
-                background: "var(--gold)",
-                boxShadow: "0 0 8px rgba(201, 162, 39, 0.5)",
+                background: "var(--red)",
+                boxShadow: "0 0 10px rgba(200, 16, 46, 0.7)",
                 display: "inline-block",
               }}
             />
             CORE TEAM
           </div>
 
-          <h2 className="animate-fade-in-up delay-100 heading-display" style={{ lineHeight: 1.05, margin: 0 }}>
+          <h2 className="heading-display" style={{ lineHeight: 0.92, margin: 0 }}>
             <span
               style={{
                 display: "block",
-                fontSize: "clamp(44px, 5.5vw, 72px)",
-                letterSpacing: "var(--tracking-normal)",
+                fontSize: "clamp(52px, 7vw, 96px)",
+                letterSpacing: "var(--tracking-tight)",
               }}
             >
-              <span className="heading-display-bold">Core</span>{" "}
-              <span className="heading-display-italic" style={{ color: "var(--red-muted)" }}>Stack</span>
+              <span className="heading-display-bold">Sacred</span>{" "}
+              <span className="heading-display-italic" style={{ color: "var(--red-muted)" }}>Arsenal</span>
             </span>
           </h2>
 
           <p
-            className="animate-fade-in-up delay-200 text-body"
+            className="text-body"
             style={{
-              marginTop: "16px",
+              marginTop: "20px",
               maxWidth: "460px",
+              fontSize: "var(--text-lg)",
             }}
           >
-            Four modules. One execution engine.
+            Four roles. One unified liquidity engine.
           </p>
         </div>
 
@@ -319,7 +320,7 @@ export default function BentoSection() {
             style={{
               height: "1px",
               width: "60px",
-              background: "linear-gradient(to right, transparent, rgba(204,51,51,0.3))",
+              background: "linear-gradient(to right, transparent, rgba(200, 16, 46,0.3))",
             }}
           />
           <span
@@ -337,7 +338,7 @@ export default function BentoSection() {
             style={{
               height: "1px",
               width: "60px",
-              background: "linear-gradient(to left, transparent, rgba(204,51,51,0.3))",
+              background: "linear-gradient(to left, transparent, rgba(200, 16, 46,0.3))",
             }}
           />
         </div>

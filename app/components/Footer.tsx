@@ -119,7 +119,7 @@ export default function Footer() {
               <span
                 key={i}
                 style={{ 
-                  color: "var(--gold)", 
+                  color: "var(--red)", 
                   fontSize: "var(--text-2xs)", 
                   opacity: 0.4 + (i * 0.1),
                   letterSpacing: "1px"

@@ -87,7 +87,7 @@ export default function Navbar() {
         <button
           type="button"
           onClick={() => setDropdownOpen((v) => !v)}
-          className={`btn btn-outline-gold${fullWidth ? "" : " hidden md:flex"}`}
+          className={`btn btn-outline-red${fullWidth ? "" : " hidden md:flex"}`}
           style={fullWidth ? { width: "100%", padding: "var(--space-6)" } : undefined}
         >
           <span
@@ -219,7 +219,7 @@ export default function Navbar() {
                 color: "var(--red-light)",
                 transition: "background 0.15s",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(204,51,51,0.08)")}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200, 16, 46,0.08)")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
             >
               <Iconify icon="mingcute:exit-line" width={14} height={14} />
@@ -232,7 +232,7 @@ export default function Navbar() {
       <button
         type="button"
         onClick={() => setModal("connect-wallet")}
-        className={`btn btn-outline-gold${fullWidth ? "" : " hidden md:flex"}`}
+        className={`btn btn-outline-red${fullWidth ? "" : " hidden md:flex"}`}
         style={fullWidth ? { width: "100%", padding: "var(--space-6)" } : undefined}
       >
         {walletLabel}
@@ -426,7 +426,7 @@ export default function Navbar() {
                   borderRadius: 999,
                   border: "1px solid rgba(201,162,39,0.35)",
                   background: "rgba(9, 6, 16, 0.72)",
-                  color: "var(--gold)",
+                  color: "var(--red-light)",
                   fontFamily: "var(--font-sans)",
                   fontSize: "10px",
                   fontWeight: 700,

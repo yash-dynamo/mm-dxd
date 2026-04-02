@@ -136,7 +136,7 @@ function SymbolCard({
           </div>
           <div className="dxd-line">
             <span>Equity</span>
-            <span className="dxd-mono" style={{ color: 'var(--gold)' }}>
+            <span className="dxd-mono" style={{ color: 'var(--red-light)' }}>
               ${fmt(m.account_equity, 2)}
             </span>
           </div>

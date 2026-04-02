@@ -208,7 +208,7 @@ export default function NewSessionPage() {
                       padding: '12px 20px',
                       borderRadius: 'var(--radius-md)',
                       border: strategy === s ? '1px solid var(--red)' : '1px solid var(--border-subtle)',
-                      background: strategy === s ? 'rgba(204,51,51,0.14)' : 'rgba(255,255,255,0.03)',
+                      background: strategy === s ? 'rgba(200, 16, 46,0.14)' : 'rgba(255,255,255,0.03)',
                       color: strategy === s ? 'var(--red-light)' : 'var(--text-primary)',
                       cursor: 'pointer',
                       transition: 'all var(--duration-fast) var(--ease-out)',

@@ -110,9 +110,9 @@ export default function SplashScreen() {
           style={{
             animationDelay: "0.2s",
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(8px, 1vw, 10px)",
+            fontSize: "clamp(10px, 1.25vw, 13px)",
             letterSpacing: "var(--tracking-caps-wide)",
-            color: "var(--red)",
+            color: "var(--red-light)",
             marginBottom: "var(--space-12)",
             display: "flex",
             alignItems: "center",
@@ -134,7 +134,7 @@ export default function SplashScreen() {
             fontStyle: "italic",
             fontWeight: "300",
             fontSize: "clamp(28px, 5vw, 68px)",
-            color: "var(--red-muted)",
+            color: "var(--red-bright)",
             lineHeight: 1.1,
             marginBottom: "var(--space-3)",
             letterSpacing: "var(--tracking-normal)",
@@ -166,10 +166,11 @@ export default function SplashScreen() {
           style={{
             animationDelay: "1.0s",
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(10px, 1.2vw, 13px)",
-            color: "var(--text-muted)",
+            fontSize: "clamp(12px, 1.5vw, 16px)",
+            color: "var(--text-secondary)",
             letterSpacing: "var(--tracking-label-wider)",
             marginBottom: "var(--space-3)",
+            fontWeight: 600,
           }}
         >
           YOUR SOUL FOR SACRED SPREADS
@@ -179,10 +180,11 @@ export default function SplashScreen() {
           style={{
             animationDelay: "1.15s",
             fontFamily: "var(--font-sans)",
-            fontSize: "clamp(9px, 1vw, 11px)",
-            color: "var(--text-dim)",
+            fontSize: "clamp(11px, 1.2vw, 14px)",
+            color: "var(--text-muted)",
             letterSpacing: "var(--tracking-caps)",
             marginBottom: "var(--space-16)",
+            fontWeight: 500,
           }}
         >
           EVERY TRADE · A BLOOD CONTRACT
@@ -204,10 +206,10 @@ export default function SplashScreen() {
             className="splash-enter-btn"
             style={{
               background: "transparent",
-              border: "1px solid rgba(204,51,51,0.5)",
-              color: "var(--red)",
+              border: "1px solid rgba(200, 16, 46,0.5)",
+              color: "var(--red-light)",
               fontFamily: "var(--font-sans)",
-              fontSize: "var(--text-base)",
+              fontSize: "var(--text-lg)",
               letterSpacing: "var(--tracking-caps-wide)",
               fontWeight: "700",
               padding: "var(--space-6) var(--space-15)",
@@ -218,23 +220,23 @@ export default function SplashScreen() {
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget;
-              el.style.background = "rgba(204,51,51,0.1)";
-              el.style.borderColor = "var(--red)";
+              el.style.background = "rgba(200, 16, 46,0.1)";
+              el.style.borderColor = "var(--red-light)";
               el.style.color = "var(--red-bright)";
-              el.style.boxShadow = "0 0 30px rgba(204,51,51,0.3)";
+              el.style.boxShadow = "0 0 34px rgba(255,47,79,0.36)";
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget;
               el.style.background = "transparent";
-              el.style.borderColor = "rgba(204,51,51,0.5)";
-              el.style.color = "var(--red)";
+              el.style.borderColor = "rgba(200, 16, 46,0.5)";
+              el.style.color = "var(--red-light)";
               el.style.boxShadow = "";
             }}
           >
             ✦ ENTER THE MARKET
           </button>
 
-          <div style={{ fontSize: "var(--text-sm)", letterSpacing: "var(--tracking-label)", color: "var(--text-ghost)", fontFamily: "var(--font-sans)" }}>
+          <div style={{ fontSize: "var(--text-base)", letterSpacing: "var(--tracking-label)", color: "var(--text-dim)", fontFamily: "var(--font-sans)", fontWeight: 500 }}>
             or wait · auto-entering soon
           </div>
         </div>

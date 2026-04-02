@@ -46,7 +46,7 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
         style={{
           padding: '14px 16px',
           background: 'rgba(201,162,39,0.06)',
-          border: '1px solid var(--border-gold)',
+          border: '1px solid var(--border-red-light)',
           borderRadius: 'var(--radius-md)',
         }}
       >
@@ -58,7 +58,7 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
             fontFamily: 'var(--font-sans)',
             fontSize: 'var(--text-sm)',
             fontWeight: 700,
-            color: 'var(--gold)',
+            color: 'var(--red-light)',
             letterSpacing: 'var(--tracking-wide)',
             marginBottom: 4,
           }}
@@ -70,7 +70,7 @@ export function AgentKeyDisplay({ privateKey, agentAddress, onConfirmed }: Agent
           </svg>
           Save your private key — shown only once
         </div>
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--gold-light)', opacity: 0.7, lineHeight: 1.5 }}>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--red-bright)', opacity: 0.7, lineHeight: 1.5 }}>
           This key authorises order signing. If lost, you must register a new agent wallet.
         </p>
       </div>

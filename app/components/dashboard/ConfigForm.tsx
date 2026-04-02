@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SymbolConfig } from '@/lib/dxd-api';
 
 interface ConfigFormProps {
@@ -58,13 +58,22 @@ function NumberInput({
   step?: number | 'any';
   disabled?: boolean;
 }) {
+  const [draft, setDraft] = useState<string>(value !== undefined ? String(value) : '');
+
+  useEffect(() => {
+    setDraft(value !== undefined ? String(value) : '');
+  }, [value]);
+
   const resolvedStep = step === 'any' ? 0.1 : step;
   const stepDecimals = String(resolvedStep).includes('.') ? String(resolvedStep).split('.')[1]?.length ?? 0 : 0;
 
   const handleManualChange = (rawValue: string) => {
-    const trimmed = rawValue.trim();
-    if (trimmed === '') {
-      onChange(typeof min === 'number' ? min : 0);
+    const normalized = rawValue.replace(',', '.');
+    if (!/^-?\d*\.?\d*$/.test(normalized)) return;
+    setDraft(normalized);
+
+    const trimmed = normalized.trim();
+    if (trimmed === '' || trimmed === '-' || trimmed === '.' || trimmed === '-.') {
       return;
     }
     const parsed = Number(trimmed);
@@ -81,14 +90,35 @@ function NumberInput({
     onChange(clamped);
   };
 
+  const commitDraft = () => {
+    const trimmed = draft.trim();
+    if (trimmed === '' || trimmed === '-' || trimmed === '.' || trimmed === '-.') {
+      const fallback = typeof min === 'number' ? min : 0;
+      onChange(fallback);
+      setDraft(String(fallback));
+      return;
+    }
+
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed)) {
+      setDraft(value !== undefined ? String(value) : '');
+      return;
+    }
+
+    const clamped = typeof min === 'number' ? Math.max(min, parsed) : parsed;
+    onChange(clamped);
+    setDraft(String(clamped));
+  };
+
   return (
     <div style={{ width: '100%', display: 'flex', gap: 6, alignItems: 'stretch', opacity: disabled ? 0.4 : 1 }}>
       <input
         type="text"
         inputMode={step === 'any' ? 'decimal' : 'numeric'}
         className="dxd-number-input"
-        value={value ?? ''}
+        value={draft}
         onChange={(e) => handleManualChange(e.target.value)}
+        onBlur={commitDraft}
         disabled={disabled}
         style={{
           flex: 1,
@@ -169,7 +199,7 @@ function Toggle({ value, onChange, disabled }: { value: boolean | undefined; onC
         height: 22,
         borderRadius: 11,
         border: value ? '1px solid var(--red)' : '1px solid var(--border-subtle)',
-        background: value ? 'rgba(204,51,51,0.2)' : 'var(--bg-elevated)',
+        background: value ? 'rgba(200, 16, 46,0.2)' : 'var(--bg-elevated)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.4 : 1,
         transition: 'all var(--duration-fast) var(--ease-out)',

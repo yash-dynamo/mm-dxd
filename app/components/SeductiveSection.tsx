@@ -8,7 +8,7 @@ const features = [
     icon: "mingcute:chart-line-line",
     title: "Strategy Engine",
     desc: "Compose maker and taker runs per symbol with shared controls.",
-    color: "var(--gold)",
+    color: "var(--red-light)",
     stat: "MAKE",
   },
   {
@@ -22,14 +22,14 @@ const features = [
     icon: "mingcute:flash-line",
     title: "Execution Loop",
     desc: "Event-driven requotes with controlled cadence.",
-    color: "var(--gold)",
+    color: "var(--red-muted)",
     stat: "EXEC",
   },
   {
     icon: "mingcute:shield-check-line",
     title: "Risk Guardrails",
     desc: "Loss caps and cooldown rules stop runaway sessions.",
-    color: "var(--red)",
+    color: "var(--red-bright)",
     stat: "GUARD",
   },
 ];
@@ -42,12 +42,12 @@ export default function SeductiveSection() {
 
       <div className="seductive-grid">
         {/* ====== LEFT: Image ====== */}
-        <div className="animate-fade-in-left" style={{ position: "relative" }}>
+        <div className="reveal-left" style={{ position: "relative" }}>
           {/* Image frame with static glow */}
           <div 
             className="seductive-image-frame"
             style={{
-              boxShadow: "0 0 60px rgba(204,51,51,0.3), 0 0 120px rgba(204,51,51,0.15)",
+              boxShadow: "0 0 60px rgba(200, 16, 46,0.3), 0 0 120px rgba(200, 16, 46,0.15)",
             }}
           >
             <AsciiImage
@@ -84,15 +84,15 @@ export default function SeductiveSection() {
             style={{
               bottom: "-24px",
               right: "-24px",
-              border: "1px solid var(--border-gold-strong)",
+              border: "1px solid rgba(255,47,79,0.45)",
               padding: "var(--space-7) var(--space-9)",
               zIndex: 10,
-              boxShadow: "0 8px 32px rgba(201,162,39,0.25), 0 0 0 1px rgba(201,162,39,0.1)",
+              boxShadow: "0 8px 32px rgba(255,47,79,0.25), 0 0 0 1px rgba(255,47,79,0.1)",
             }}
           >
             <div
               className="stat-value"
-              style={{ fontSize: "var(--text-6xl)", color: "var(--gold)", marginBottom: "var(--space-1)" }}
+              style={{ fontSize: "var(--text-6xl)", color: "var(--red-light)", marginBottom: "var(--space-1)" }}
             >
               200ms
             </div>
@@ -109,7 +109,7 @@ export default function SeductiveSection() {
               right: "-28px",
               border: "1px solid var(--border-red-strong)",
               padding: "var(--space-5) var(--space-7)",
-              boxShadow: "0 8px 32px rgba(204,51,51,0.2), 0 0 0 1px rgba(204,51,51,0.1)",
+              boxShadow: "0 8px 32px rgba(200, 16, 46,0.2), 0 0 0 1px rgba(200, 16, 46,0.1)",
               zIndex: 10,
             }}
           >
@@ -130,10 +130,10 @@ export default function SeductiveSection() {
         </div>
 
         {/* ====== RIGHT: Content ====== */}
-        <div className="animate-fade-in-right delay-200">
+        <div className="reveal-right reveal-delay-2">
           {/* Section label */}
-          <div className="section-label section-label-gold">
-            <span className="dot dot-sm dot-gold" />
+          <div className="section-label section-label-red">
+            <span className="dot dot-sm dot-red" />
             TOOLSET
           </div>
 
@@ -142,17 +142,21 @@ export default function SeductiveSection() {
             <span
               style={{
                 display: "block",
-                fontSize: "clamp(38px, 4.5vw, 60px)",
+                fontSize: "clamp(42px, 5vw, 72px)",
+                lineHeight: 0.95,
+                letterSpacing: "var(--tracking-tight)",
               }}
             >
               <span className="heading-display-italic">Strategy</span>{" "}
               <span className="heading-display-bold">Stack.</span>
             </span>
             <span
-              className="animate-glow-gold heading-display-gold"
+              className="animate-glow-red heading-display-gold"
               style={{
                 display: "block",
-                fontSize: "clamp(38px, 4.5vw, 60px)",
+                fontSize: "clamp(42px, 5vw, 72px)",
+                lineHeight: 0.95,
+                letterSpacing: "var(--tracking-tight)",
               }}
             >
               Execution Control.
@@ -246,7 +250,7 @@ export default function SeductiveSection() {
       </div>
 
       {/* Separator */}
-      <div className="divider-gold-red" />
+      <div className="divider-red-gold" />
     </section>
   );
 }

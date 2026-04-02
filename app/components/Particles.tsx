@@ -50,14 +50,14 @@ export default function Particles({ count = 30 }: { count?: number }) {
             height: p.type === "cross" ? "8px" : `${p.size}px`,
             opacity: p.opacity,
             animation: `float-slow ${p.duration}s ease-in-out ${p.delay}s infinite`,
-            color: Math.random() > 0.5 ? "#cc0000" : "#c9a227",
+            color: Math.random() > 0.5 ? "#ff2f4f" : "#ff5a72",
             fontSize: p.type === "cross" ? "8px" : undefined,
             borderRadius: p.type === "dot" ? "50%" : undefined,
             background:
               p.type === "dot"
                 ? Math.random() > 0.5
-                  ? "#cc0000"
-                  : "#c9a227"
+                  ? "#ff2f4f"
+                  : "#ff5a72"
                 : "transparent",
             display: "flex",
             alignItems: "center",

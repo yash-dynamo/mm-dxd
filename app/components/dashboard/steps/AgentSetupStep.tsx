@@ -88,7 +88,7 @@ export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
               width: 48,
               height: 48,
               borderRadius: 'var(--radius-full)',
-              background: 'rgba(204,51,51,0.08)',
+              background: 'rgba(200, 16, 46,0.08)',
               border: '1px solid var(--border-red)',
               display: 'flex',
               alignItems: 'center',
@@ -117,9 +117,10 @@ export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-xs)',
-                color: 'var(--text-dim)',
+                fontSize: 'var(--text-sm)',
+                color: 'var(--text-secondary)',
                 letterSpacing: 'var(--tracking-wide)',
+                fontWeight: 500,
               }}
             >
               Wallet: {address?.slice(0, 6)}…{address?.slice(-4)}
@@ -133,7 +134,7 @@ export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
             <p
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--text-sm)',
+                fontSize: 'var(--text-lg)',
                 color: 'var(--text-secondary)',
                 lineHeight: 1.7,
               }}
@@ -146,10 +147,11 @@ export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
                 style={{
                   display: 'block',
                   fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--text-xs)',
-                  color: 'var(--text-dim)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--text-muted)',
                   letterSpacing: 'var(--tracking-label)',
                   marginBottom: 6,
+                  fontWeight: 600,
                 }}
               >
                 AGENT NAME
@@ -203,7 +205,7 @@ export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
                 <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
                   Waiting for wallet confirmation…
                 </p>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-xs)', color: 'var(--text-dim)', marginTop: 6 }}>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginTop: 6 }}>
                   You may see two wallet prompts: addAgent first, then broker fee approval.
                 </p>
               </>
@@ -213,7 +215,7 @@ export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
                 <div
                   style={{
                     padding: '10px 14px',
-                    background: 'rgba(204,51,51,0.08)',
+                    background: 'rgba(200, 16, 46,0.08)',
                     border: '1px solid var(--border-red-medium)',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'var(--text-sm)',

@@ -167,15 +167,16 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
           <div className="dash-topbar-actions ml-auto w-full sm:w-auto">
             {effectiveAgentAddress ? (
               <div className="dash-agent-pill hidden md:inline-flex">
-                Agent: {effectiveAgentAddress.slice(0, 6)}…{effectiveAgentAddress.slice(-4)}
+                {effectiveAgentAddress.slice(0, 6)}…{effectiveAgentAddress.slice(-4)}
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => router.push('/dashboard/agent?next=/dashboard')}
-                className="dash-top-action-btn min-w-[120px]"
+                className="dash-top-action-btn"
+                style={{ minWidth: 110 }}
               >
-                SET UP AGENT
+                SETUP AGENT
               </button>
             )}
             <button

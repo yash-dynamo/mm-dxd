@@ -1,24 +1,26 @@
 import Navbar from "./components/Navbar";
 import Ticker from "./components/Ticker";
 import HeroSection from "./components/HeroSection";
-import BentoSection from "./components/BentoSection";
+import StorySection from "./components/StorySection";
 import SeductiveSection from "./components/SeductiveSection";
 import CTASection from "./components/CTASection";
 import Footer from "./components/Footer";
 import SplashScreen from "./components/SplashScreen";
+import RevealInit from "./components/RevealInit";
 
 export default function Home() {
   return (
     <>
       <SplashScreen />
-      <main style={{ background: "var(--bg-base)", minHeight: "100vh" }}>
+      <RevealInit />
+      <main className="landing-main">
         <Navbar />
         <Ticker />
         <HeroSection />
-        <BentoSection />
+        <StorySection />
         <SeductiveSection />
         <CTASection />
-        {/* <Footer /> */}
+        <Footer />
       </main>
     </>
   );

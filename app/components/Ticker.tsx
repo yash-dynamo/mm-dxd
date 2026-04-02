@@ -4,6 +4,20 @@ import { useMemo } from "react";
 import Image from "next/image";
 import { useLandingTickers } from "@/hooks/use-landing-tickers";
 
+// Static placeholder shown instantly while API loads
+const PLACEHOLDER_ITEMS = [
+  { symbol: "BTC", value: "$—", change: "—", up: true },
+  { symbol: "ETH", value: "$—", change: "—", up: true },
+  { symbol: "SOL", value: "$—", change: "—", up: true },
+  { symbol: "ARB", value: "$—", change: "—", up: true },
+  { symbol: "SUI", value: "$—", change: "—", up: true },
+  { symbol: "DOGE", value: "$—", change: "—", up: true },
+  { symbol: "AVAX", value: "$—", change: "—", up: true },
+  { symbol: "TIA", value: "$—", change: "—", up: true },
+  { symbol: "EURUSD", value: "—", change: "—", up: true },
+  { symbol: "USDJPY", value: "—", change: "—", up: true },
+];
+
 type TickerItem = {
   symbol: string;
   value: string;
@@ -36,7 +50,7 @@ const getLogoPath = (symbol: string) => {
 };
 
 export default function Ticker() {
-  const { tickers, isLoading } = useLandingTickers();
+  const { tickers } = useLandingTickers();
 
   const items = useMemo<TickerItem[]>(() => {
     const tickerEntries = Object.entries(tickers);
@@ -61,12 +75,9 @@ export default function Ticker() {
       .sort((a, b) => a.symbol.localeCompare(b.symbol));
   }, [tickers]);
 
-  const allItems = useMemo(() => [...items, ...items], [items]);
-
-  // Show loading state or nothing if no items
-  if (isLoading || items.length === 0) {
-    return null;
-  }
+  // Use live data if available, otherwise placeholder (shows instantly)
+  const displayItems = items.length > 0 ? items : PLACEHOLDER_ITEMS;
+  const allItems = useMemo(() => [...displayItems, ...displayItems], [displayItems]);
 
   return (
     <div className="ticker-wrapper">

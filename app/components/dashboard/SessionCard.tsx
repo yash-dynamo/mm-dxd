@@ -4,167 +4,126 @@ import Link from 'next/link';
 import { Session } from '@/lib/dxd-api';
 import { useDxdMetricsStore } from '@/stores';
 
-const statusStyles: Record<string, { bg: string; border: string; color: string; rail: string }> = {
-  running: {
-    bg: 'color-mix(in srgb, var(--dxd-pos, var(--green)) 14%, transparent)',
-    border: 'color-mix(in srgb, var(--dxd-pos, var(--green)) 38%, var(--dxd-border, transparent) 62%)',
-    color: 'var(--dxd-pos, var(--green))',
-    rail: 'color-mix(in srgb, var(--dxd-pos, var(--green)) 72%, transparent)',
-  },
-  starting: {
-    bg: 'color-mix(in srgb, var(--gold) 14%, transparent)',
-    border: 'color-mix(in srgb, var(--gold) 45%, var(--dxd-border, transparent) 55%)',
-    color: 'var(--gold)',
-    rail: 'color-mix(in srgb, var(--gold) 72%, transparent)',
-  },
-  stopped: {
-    bg: 'var(--dxd-panel-soft, var(--bg-card-alt))',
-    border: 'var(--dxd-border, var(--border-subtle))',
-    color: 'var(--dxd-muted, var(--text-dim))',
-    rail: 'var(--dxd-border, rgba(255,255,255,0.12))',
-  },
-  error: {
-    bg: 'color-mix(in srgb, var(--dxd-neg, var(--red-light)) 14%, transparent)',
-    border: 'color-mix(in srgb, var(--dxd-neg, var(--red-light)) 45%, var(--dxd-border, transparent) 55%)',
-    color: 'var(--dxd-neg, var(--red-light))',
-    rail: 'color-mix(in srgb, var(--dxd-neg, var(--red-light)) 72%, transparent)',
-  },
+const STATUS_CONFIG: Record<string, { color: string; pulse: boolean; label: string }> = {
+  running:  { color: 'var(--green)',      pulse: true,  label: 'Running'  },
+  starting: { color: 'var(--red-light)',  pulse: true,  label: 'Starting' },
+  stopped:  { color: 'var(--text-ghost)', pulse: false, label: 'Stopped'  },
+  error:    { color: 'var(--red)',        pulse: false, label: 'Error'    },
+};
+
+const RIBBON_CONFIG: Record<string, { bg: string; text: string }> = {
+  maker: { bg: 'var(--red)',   text: '#fff'  },
+  taker: { bg: 'var(--green)', text: '#000'  },
 };
 
 function fmtSignedUsd(n: number, d = 2) {
-  return `${n < 0 ? '-' : '+'}$${Math.abs(n).toFixed(d)}`;
+  const sign = n < 0 ? '−' : '+';
+  return `${sign}$${Math.abs(n).toFixed(d)}`;
+}
+
+function relativeTime(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
 }
 
 export function SessionCard({ session }: { session: Session }) {
   const liveMetrics = useDxdMetricsStore((s) => s.liveMetrics[session.session_id]);
+  const totalPnl = liveMetrics
+    ? Object.values(liveMetrics).reduce((sum, m) => sum + m.pnl, 0)
+    : null;
 
-  const totalPnl = liveMetrics ? Object.values(liveMetrics).reduce((sum, m) => sum + m.pnl, 0) : null;
-
-  const startedAt = new Date(session.started_at).toLocaleString();
-  const st = statusStyles[session.status] ?? statusStyles.stopped;
+  const sc = STATUS_CONFIG[session.status] ?? STATUS_CONFIG.stopped;
+  const rb = RIBBON_CONFIG[session.strategy ?? 'maker'];
+  const isAlive = session.status === 'running' || session.status === 'starting';
+  const symbolCount = session.symbols.length;
 
   return (
     <Link
       href={`/dashboard/sessions/${session.session_id}`}
-      className="card-interactive dash-session-card"
-      style={{
-        display: 'block',
-        position: 'relative',
-        padding: '26px 26px 26px 22px',
-        textDecoration: 'none',
-        transition: 'all var(--duration-normal) var(--ease-out)',
-        overflow: 'hidden',
-      }}
+      className="dash-scard"
+      aria-label={`${session.strategy ?? 'maker'} session — ${sc.label}`}
     >
+      {/* ── Corner ribbon: maker / taker ── */}
       <span
+        className="dash-scard__ribbon"
+        style={{ '--rb-bg': rb.bg, '--rb-text': rb.text } as React.CSSProperties}
         aria-hidden
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 4,
-          background: st.rail,
-          opacity: 0.85,
-        }}
-      />
+      >
+        <span className="dash-scard__ribbon-inner">
+          {(session.strategy ?? 'maker').toUpperCase()}
+        </span>
+      </span>
 
-      <div style={{ paddingLeft: 8 }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: 12,
-            marginBottom: 18,
-          }}
-        >
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, minWidth: 0 }}>
-            <span className="dash-session-chip" style={{ borderStyle: 'dashed' }}>
-              {(session.strategy ?? 'unknown').toUpperCase()}
-            </span>
-            {session.symbols.map((sym) => (
-              <span key={sym} className="dash-session-chip">
-                {sym}
-              </span>
-            ))}
-          </div>
-          <span
-            style={{
-              fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 700,
-              letterSpacing: 'var(--tracking-label)',
-              textTransform: 'uppercase',
-              color: st.color,
-              background: st.bg,
-              border: `1px solid ${st.border}`,
-              borderRadius: 'var(--radius-sm)',
-              padding: '6px 12px',
-              flexShrink: 0,
-            }}
-          >
-            {session.status}
-          </span>
+      {/* ── Status rail (bottom edge) ── */}
+      <span className="dash-scard__rail" style={{ background: sc.color }} aria-hidden />
+
+      <div className="dash-scard__body">
+
+        {/* ─ Symbols ─ */}
+        <div className="dash-scard__symbols">
+          {session.symbols.slice(0, 4).map((sym) => (
+            <span key={sym} className="dash-scard__sym">{sym}</span>
+          ))}
+          {symbolCount > 4 && (
+            <span className="dash-scard__sym dash-scard__sym--more">+{symbolCount - 4}</span>
+          )}
         </div>
 
-        {totalPnl !== null && (
-          <div style={{ marginBottom: 18 }}>
+        {/* ─ PnL ─ */}
+        <div className="dash-scard__pnl-block">
+          <p className="dash-scard__pnl-label">Session PnL</p>
+          {totalPnl !== null ? (
             <p
-              style={{
-                fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',
-                fontSize: 'var(--text-xs)',
-                fontWeight: 700,
-                color: 'var(--text-dim)',
-                letterSpacing: 'var(--tracking-label)',
-                marginBottom: 6,
-                textTransform: 'uppercase',
-              }}
+              className="dash-scard__pnl-value"
+              style={{ color: totalPnl >= 0 ? 'var(--green)' : 'var(--red)' }}
             >
-              Session PnL
+              {fmtSignedUsd(totalPnl)}
+              <span className="dash-scard__pnl-unit">USD</span>
             </p>
-            <p
-              style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: 'clamp(1.75rem, 3.5vw, 2.35rem)',
-                fontStyle: 'italic',
-                fontWeight: 500,
-                lineHeight: 1.05,
-                color: totalPnl >= 0 ? 'var(--green)' : 'var(--red)',
-                margin: 0,
-              }}
-            >
-              {fmtSignedUsd(totalPnl)}{' '}
-              <span style={{ fontSize: '0.55em', color: 'var(--text-secondary)', fontWeight: 600 }}>USD</span>
-            </p>
-          </div>
-        )}
-
-        <div className="dash-session-divider" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <p
-            style={{
-              fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',
-              fontSize: 'var(--text-sm)',
-              fontWeight: 500,
-              color: 'var(--text-secondary)',
-              letterSpacing: '0.02em',
-              margin: 0,
-            }}
-          >
-            Started <time dateTime={session.started_at}>{startedAt}</time>
-          </p>
-          <p
-            style={{
-              fontFamily: 'var(--font-mono), ui-monospace, monospace',
-              fontSize: 'var(--text-xs)',
-              color: 'var(--text-dim)',
-              margin: 0,
-              letterSpacing: '0.04em',
-            }}
-          >
-            {session.session_id.slice(0, 10)}… · Agent {session.agent_address.slice(0, 6)}…{session.agent_address.slice(-4)}
-          </p>
+          ) : (
+            <p className="dash-scard__pnl-value dash-scard__pnl-value--empty">—</p>
+          )}
         </div>
+
+        {/* ─ Footer ─ */}
+        <div className="dash-scard__footer">
+          {/* Status */}
+          <div className="dash-scard__status">
+            {sc.pulse && (
+              <span
+                className="dash-scard__pulse"
+                style={{ '--pulse-color': sc.color } as React.CSSProperties}
+                aria-hidden
+              />
+            )}
+            <span className="dash-scard__status-dot" style={{ background: sc.color }} aria-hidden />
+            <span className="dash-scard__status-text" style={{ color: sc.color }}>{sc.label}</span>
+          </div>
+
+          {/* Time + live badge */}
+          <div className="dash-scard__footer-right">
+            {isAlive && <span className="dash-scard__live-badge">LIVE</span>}
+            <span className="dash-scard__time">{relativeTime(session.started_at)}</span>
+          </div>
+        </div>
+
+        {/* ─ ID row ─ */}
+        <div className="dash-scard__id-row">
+          <span className="dash-scard__id">#{session.session_id.slice(0, 12)}</span>
+          <svg
+            className="dash-scard__arrow-icon"
+            width="13" height="13" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" strokeWidth="2" aria-hidden
+          >
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+
       </div>
     </Link>
   );

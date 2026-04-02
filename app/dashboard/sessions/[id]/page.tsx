@@ -45,7 +45,7 @@ const EMPTY_HISTORY_ROWS: never[] = [];
 
 const statusStyles: Record<string, { bg: string; border: string; color: string }> = {
   running: { bg: 'rgba(0,200,100,0.06)', border: 'rgba(0,200,100,0.25)', color: 'var(--green)' },
-  starting: { bg: 'rgba(201,162,39,0.06)', border: 'var(--border-gold)', color: 'var(--gold)' },
+  starting: { bg: 'rgba(255,47,79,0.06)', border: 'var(--border-red-light)', color: 'var(--red-light)' },
   stopped: { bg: 'var(--bg-card-alt)', border: 'var(--border-subtle)', color: 'var(--text-dim)' },
   error: { bg: 'rgba(204,51,51,0.06)', border: 'var(--border-red-medium)', color: 'var(--red-light)' },
 };
@@ -338,7 +338,7 @@ export default function SessionDetailPage() {
           >
             <span>
               EDIT CONFIG{' '}
-              {isRestarting && <span style={{ color: 'var(--gold)', fontWeight: 400, fontSize: 'var(--text-xs)' }}>(restarting…)</span>}
+              {isRestarting && <span style={{ color: 'var(--red-light)', fontWeight: 400, fontSize: 'var(--text-xs)' }}>(restarting…)</span>}
             </span>
             <svg
               width="14"

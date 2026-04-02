@@ -68,7 +68,7 @@ export function SymbolSelector({
                   ? '1px solid var(--red)'
                   : '1px solid var(--border-subtle)',
                 background: selected
-                  ? 'rgba(204,51,51,0.14)'
+                  ? 'rgba(200, 16, 46,0.14)'
                   : 'rgba(255,255,255,0.03)',
                 color: selected
                   ? 'var(--red-light)'
@@ -89,7 +89,7 @@ export function SymbolSelector({
             fontFamily: 'var(--font-ui), var(--font-sans), sans-serif',
             fontSize: 'var(--text-sm)',
             fontWeight: 600,
-            color: 'var(--gold)',
+            color: 'var(--red-light)',
             marginTop: 12,
             lineHeight: 1.45,
           }}

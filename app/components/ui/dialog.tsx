@@ -68,7 +68,7 @@ function DialogContent({
           background: 'var(--bg-card)',
           border: '1px solid var(--border-red-medium)',
           borderRadius: 'var(--radius-lg)',
-          boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(204,51,51,0.08)',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(200, 16, 46,0.08)',
         }}
         {...props}
       >
