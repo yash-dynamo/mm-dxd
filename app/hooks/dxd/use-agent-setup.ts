@@ -69,7 +69,8 @@ export function useAgentSetup() {
         const validUntil = Date.now() + AGENT_VALID_DAYS * 24 * 60 * 60 * 1000;
         // SDK expects forAccount to be active vault address or empty string for main account.
         const forAccount = activeVault && activeVault !== ZERO_ADDRESS ? activeVault : '';
-        const signer = currentAddress;
+        // addAgent signature is created by the main wallet client, so signer must be master.
+        const signer = currentMaster;
 
         const result = await addAgent(
           agentName,
