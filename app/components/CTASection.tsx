@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const stats = [
   { label: "$50k+", sub: "Daily Volume" },
@@ -12,7 +11,6 @@ const stats = [
 ];
 
 export default function CTASection() {
-  useScrollReveal();
   const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
 

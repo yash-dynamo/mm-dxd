@@ -1,26 +1,20 @@
 import Navbar from "./components/Navbar";
 import Ticker from "./components/Ticker";
 import HeroSection from "./components/HeroSection";
-import StorySection from "./components/StorySection";
-import SeductiveSection from "./components/SeductiveSection";
-import CTASection from "./components/CTASection";
-import Footer from "./components/Footer";
-import SplashScreen from "./components/SplashScreen";
-import RevealInit from "./components/RevealInit";
+// import SplashScreen from "./components/SplashScreen";
+import HomeDeferredSections from "./components/HomeDeferredSections";
 
 export default function Home() {
   return (
     <>
-      <SplashScreen />
-      <RevealInit />
+      {/* <SplashScreen /> */}
       <main className="landing-main">
-        <Navbar />
-        <Ticker />
+        <div className="landing-header">
+          <Navbar />
+          <Ticker />
+        </div>
         <HeroSection />
-        <StorySection />
-        <SeductiveSection />
-        <CTASection />
-        <Footer />
+        <HomeDeferredSections />
       </main>
     </>
   );

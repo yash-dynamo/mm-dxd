@@ -189,20 +189,6 @@
   box-sizing: border-box;
 }
 
-/* Custom cursor — landing page only; excluded from dashboard  */
-body:not(:has(.dashboard-app)) * {
-  cursor: none !important;
-}
-body:not(:has(.dashboard-app)) input,
-body:not(:has(.dashboard-app)) textarea,
-body:not(:has(.dashboard-app)) [contenteditable] {
-  cursor: text !important;
-}
-/* Keep cursor dots hidden inside dashboard */
-.dashboard-app ~ .neon-cursor-dot,
-.dashboard-app ~ .neon-cursor-ring {
-  display: none !important;
-}
 
 html {
   scroll-behavior: smooth;
@@ -215,42 +201,38 @@ body {
   overflow-x: hidden;
 }
 
-/* ===================== CUSTOM CURSOR ===================== */
-.neon-cursor-dot {
-  position: fixed;
-  top: 0; left: 0;
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--red-bright);
-  pointer-events: none;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  transition: width 0.15s, height 0.15s;
-  will-change: transform;
-}
-
-.neon-cursor-ring {
-  position: fixed;
-  top: 0; left: 0;
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(200, 16, 46, 0.7);
-  pointer-events: none;
-  z-index: 99998;
-  transform: translate(-50%, -50%);
-  transition: transform 0.08s linear, width 0.2s, height 0.2s, border-color 0.2s;
-  will-change: transform;
-}
-
-.neon-cursor-ring.hovering {
-  width: 44px; height: 44px;
-  border-color: var(--red);
-  border-width: 2px;
-}
 
 /* ===================== LANDING MAIN WRAPPER — unified scroll story ===================== */
 .landing-main {
   background: var(--bg-base);
+  /* Navbar (64px) + ticker strip — keeps hero below fixed header (see .landing-header) */
+  --landing-top-offset: 118px;
+  padding-top: var(--landing-top-offset);
+}
+
+/* Single fixed column: nav + ticker flush (no extra margin gap above ticker) */
+.landing-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-navbar);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.landing-header .navbar {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  flex-shrink: 0;
+}
+
+.landing-header .ticker-wrapper {
+  margin-top: 0 !important;
+  flex-shrink: 0;
 }
 
 /* Each section gets a faint crimson streak that grows as the page deepens */
@@ -1656,7 +1638,8 @@ input:focus, textarea:focus, select:focus {
   gap: 14px;
   flex: 1;
   min-height: 0;
-  align-items: stretch;
+  /* start alignment — each panel only as tall as its content */
+  align-items: start;
 }
 
 .dash-new-main > .dash-panel {
@@ -1667,6 +1650,8 @@ input:focus, textarea:focus, select:focus {
   .dash-new-main {
     grid-template-columns: minmax(240px, min(32vw, 360px)) minmax(0, 1fr);
     gap: 18px;
+    /* both panels match each other's height */
+    align-items: stretch;
   }
 }
 
@@ -1679,12 +1664,17 @@ input:focus, textarea:focus, select:focus {
 }
 
 @media (min-width: 1024px) {
+  /* left panel: scroll if content overflows */
+  .dash-panel--new:first-of-type {
+    overflow-y: auto;
+  }
+  /* right config panel: always scrollable, fills remaining height */
   .dash-panel--config-scroll {
-    max-height: calc(100dvh - 13.5rem);
-    min-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
+    /* max height so it doesn't push off-screen */
+    max-height: calc(100dvh - 13rem);
   }
 }
 
@@ -2340,6 +2330,27 @@ input:focus, textarea:focus, select:focus {
 }
 .splash-enter-btn {
   animation: splash-enter-pulse 2s ease-in-out infinite;
+}
+
+/* Simple text-only splash */
+.splash-simple {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-base);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.splash-simple__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 45% at 50% 40%, rgba(200, 16, 46, 0.07) 0%, transparent 62%);
+  pointer-events: none;
 }
 
 /* ===================== ARSENAL VERTICAL SCROLL ===================== */
@@ -3394,7 +3405,7 @@ input:focus, textarea:focus, select:focus {
 /* ===================== HERO SECTION SPECIFIC ===================== */
 .hero-section {
   position: relative;
-  height: calc(100vh - 110px);
+  height: calc(100vh - var(--landing-top-offset, 118px));
   display: flex;
   align-items: center;
   overflow: hidden;

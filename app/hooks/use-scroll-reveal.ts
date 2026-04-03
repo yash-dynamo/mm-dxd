@@ -2,10 +2,15 @@
 
 import { useEffect } from "react";
 
-export function useScrollReveal(selector = ".reveal, .reveal-left, .reveal-right, .reveal-scale") {
+const DEFAULT_SELECTOR = ".reveal, .reveal-left, .reveal-right, .reveal-scale";
+
+/**
+ * Observes reveal elements and adds `revealed` when they enter the viewport.
+ * Re-scans the DOM when nodes are added (needed for `next/dynamic` sections that mount after first paint).
+ */
+export function useScrollReveal(selector = DEFAULT_SELECTOR) {
   useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>(selector);
-    if (!els.length) return;
+    const observed = new WeakSet<Element>();
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -16,10 +21,27 @@ export function useScrollReveal(selector = ".reveal, .reveal-left, .reveal-right
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
     );
 
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    const scan = () => {
+      document.querySelectorAll<HTMLElement>(selector).forEach((el) => {
+        if (observed.has(el)) return;
+        observed.add(el);
+        io.observe(el);
+      });
+    };
+
+    scan();
+
+    const mo = new MutationObserver(() => {
+      scan();
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      mo.disconnect();
+      io.disconnect();
+    };
   }, [selector]);
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { Providers } from './providers'
-import NeonCursor from './components/NeonCursor'
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -42,7 +41,6 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${cormorant.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased`}>
         <Providers>
-          <NeonCursor />
           {children}
         </Providers>
       </body>

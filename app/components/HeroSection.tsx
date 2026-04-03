@@ -3,8 +3,6 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Particles from "./Particles";
-import { BackgroundBeams } from "../../components/ui/background-beams";
 import { CardContainer, CardBody, CardItem } from "../../components/ui/3d-card";
 
 /* ─────────────────────────── data ─────────────────────────── */
@@ -157,11 +155,6 @@ export default function HeroSection() {
         }}
       />
 
-      <Particles count={28} />
-      
-      {/* Aceternity Background Beams */}
-      <BackgroundBeams className="opacity-40" />
-
       <div className="container" style={{ position: "relative", zIndex: 1 }}>
         <div className="hero-grid">
 
@@ -169,7 +162,7 @@ export default function HeroSection() {
           <div>
             {/* Protocol badge */}
             <div className="animate-fade-in-left badge badge-red" style={{ marginBottom: "var(--space-12)" }}>
-              <span className="animate-spark" style={{ fontSize: "var(--text-xs)" }}>✦</span>
+              <span style={{ fontSize: "var(--text-xs)", opacity: 0.9 }}>✦</span>
               DXD · LIVE
             </div>
 
