@@ -12,7 +12,9 @@ export default function HomeDeferredSections() {
   return (
     <>
       <RevealInit />
-      <StorySection />
+      <div className="home-story-mobile-hidden">
+        <StorySection />
+      </div>
       <SeductiveSection />
       <CTASection />
       <Footer />

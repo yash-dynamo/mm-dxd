@@ -232,6 +232,7 @@ body {
 
 .landing-header .ticker-wrapper {
   margin-top: 0 !important;
+  padding: 0 !important;
   flex-shrink: 0;
 }
 
@@ -2572,6 +2573,34 @@ input:focus, textarea:focus, select:focus {
 
 /* ---- mobile (≤768px) ---- */
 @media (max-width: 768px) {
+  .landing-main {
+    --landing-top-offset: 132px;
+    padding-top: 132px !important;
+  }
+
+  .landing-header .ticker-wrapper {
+    margin-top: 10px !important;
+  }
+
+  .home-story-mobile-hidden {
+    display: none !important;
+  }
+
+  .navbar-desktop-links,
+  .navbar-launch-desktop,
+  .navbar-wallet-desktop {
+    display: none !important;
+  }
+
+  .hamburger-btn {
+    display: flex !important;
+  }
+
+  .mobile-drawer,
+  .mobile-backdrop {
+    display: block !important;
+  }
+
   .hero-grid {
     grid-template-columns: 1fr;
     gap: var(--space-14);
@@ -2606,11 +2635,11 @@ input:focus, textarea:focus, select:focus {
   }
 
   .ticker-wrapper {
-    padding: var(--space-3) 0;
+    padding: 0 !important;
   }
 
   .ticker-item {
-    padding: var(--space-2) var(--space-5);
+    padding: 2px var(--space-4);
     font-size: var(--text-xs);
   }
 
@@ -2621,6 +2650,12 @@ input:focus, textarea:focus, select:focus {
 
   .hero-section.home-hero .container {
     padding: 0 var(--space-5);
+  }
+
+  .home-hero .hero-grid > div:first-child {
+    position: relative;
+    z-index: 6;
+    margin-top: var(--space-9);
   }
 
   .cta-section {
@@ -2636,6 +2671,10 @@ input:focus, textarea:focus, select:focus {
   .platform-row > div:last-child {
     justify-content: space-between;
   }
+}
+
+.home-story-mobile-hidden {
+  display: block;
 }
 
 /* ---- small mobile (≤480px) ---- */
@@ -3138,6 +3177,7 @@ input:focus, textarea:focus, select:focus {
   top: 64px;
   left: 0;
   right: 0;
+  display: none;
   z-index: var(--z-drawer);
   background: var(--bg-overlay-heavy);
   backdrop-filter: blur(20px);
@@ -3161,6 +3201,7 @@ input:focus, textarea:focus, select:focus {
 .mobile-backdrop {
   position: fixed;
   inset: 0;
+  display: none;
   z-index: var(--z-backdrop);
   background: rgba(0, 0, 0, 0.5);
   top: 64px;
@@ -3172,7 +3213,7 @@ input:focus, textarea:focus, select:focus {
   border: 1px solid var(--border-red-strong);
   padding: var(--space-3) var(--space-4);
   cursor: pointer;
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 5px;
   align-items: center;
@@ -3208,7 +3249,7 @@ input:focus, textarea:focus, select:focus {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
   margin-top: 64px;
-  padding: var(--space-4) 0;
+  padding: 0 !important;
   position: relative;
   box-shadow:
     0 6px 28px rgba(0, 0, 0, 0.28),
@@ -3252,7 +3293,7 @@ input:focus, textarea:focus, select:focus {
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-8);
+  padding: 2px var(--space-6);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   border-right: 1px solid rgba(200, 16, 46, 0.12);
@@ -5104,4 +5145,43 @@ input:focus, textarea:focus, select:focus {
 .dot-red {
   background: var(--red);
   box-shadow: 0 0 8px rgba(200, 16, 46,0.6);
+}
+
+/* ===================== FINAL MOBILE OVERRIDES (ANTI-CLASH) ===================== */
+@media (max-width: 768px) {
+  .landing-main {
+    padding-top: 132px !important;
+  }
+
+  .landing-header .ticker-wrapper {
+    margin-top: 0 !important;
+    padding: 0 !important;
+  }
+
+  .ticker-wrapper {
+    padding: 0 !important;
+  }
+
+  .ticker-item {
+    padding: 2px var(--space-4) !important;
+  }
+
+  .home-story-mobile-hidden {
+    display: none !important;
+  }
+
+  .navbar-desktop-links,
+  .navbar-launch-desktop,
+  .navbar-wallet-desktop {
+    display: none !important;
+  }
+
+  .hamburger-btn {
+    display: flex !important;
+  }
+
+  .mobile-drawer,
+  .mobile-backdrop {
+    display: block !important;
+  }
 }

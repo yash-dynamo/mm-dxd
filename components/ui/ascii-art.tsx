@@ -175,9 +175,18 @@ export const AsciiArt: React.FC<AsciiArtProps> = ({
       const imgHeight = img.naturalHeight;
       const imgAspect = imgWidth / imgHeight;
       const charAspectRatio = 0.55;
+      const targetAspect =
+        Number.isFinite(visualAspect) && visualAspect > 0
+          ? visualAspect
+          : imgAspect;
 
       const cols = resolution;
-      const rows = Math.floor(cols * charAspectRatio);
+      // Respect target visual aspect (width/height) in the ASCII grid itself.
+      // Without this, non-square images get squeezed/cropped unpredictably.
+      const rows = Math.max(
+        1,
+        Math.floor((cols * charAspectRatio) / targetAspect),
+      );
 
       canvas.width = cols;
       canvas.height = rows;
@@ -190,11 +199,11 @@ export const AsciiArt: React.FC<AsciiArtProps> = ({
         sh = imgHeight;
 
       if (objectFit === "cover") {
-        if (imgAspect > visualAspect) {
-          sw = imgHeight * visualAspect;
+        if (imgAspect > targetAspect) {
+          sw = imgHeight * targetAspect;
           sx = (imgWidth - sw) / 2;
         } else {
-          sh = imgWidth / visualAspect;
+          sh = imgWidth / targetAspect;
           sy = (imgHeight - sh) / 2;
         }
       } else if (objectFit === "contain") {
@@ -202,7 +211,7 @@ export const AsciiArt: React.FC<AsciiArtProps> = ({
         ctx.fillRect(0, 0, cols, rows);
 
         let dw, dh, dx, dy;
-        if (imgAspect > visualAspect) {
+        if (imgAspect > targetAspect) {
           dw = cols;
           dh = cols / imgAspect * charAspectRatio;
           dx = 0;

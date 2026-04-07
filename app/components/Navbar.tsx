@@ -9,16 +9,23 @@ import { Iconify } from "@/components/ui/iconify";
 
 const navLinks = ["JOIN"];
 const comingSoonContent = {
-  docs: {
-    label: "DOCS",
-    message: "DXD docs are being prepared with API guides, session flows, and config references.",
-  },
   markets: {
     label: "MARKETS",
     message: "Markets board is being tuned for live spreads, depth, and cross-symbol monitoring.",
   },
+  leaderboard: {
+    label: "LEADERBOARD",
+    message: "Leaderboard rankings for PnL, volume, and consistency are in progress.",
+  },
 } as const;
 type ComingSoonKey = keyof typeof comingSoonContent;
+
+const leaderboardPreviewRows = [
+  { rank: 1, desk: "Atlas MM", pnl: "+$18,420", volume: "$2.14M", winRate: "63%" },
+  { rank: 2, desk: "NightShift", pnl: "+$14,980", volume: "$1.86M", winRate: "59%" },
+  { rank: 3, desk: "Raven Flow", pnl: "+$11,230", volume: "$1.52M", winRate: "61%" },
+  { rank: 4, desk: "Gamma Lane", pnl: "+$8,670", volume: "$1.17M", winRate: "57%" },
+];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -87,7 +94,7 @@ export default function Navbar() {
         <button
           type="button"
           onClick={() => setDropdownOpen((v) => !v)}
-          className={`btn btn-outline-red${fullWidth ? "" : " hidden md:flex"}`}
+          className={`btn btn-outline-red${fullWidth ? "" : " navbar-wallet-desktop hidden md:flex"}`}
           style={fullWidth ? { width: "100%", padding: "var(--space-6)" } : undefined}
         >
           <span
@@ -232,7 +239,7 @@ export default function Navbar() {
       <button
         type="button"
         onClick={() => setModal("connect-wallet")}
-        className={`btn btn-outline-red${fullWidth ? "" : " hidden md:flex"}`}
+        className={`btn btn-outline-red${fullWidth ? "" : " navbar-wallet-desktop hidden md:flex"}`}
         style={fullWidth ? { width: "100%", padding: "var(--space-6)" } : undefined}
       >
         {walletLabel}
@@ -264,7 +271,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="navbar-desktop-links hidden md:flex items-center gap-8">
             <button
               type="button"
               className="nav-link"
@@ -273,19 +280,19 @@ export default function Navbar() {
             >
               MARKETS
             </button>
+            <button
+              type="button"
+              className="nav-link"
+              onClick={() => openComingSoon("leaderboard")}
+              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            >
+              LEADERBOARD
+            </button>
             {navLinks.map((link) => (
               <a key={link} href="#" className="nav-link">
                 {link}
               </a>
             ))}
-            <button
-              type="button"
-              className="nav-link"
-              onClick={() => openComingSoon("docs")}
-              style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
-            >
-              DOCS
-            </button>
           </div>
 
           {/* Right side: CTA + Wallet + Hamburger */}
@@ -293,18 +300,36 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => router.push("/dashboard")}
-              className="hidden md:flex btn btn-outline-red"
+              className="navbar-launch-desktop hidden md:flex btn btn-outline-red"
             >
               LAUNCH APP
             </button>
             <WalletButton />
+            <button
+              type="button"
+              className="hamburger-btn"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-navbar-drawer"
+            >
+              <span
+                className="hamburger-line hamburger-line-long"
+                style={menuOpen ? { transform: "translateY(3px) rotate(45deg)" } : undefined}
+              />
+              <span
+                className="hamburger-line hamburger-line-short"
+                style={menuOpen ? { transform: "translateY(-3px) rotate(-45deg)", width: 20 } : undefined}
+              />
+            </button>
           </div>
         </div>
       </nav>
 
       {/* Mobile drawer */}
       <div
-        className={`md:hidden mobile-drawer ${menuOpen ? "mobile-drawer-visible" : "mobile-drawer-hidden"}`}
+        id="mobile-navbar-drawer"
+        className={`mobile-drawer ${menuOpen ? "mobile-drawer-visible" : "mobile-drawer-hidden"}`}
       >
         <div
           style={{
@@ -350,7 +375,7 @@ export default function Navbar() {
           </button>
           <button
             type="button"
-            onClick={() => openComingSoon("docs")}
+            onClick={() => openComingSoon("leaderboard")}
             className="nav-link"
             style={{
               background: "none",
@@ -363,7 +388,7 @@ export default function Navbar() {
               letterSpacing: "var(--tracking-label-wider)",
             }}
           >
-            DOCS
+            LEADERBOARD
           </button>
         </div>
 
@@ -459,6 +484,78 @@ export default function Navbar() {
               </button>
             </div>
             <div style={{ padding: "20px 20px 22px" }}>
+              {comingSoonOpen === "leaderboard" && (
+                <div
+                  style={{
+                    position: "relative",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: "var(--radius-md)",
+                    overflow: "hidden",
+                    marginBottom: 14,
+                    background: "rgba(255,255,255,0.02)",
+                  }}
+                >
+                  <div style={{ filter: "blur(1.8px)", opacity: 0.72 }}>
+                    <table
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        fontFamily: "var(--font-sans)",
+                        fontSize: "11px",
+                        color: "var(--text-secondary)",
+                      }}
+                    >
+                      <thead>
+                        <tr style={{ background: "rgba(255,255,255,0.03)" }}>
+                          <th style={{ textAlign: "left", padding: "8px 10px", fontWeight: 700 }}>#</th>
+                          <th style={{ textAlign: "left", padding: "8px 10px", fontWeight: 700 }}>Desk</th>
+                          <th style={{ textAlign: "right", padding: "8px 10px", fontWeight: 700 }}>PnL</th>
+                          <th style={{ textAlign: "right", padding: "8px 10px", fontWeight: 700 }}>Volume</th>
+                          <th style={{ textAlign: "right", padding: "8px 10px", fontWeight: 700 }}>Win%</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {leaderboardPreviewRows.map((row) => (
+                          <tr key={row.rank} style={{ borderTop: "1px solid var(--border-subtle)" }}>
+                            <td style={{ padding: "8px 10px" }}>{row.rank}</td>
+                            <td style={{ padding: "8px 10px" }}>{row.desk}</td>
+                            <td style={{ padding: "8px 10px", textAlign: "right", color: "var(--green)" }}>{row.pnl}</td>
+                            <td style={{ padding: "8px 10px", textAlign: "right" }}>{row.volume}</td>
+                            <td style={{ padding: "8px 10px", textAlign: "right" }}>{row.winRate}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <span
+                      style={{
+                        padding: "7px 10px",
+                        borderRadius: 999,
+                        border: "1px solid rgba(201,162,39,0.35)",
+                        background: "rgba(6, 2, 10, 0.82)",
+                        color: "var(--red-light)",
+                        fontFamily: "var(--font-sans)",
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        letterSpacing: "2px",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      Coming soon
+                    </span>
+                  </div>
+                </div>
+              )}
               <p
                 style={{
                   margin: "0 0 8px",
@@ -492,7 +589,7 @@ export default function Navbar() {
       {/* Backdrop when menu open */}
       {menuOpen && (
         <div
-          className="md:hidden mobile-backdrop"
+          className="mobile-backdrop"
           onClick={() => setMenuOpen(false)}
         />
       )}
