@@ -10,6 +10,82 @@ import { ConfigForm } from '@/components/dashboard/ConfigForm';
 import { TakerConfigForm } from '@/components/dashboard/TakerConfigForm';
 import type { CreateSessionRequest, DxdStrategy, SymbolConfig, TakerConfig } from '@/lib/dxd-api';
 
+type MakerPresetKey = 'volume-making' | 'positive-pnl';
+
+const MAKER_PRESETS: Record<
+  MakerPresetKey,
+  { label: string; description: string; values: Partial<SymbolConfig> }
+> = {
+  'volume-making': {
+    label: 'Volume-Making',
+    description: 'More fills, higher turnover.',
+    values: {
+      min_spread_bps: 3,
+      levels: 5,
+      level_spacing_bps: 1.2,
+      order_size_usd: 180,
+      target_exposure_x: 2.2,
+      market_bias: 0,
+      use_alpha: false,
+      fixed_tp_enabled: false,
+      spread_vol_mult: 0.7,
+      close_spread_bps: 2.5,
+      inventory_skew_bps: 8,
+      max_inventory: 6,
+      leverage: 4,
+      level_size_scale: 1.1,
+      close_threshold_usd: 18,
+      inv_skew_start_pct: 60,
+      inv_skip_open_pct: 92,
+      toxic_threshold: 0.7,
+      max_loss_pct: 6,
+      guard_max_session_loss_usd: 1200,
+      guard_max_drawdown_pct: 8,
+      guard_cooldown_s: 45,
+      guard_loss_streak_trigger: 6,
+      adx_regime_enabled: false,
+      supertrend_enabled: false,
+      pivot_enabled: false,
+      noise_bps: 0.5,
+    },
+  },
+  'positive-pnl': {
+    label: 'Positive PnL',
+    description: 'Risk-first, steadier PnL.',
+    values: {
+      min_spread_bps: 8,
+      levels: 3,
+      level_spacing_bps: 3,
+      order_size_usd: 90,
+      target_exposure_x: 1.2,
+      market_bias: 0,
+      use_alpha: true,
+      fixed_tp_enabled: true,
+      fixed_tp_bps: 10,
+      spread_vol_mult: 1.25,
+      close_spread_bps: 5,
+      alpha_bps: 10,
+      inventory_skew_bps: 18,
+      max_inventory: 3,
+      leverage: 2,
+      level_size_scale: 1.2,
+      close_threshold_usd: 12,
+      inv_skew_start_pct: 35,
+      inv_skip_open_pct: 70,
+      toxic_threshold: 0.45,
+      max_loss_pct: 3,
+      guard_max_session_loss_usd: 600,
+      guard_max_drawdown_pct: 4,
+      guard_cooldown_s: 90,
+      guard_loss_streak_trigger: 4,
+      adx_regime_enabled: true,
+      supertrend_enabled: true,
+      pivot_enabled: true,
+      noise_bps: 0.2,
+    },
+  },
+};
+
 export default function NewSessionPage() {
   const router = useRouter();
   const { agentAddress } = useDxdAuthStore();
@@ -20,6 +96,7 @@ export default function NewSessionPage() {
   const [strategy, setStrategy] = useState<DxdStrategy>('maker');
   const [symbols, setSymbols] = useState<string[]>([]);
   const [globalConfig, setGlobalConfig] = useState<Partial<SymbolConfig>>({});
+  const [selectedMakerPreset, setSelectedMakerPreset] = useState<MakerPresetKey | null>(null);
   const [takerConfig, setTakerConfig] = useState<Partial<TakerConfig>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +167,11 @@ export default function NewSessionPage() {
     const firstAvailableSymbol = Object.keys(defaultsBySymbol)[0];
     return firstAvailableSymbol ? defaultsBySymbol[firstAvailableSymbol] : undefined;
   }, [configDefaults?.defaults, symbols]);
+
+  const applyMakerPreset = (preset: MakerPresetKey) => {
+    setSelectedMakerPreset(preset);
+    setGlobalConfig((prev) => ({ ...prev, ...MAKER_PRESETS[preset].values }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -258,11 +340,125 @@ export default function NewSessionPage() {
                   defaults={configDefaults?.taker_defaults}
                 />
               ) : (
-                <ConfigForm
-                  value={globalConfig}
-                  onChange={setGlobalConfig}
-                  defaults={makerDefaults}
-                />
+                <>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gap: 10,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span
+                        style={{
+                          fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+                          fontSize: 'var(--text-xs)',
+                          fontWeight: 700,
+                          letterSpacing: 'var(--tracking-label)',
+                          color: 'var(--text-secondary)',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        AI presets
+                      </span>
+                      <span
+                        title="Quick starter profiles for Global Config. Pick one, then fine-tune fields below."
+                        aria-label="AI presets info"
+                        style={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: '50%',
+                          border: '1px solid var(--border-subtle)',
+                          color: 'var(--text-dim)',
+                          fontSize: 10,
+                          fontWeight: 700,
+                          lineHeight: '14px',
+                          textAlign: 'center',
+                          cursor: 'help',
+                          userSelect: 'none',
+                        }}
+                      >
+                        i
+                      </span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+                      {(Object.keys(MAKER_PRESETS) as MakerPresetKey[]).map((key) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => applyMakerPreset(key)}
+                          style={{
+                            textAlign: 'left',
+                            fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+                            padding: '10px 12px',
+                            borderRadius: 'var(--radius-md)',
+                            border: selectedMakerPreset === key ? '1px solid var(--red)' : '1px solid var(--border-subtle)',
+                            background:
+                              selectedMakerPreset === key
+                                ? 'linear-gradient(180deg, rgba(200, 16, 46,0.14), rgba(200, 16, 46,0.06))'
+                                : 'rgba(255,255,255,0.03)',
+                            color: 'var(--text-primary)',
+                            cursor: 'pointer',
+                            transition: 'all var(--duration-fast) var(--ease-out)',
+                            boxShadow:
+                              selectedMakerPreset === key
+                                ? '0 0 0 1px rgba(200, 16, 46, 0.2) inset'
+                                : 'none',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: 8,
+                              marginBottom: 4,
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: 'var(--text-xs)',
+                                fontWeight: 700,
+                                letterSpacing: 'var(--tracking-label)',
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              {MAKER_PRESETS[key].label}
+                            </span>
+                            {selectedMakerPreset === key && (
+                              <span
+                                style={{
+                                  fontSize: 9,
+                                  fontWeight: 700,
+                                  letterSpacing: '0.06em',
+                                  textTransform: 'uppercase',
+                                  color: 'var(--text-dim)',
+                                }}
+                              >
+                                Active
+                              </span>
+                            )}
+                          </div>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: 11,
+                              lineHeight: 1.35,
+                              color: 'var(--text-dim)',
+                            }}
+                          >
+                            {MAKER_PRESETS[key].description}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <ConfigForm
+                    value={globalConfig}
+                    onChange={setGlobalConfig}
+                    defaults={makerDefaults}
+                  />
+                </>
               )}
             </section>
           </div>
@@ -277,7 +473,7 @@ export default function NewSessionPage() {
               isSubmitting ||
               (strategy === 'taker' && symbols.length !== 1)
             }
-            className="btn btn-primary w-full lg:w-auto"
+            className="btn btn-primary w-full lg:w-auto dash-start-btn"
             style={{
               opacity:
                 symbols.length === 0 || isSubmitting || (strategy === 'taker' && symbols.length !== 1)

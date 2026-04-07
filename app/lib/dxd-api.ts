@@ -83,6 +83,8 @@ export const DXD_PERP_SYMBOLS = [
   'WTIOIL-PERP',
   'BRENTOIL-PERP',
   'NATGAS-PERP',
+  'USDJPY-PERP',
+  'EURUSD-PERP'
 ] as const;
 
 export type DxdPerpSymbol = (typeof DXD_PERP_SYMBOLS)[number];

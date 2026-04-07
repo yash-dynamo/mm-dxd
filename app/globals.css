@@ -1664,17 +1664,23 @@ input:focus, textarea:focus, select:focus {
 }
 
 @media (min-width: 1024px) {
+  .dash-new-main {
+    --dash-new-panel-height: calc(100dvh - 13rem);
+  }
+
   /* left panel: scroll if content overflows */
   .dash-panel--new:first-of-type {
     overflow-y: auto;
+    height: var(--dash-new-panel-height);
+    max-height: var(--dash-new-panel-height);
   }
   /* right config panel: always scrollable, fills remaining height */
   .dash-panel--config-scroll {
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
-    /* max height so it doesn't push off-screen */
-    max-height: calc(100dvh - 13rem);
+    height: var(--dash-new-panel-height);
+    max-height: var(--dash-new-panel-height);
   }
 }
 
@@ -1724,6 +1730,33 @@ input:focus, textarea:focus, select:focus {
 .dash-new-footer .btn.btn-primary {
   width: 100%;
   max-width: none;
+}
+
+.dash-new-footer .dash-start-btn {
+  border-radius: 8px;
+  box-shadow:
+    0 5px 0 color-mix(in srgb, var(--red) 58%, #20060d 42%),
+    0 12px 24px rgba(0, 0, 0, 0.28);
+  transform: translateY(0);
+  transition:
+    transform 120ms var(--ease-out),
+    box-shadow 120ms var(--ease-out),
+    filter 120ms var(--ease-out);
+}
+
+.dash-new-footer .dash-start-btn:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+
+.dash-new-footer .dash-start-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 2px 0 color-mix(in srgb, var(--red) 58%, #20060d 42%),
+    0 7px 16px rgba(0, 0, 0, 0.24);
+}
+
+.dash-new-footer .dash-start-btn:disabled {
+  box-shadow: none;
 }
 
 @media (min-width: 1024px) {
