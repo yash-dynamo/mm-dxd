@@ -45,9 +45,25 @@ export default function DashboardPage() {
         {/* Top row: eyebrow + capsule button */}
         <div className="dash-command-card__top">
           <p className="dash-eyebrow">Market Making</p>
-          <Link href={actionHref} className="dash-capsule-btn">
-            <span className="dash-capsule-btn__dot" aria-hidden />
-            {actionLabel}
+          <Link
+            href={actionHref}
+            className="btn btn-primary"
+            style={
+              hasAgent
+                ? {
+                    width: 'clamp(38px, 10vw, 54px)',
+                    height: 'clamp(38px, 10vw, 54px)',
+                    padding: 0,
+                    borderRadius: 8,
+                    fontSize: 'clamp(20px, 5.8vw, 34px)',
+                    lineHeight: 1,
+                    letterSpacing: 0,
+                  }
+                : { padding: '8px 12px', fontSize: '10px', letterSpacing: '0.06em', lineHeight: 1 }
+            }
+            aria-label={hasAgent ? 'New session' : 'Setup agent'}
+          >
+            {hasAgent ? '+' : actionLabel}
           </Link>
         </div>
 

@@ -211,7 +211,7 @@ export default function SessionDetailPage() {
           </button>
           <div className="dxd-session-brand">
             <span className="dxd-brand-dot" aria-hidden />
-            <span>Live session</span>
+            <span>{isRunning ? 'Live session' : 'ENDED'}</span>
           </div>
           {isRunning && (
             <button
