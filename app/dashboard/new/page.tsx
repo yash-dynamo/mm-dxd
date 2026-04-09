@@ -8,6 +8,7 @@ import { useAgentSetup } from '@/hooks/dxd';
 import { SymbolSelector } from '@/components/dashboard/SymbolSelector';
 import { ConfigForm } from '@/components/dashboard/ConfigForm';
 import { TakerConfigForm } from '@/components/dashboard/TakerConfigForm';
+import { DxdApiError } from '@/lib/dxd-api';
 import type { CreateSessionRequest, DxdStrategy, SymbolConfig, TakerConfig } from '@/lib/dxd-api';
 
 type MakerPresetKey = 'volume-making' | 'positive-pnl';
@@ -90,7 +91,7 @@ export default function NewSessionPage() {
   const router = useRouter();
   const { agentAddress } = useDxdAuthStore();
   const { configDefaults, sessions, isLoadingDefaults } = useDxdSessionsStore();
-  const { loadDefaults, createSession, listSessions } = useSessions();
+  const { loadDefaults, createSession, listSessions, fetchSession } = useSessions();
   const { getAgentPrivateKey } = useAgentSetup();
 
   const [strategy, setStrategy] = useState<DxdStrategy>('maker');
@@ -141,19 +142,6 @@ export default function NewSessionPage() {
     };
   }, [strategy, symbols, configDefaults]);
 
-  const conflictSymbols = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          sessions
-            .filter((s) => s.status === 'running' || s.status === 'starting')
-            .flatMap((s) => s.symbols)
-            .map((sym) => sym.trim().toUpperCase()),
-        ),
-      ),
-    [sessions],
-  );
-
   const phase: 1 | 2 | 3 = symbols.length === 0 ? 1 : isLoadingDefaults ? 2 : 3;
   const makerDefaults = useMemo(() => {
     const defaultsBySymbol = configDefaults?.defaults;
@@ -171,6 +159,18 @@ export default function NewSessionPage() {
   const applyMakerPreset = (preset: MakerPresetKey) => {
     setSelectedMakerPreset(preset);
     setGlobalConfig((prev) => ({ ...prev, ...MAKER_PRESETS[preset].values }));
+  };
+
+  const isSigningOrAuthFailure = (err: unknown) => {
+    if (err instanceof DxdApiError && err.status === 401) return true;
+    if (!(err instanceof Error)) return false;
+    const msg = err.message.toLowerCase();
+    return (
+      msg.includes('authentication required')
+      || msg.includes('user rejected')
+      || msg.includes('sign-in failed')
+      || msg.includes('sign in failed')
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -196,10 +196,54 @@ export default function NewSessionPage() {
           strategy === 'taker' && Object.keys(takerConfig).length > 0 ? takerConfig : undefined,
       };
 
-      const session = await createSession(payload);
-      router.push(`/dashboard/sessions/${session.session_id}`);
+      const created = await createSession(payload);
+      const createdId = created.session_id?.trim();
+      if (!createdId) {
+        throw new Error('Session was not created. Please sign and try again.');
+      }
+
+      let session = created;
+      try {
+        session = await fetchSession(createdId);
+      } catch (fetchErr) {
+        if (isSigningOrAuthFailure(fetchErr)) {
+          setIsSubmitting(false);
+          router.replace('/dashboard');
+          return;
+        }
+        if (fetchErr instanceof DxdApiError && fetchErr.status === 404) {
+          setIsSubmitting(false);
+          await listSessions();
+          router.replace('/dashboard');
+          return;
+        }
+      }
+
+      const backendError = (session.error ?? '').toLowerCase();
+      const signingFailedOnBackend =
+        session.status === 'error'
+        && (
+          backendError.includes('sign')
+          || backendError.includes('signature')
+          || backendError.includes('auth')
+          || backendError.includes('reject')
+        );
+
+      if (signingFailedOnBackend) {
+        setIsSubmitting(false);
+        await listSessions();
+        router.replace('/dashboard');
+        return;
+      }
+
+      router.push(`/dashboard/sessions/${createdId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start session');
+      if (isSigningOrAuthFailure(err)) {
+        setIsSubmitting(false);
+        router.replace('/dashboard');
+        return;
+      }
       setIsSubmitting(false);
     }
   };
@@ -230,8 +274,7 @@ export default function NewSessionPage() {
         </div>
 
         <p className="dash-new-lede">
-          Choose maker (multi-symbol quoting) or taker (single symbol), pick markets, tune parameters, then start. Conflicting
-          symbols already running elsewhere are disabled automatically.
+          Choose maker (multi-symbol quoting) or taker (single symbol), pick markets, tune parameters, then start.
         </p>
 
         <div className="dash-new-shell">
@@ -268,7 +311,7 @@ export default function NewSessionPage() {
                 <div>
                   <h2 className="dash-panel-title">Strategy and symbols</h2>
                   <p className="dash-panel-desc">
-                    Maker quotes multiple PERPs; taker runs on exactly one. Active sessions reserve their symbols.
+                    Maker quotes multiple PERPs; taker runs on exactly one symbol per session.
                   </p>
                 </div>
               </div>
@@ -303,7 +346,6 @@ export default function NewSessionPage() {
               <SymbolSelector
                 value={symbols}
                 onChange={setSymbols}
-                disabledSymbols={conflictSymbols}
                 selectionMode={strategy === 'taker' ? 'single' : 'multi'}
               />
             </section>
