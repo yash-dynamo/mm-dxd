@@ -24,6 +24,18 @@ export const errorOverrideConfig: ErrorOverrideConfig[] = [
     skip: true,
   },
   {
+    originalError: 'Failed wallet/agent linkage check',
+    overrideError:
+      'Wallet/agent linkage check failed on backend. Please update/restart the backend service and try again.',
+    strategy: 'includes',
+  },
+  {
+    originalError: "has no attribute 'agents'",
+    overrideError:
+      'Backend SDK mismatch: InfoClient.agents is unavailable. Please update the backend SDK/service and retry.',
+    strategy: 'includes',
+  },
+  {
     originalError: 'Internal server error',
     overrideError: 'Something went wrong',
     strategy: 'includes',
@@ -40,19 +52,21 @@ export const errorOverrideConfig: ErrorOverrideConfig[] = [
 ];
 
 export const getErrorOverride = (errorMessage: string) => {
+  const normalized = errorMessage.toLowerCase();
   for (const config of errorOverrideConfig) {
+    const needle = config.originalError.toLowerCase();
     if (config.skip === true) {
-      if (errorMessage.includes(config.originalError)) {
+      if (normalized.includes(needle)) {
         return false;
       } else {
         continue;
       }
     }
 
-    if (config.strategy === 'includes' && errorMessage.includes(config.originalError)) {
+    if (config.strategy === 'includes' && normalized.includes(needle)) {
       return config.overrideError;
     }
-    if (config.strategy === 'exact' && errorMessage === config.originalError) {
+    if (config.strategy === 'exact' && normalized === needle) {
       return config.overrideError;
     }
   }

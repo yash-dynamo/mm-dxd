@@ -1,13 +1,32 @@
 import { NextResponse } from 'next/server';
 
 /**
- * Popular symbols shown on the landing ticker.
- * Keep this list small to avoid unnecessary CoinMarketCap payload size.
+ * CoinMarketCap `cryptocurrency/quotes/latest` symbols (crypto tickers only).
+ * Covers assets aligned with `DXD_PERP_SYMBOLS` in `@/lib/dxd-api` where CMC has a
+ * direct match: HYPE, XRP, ZEC, BNB, PAXG (proxy for GOLD-PERP). Oil/gas/forex/silver
+ * perps have no stable crypto `symbol=` on this endpoint, so they are omitted.
  */
 const SYMBOLS = [
-  'BTC', 'ETH', 'SOL', 'ARB', 'PEPE',
-  'DOGE', 'AVAX', 'LINK', 'MATIC', 'OP',
-  'SUI', 'APT', 'INJ', 'TIA', 'SEI',
+  'APT',
+  'ARB',
+  'AVAX',
+  'BNB',
+  'BTC',
+  'DOGE',
+  'ETH',
+  'HYPE',
+  'INJ',
+  'LINK',
+  'MATIC',
+  'OP',
+  'PAXG',
+  'PEPE',
+  'SEI',
+  'SOL',
+  'SUI',
+  'TIA',
+  'XRP',
+  'ZEC',
 ] as const;
 
 type Quote = { price: number; percent_change_24h: number };

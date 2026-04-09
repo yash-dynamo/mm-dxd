@@ -80,11 +80,6 @@ export const DXD_PERP_SYMBOLS = [
   'GOLD-PERP',
   'SILVER-PERP',
   'X-PERP',
-  'WTIOIL-PERP',
-  'BRENTOIL-PERP',
-  'NATGAS-PERP',
-  'USDJPY-PERP',
-  'EURUSD-PERP'
 ] as const;
 
 export type DxdPerpSymbol = (typeof DXD_PERP_SYMBOLS)[number];
@@ -95,8 +90,12 @@ export interface Session {
   strategy?: DxdStrategy;
   symbols: string[];
   agent_address: string;
+  bot_id?: string;
+  bot_name?: string;
+  bot_address?: string;
   started_at: string;
   stopped_at: string | null;
+  duration_seconds?: number;
   error: string | null;
 }
 
@@ -186,6 +185,7 @@ export interface CreateSessionRequest {
   strategy?: DxdStrategy;
   agent_address: string;
   agent_private_key: string;
+  bot_name?: string;
   symbols: string[];
   config?: Partial<SymbolConfig>;
   symbol_config?: Record<string, Partial<SymbolConfig>>;
@@ -235,7 +235,23 @@ export interface SymbolMetrics {
 
 interface MetricsResponse {
   session_id: string;
+  status?: SessionStatus;
+  started_at?: string;
+  stopped_at?: string | null;
+  duration_seconds?: number;
   metrics: Record<string, SymbolMetrics>;
+  totals?: {
+    symbol_count: number;
+    pnl: number;
+    pnl_realized?: number;
+    pnl_unrealized?: number;
+    total_fills: number;
+    total_volume_usd: number;
+    round_trips: number;
+    account_equity?: number;
+    balance_usd?: number;
+    account_equity_ts?: string;
+  };
 }
 
 export interface MetricsHistoryParams {
@@ -248,6 +264,107 @@ export interface MetricsHistoryParams {
 interface MetricsHistoryResponse {
   session_id: string;
   rows: Array<{ symbol: string } & SymbolMetrics>;
+}
+
+export type LeaderboardFilter = 'volume' | 'pnl';
+
+export interface LeaderboardRow {
+  rank: number;
+  bot_id?: string;
+  bot_name: string;
+  bot_address: string;
+  bot_address_display?: string;
+  user_id?: string;
+  volume: number;
+  volume_display?: string;
+  pnl: number;
+  pnl_display?: string;
+}
+
+interface LeaderboardBotsResponse {
+  rows: LeaderboardRow[];
+  total?: number;
+  filter?: LeaderboardFilter;
+  limit?: number;
+  offset?: number;
+}
+
+interface UserBotsResponse {
+  relationships?: {
+    user?: {
+      main_eoa?: string;
+      bots?: string[];
+    };
+  };
+  bots?: Array<{
+    bot_id: string;
+    bot_name?: string;
+    bot_address: string;
+    user_id?: string;
+  }>;
+}
+
+function toFiniteNumber(value: unknown, fallback = 0): number {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const n = Number(value);
+    if (Number.isFinite(n)) return n;
+  }
+  return fallback;
+}
+
+function toOptionalFiniteNumber(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const n = Number(value);
+    if (Number.isFinite(n)) return n;
+  }
+  return undefined;
+}
+
+function toOptionalString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim().length > 0 ? value : undefined;
+}
+
+function toStringOrEmpty(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+function normalizeLeaderboardRow(raw: unknown, index: number): LeaderboardRow {
+  const row = (raw ?? {}) as Record<string, unknown>;
+  return {
+    rank: toFiniteNumber(row.rank, index + 1),
+    bot_id: toOptionalString(row.bot_id ?? row.botId),
+    bot_name: toStringOrEmpty(row.bot_name ?? row.botName ?? row.agent_name ?? row.agentName) || '-',
+    bot_address: toStringOrEmpty(row.bot_address ?? row.botAddress ?? row.address),
+    bot_address_display: toOptionalString(row.bot_address_display ?? row.botAddressDisplay ?? row.address_display),
+    user_id: toOptionalString(row.user_id ?? row.userId),
+    volume: toFiniteNumber(
+      row.volume ?? row.volume_usd ?? row.volumeUsd ?? row.total_volume_usd ?? row.totalVolumeUsd,
+      0,
+    ),
+    volume_display: toOptionalString(row.volume_display ?? row.volumeDisplay),
+    pnl: toFiniteNumber(row.pnl ?? row.pnl_usd ?? row.pnlUsd ?? row.total_pnl ?? row.totalPnl, 0),
+    pnl_display: toOptionalString(row.pnl_display ?? row.pnlDisplay),
+  };
+}
+
+function normalizeLeaderboardResponse(raw: unknown): LeaderboardBotsResponse {
+  if (Array.isArray(raw)) {
+    return { rows: raw.map((r, i) => normalizeLeaderboardRow(r, i)) };
+  }
+
+  const body = (raw ?? {}) as Record<string, unknown>;
+  const rowsCandidate = body.rows ?? body.bots ?? body.data;
+  const rowList = Array.isArray(rowsCandidate) ? rowsCandidate : [];
+
+  return {
+    rows: rowList.map((r, i) => normalizeLeaderboardRow(r, i)),
+    total: toOptionalFiniteNumber(body.total) ?? rowList.length,
+    filter: (body.filter === 'volume' || body.filter === 'pnl') ? body.filter : undefined,
+    limit: toOptionalFiniteNumber(body.limit),
+    offset: toOptionalFiniteNumber(body.offset),
+  };
 }
 
 export type TakerConfigPatch = Partial<TakerConfig>;
@@ -294,8 +411,18 @@ async function request<T>(
   if (!res.ok) {
     let detail = `HTTP ${res.status}`;
     try {
-      const body = await res.json();
-      detail = body?.detail ?? detail;
+      const contentType = (res.headers.get('content-type') ?? '').toLowerCase();
+      if (contentType.includes('application/json')) {
+        const body = await res.json();
+        if (typeof body?.detail === 'string' && body.detail.trim().length > 0) {
+          detail = body.detail;
+        } else if (body && typeof body === 'object') {
+          detail = JSON.stringify(body);
+        }
+      } else {
+        const text = (await res.text()).trim();
+        if (text) detail = text;
+      }
     } catch {
       // ignore parse errors
     }
@@ -391,5 +518,36 @@ export const dxdApi = {
     if (params.limit) qs.set('limit', String(params.limit));
     const query = qs.toString() ? `?${qs.toString()}` : '';
     return request(`/sessions/${id}/metrics/history${query}`, {}, token);
+  },
+
+  // GET /v1/leaderboard/bots
+  getLeaderboardBots(
+    token: string,
+    params: { filter?: LeaderboardFilter; limit?: number; offset?: number } = {},
+  ): Promise<LeaderboardBotsResponse> {
+    const qs = new URLSearchParams();
+    if (params.filter) qs.set('filter', params.filter);
+    if (typeof params.limit === 'number') qs.set('limit', String(params.limit));
+    if (typeof params.offset === 'number') qs.set('offset', String(params.offset));
+    const query = qs.toString() ? `?${qs.toString()}` : '';
+    return request<unknown>(`/leaderboard/bots${query}`, {}, token).then(normalizeLeaderboardResponse);
+  },
+
+  // GET /v1/dashboard/personal/bots
+  getPersonalBots(
+    token: string,
+    params: { filter?: LeaderboardFilter; limit?: number; offset?: number } = {},
+  ): Promise<LeaderboardBotsResponse> {
+    const qs = new URLSearchParams();
+    if (params.filter) qs.set('filter', params.filter);
+    if (typeof params.limit === 'number') qs.set('limit', String(params.limit));
+    if (typeof params.offset === 'number') qs.set('offset', String(params.offset));
+    const query = qs.toString() ? `?${qs.toString()}` : '';
+    return request<unknown>(`/dashboard/personal/bots${query}`, {}, token).then(normalizeLeaderboardResponse);
+  },
+
+  // GET /v1/users/me/bots
+  getMyBots(token: string): Promise<UserBotsResponse> {
+    return request('/users/me/bots', {}, token);
   },
 };

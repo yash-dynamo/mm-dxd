@@ -4,12 +4,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDxdAuthStore, useDxdSessionsStore } from '@/stores';
 import { useSessions } from '@/hooks/dxd';
+import { useDxdAuth } from '@/hooks/dxd';
 import { useAgentSetup } from '@/hooks/dxd';
 import { SymbolSelector } from '@/components/dashboard/SymbolSelector';
 import { ConfigForm } from '@/components/dashboard/ConfigForm';
 import { TakerConfigForm } from '@/components/dashboard/TakerConfigForm';
-import { DxdApiError } from '@/lib/dxd-api';
+import { dxdApi, DxdApiError } from '@/lib/dxd-api';
 import type { CreateSessionRequest, DxdStrategy, SymbolConfig, TakerConfig } from '@/lib/dxd-api';
+import { privateKeyToAccount } from 'viem/accounts';
 
 type MakerPresetKey = 'volume-making' | 'positive-pnl';
 
@@ -89,9 +91,10 @@ const MAKER_PRESETS: Record<
 
 export default function NewSessionPage() {
   const router = useRouter();
-  const { agentAddress } = useDxdAuthStore();
+  const { agentAddress, agentName } = useDxdAuthStore();
   const { configDefaults, sessions, isLoadingDefaults } = useDxdSessionsStore();
   const { loadDefaults, createSession, listSessions, fetchSession } = useSessions();
+  const { withAuth } = useDxdAuth();
   const { getAgentPrivateKey } = useAgentSetup();
 
   const [strategy, setStrategy] = useState<DxdStrategy>('maker');
@@ -173,6 +176,35 @@ export default function NewSessionPage() {
     );
   };
 
+  const isBackendLinkageSdkMismatch = (err: unknown) => {
+    const msg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+    return (
+      msg.includes('failed wallet/agent linkage check')
+      || msg.includes("has no attribute 'agents'")
+      || (msg.includes('infoclient') && msg.includes('agents'))
+    );
+  };
+
+  const toStartSessionErrorMessage = (err: unknown) => {
+    if (isBackendLinkageSdkMismatch(err)) {
+      return 'Backend linkage check is failing (InfoClient.agents missing). Please restart/update DXD API backend, then retry.';
+    }
+    if (err instanceof Error && err.message.trim()) return err.message;
+    return 'Failed to start session';
+  };
+
+  const isBotNameValidationError = (err: unknown) => {
+    if (!(err instanceof DxdApiError) || err.status !== 400) return false;
+    const detail = (err.detail ?? '').toLowerCase();
+    return (
+      detail.includes('bot_name')
+      || detail.includes('extra fields')
+      || detail.includes('extra_forbidden')
+      || detail.includes('unexpected keyword')
+      || detail.includes('unknown field')
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (symbols.length === 0 || !effectiveAgentAddress || !agentPrivateKey) return;
@@ -185,10 +217,35 @@ export default function NewSessionPage() {
     setError(null);
 
     try {
+      const normalizedAgentAddress = effectiveAgentAddress.trim().toLowerCase();
+      const derivedAddress = privateKeyToAccount(agentPrivateKey as `0x${string}`).address.toLowerCase();
+      if (derivedAddress !== normalizedAgentAddress) {
+        setError('Agent private key does not match selected agent address. Re-register agent and try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      try {
+        const me = await withAuth((token) => dxdApi.getMyBots(token));
+        const linkedAddresses = (me.bots ?? []).map((b) => (b.bot_address ?? '').toLowerCase());
+        // Advisory only: `/users/me/bots` can lag right after fresh addAgent.
+        // Backend session create remains the source-of-truth validation.
+        void linkedAddresses;
+      } catch (linkErr) {
+        if (linkErr instanceof DxdApiError && (linkErr.status === 404 || linkErr.status === 405)) {
+          // Older backends may not expose /users/me/bots — skip this preflight.
+        } else if (isSigningOrAuthFailure(linkErr)) {
+          setIsSubmitting(false);
+          router.replace('/dashboard');
+          return;
+        }
+      }
+
       const payload: CreateSessionRequest = {
         strategy,
-        agent_address: effectiveAgentAddress,
+        agent_address: normalizedAgentAddress,
         agent_private_key: agentPrivateKey,
+        bot_name: agentName?.trim() ? agentName.trim().slice(0, 80) : undefined,
         symbols,
         config:
           strategy === 'maker' && Object.keys(globalConfig).length > 0 ? globalConfig : undefined,
@@ -196,7 +253,17 @@ export default function NewSessionPage() {
           strategy === 'taker' && Object.keys(takerConfig).length > 0 ? takerConfig : undefined,
       };
 
-      const created = await createSession(payload);
+      let created;
+      try {
+        created = await createSession(payload);
+      } catch (createErr) {
+        if (payload.bot_name && isBotNameValidationError(createErr)) {
+          const fallbackPayload: CreateSessionRequest = { ...payload, bot_name: undefined };
+          created = await createSession(fallbackPayload);
+        } else {
+          throw createErr;
+        }
+      }
       const createdId = created.session_id?.trim();
       if (!createdId) {
         throw new Error('Session was not created. Please sign and try again.');
@@ -238,7 +305,7 @@ export default function NewSessionPage() {
 
       router.push(`/dashboard/sessions/${createdId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start session');
+      setError(toStartSessionErrorMessage(err));
       if (isSigningOrAuthFailure(err)) {
         setIsSubmitting(false);
         router.replace('/dashboard');

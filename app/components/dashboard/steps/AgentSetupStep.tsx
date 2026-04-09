@@ -46,7 +46,16 @@ export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
   return (
     <div
       className="agent-setup-shell flex min-h-screen items-center justify-center"
-      style={{ background: 'var(--bg-base)' }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 120,
+        background: 'rgba(5, 2, 10, 0.78)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        padding: '24px',
+        overflowY: 'auto',
+      }}
     >
       <div
         className="agent-setup-card"
@@ -56,6 +65,9 @@ export function AgentSetupStep({ onComplete, onClose }: AgentSetupStepProps) {
           borderRadius: 'var(--radius-lg)',
           boxShadow: 'var(--shadow-card)',
           position: 'relative',
+          width: '100%',
+          maxWidth: 640,
+          margin: 'auto',
         }}
       >
         {onClose && (

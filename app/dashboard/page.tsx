@@ -14,7 +14,7 @@ const Spin = () => (
 );
 
 export default function DashboardPage() {
-  const { agentAddress } = useDxdAuthStore();
+  const { agentAddress, dxdWalletAddress } = useDxdAuthStore();
   const { sessions, isLoadingSessions, sessionsError } = useDxdSessionsStore();
   const { listSessions } = useSessions();
 
@@ -24,7 +24,13 @@ export default function DashboardPage() {
   );
   const hasAgent = Boolean(inferredAgentAddress);
   const actionHref = hasAgent ? '/dashboard/new' : '/dashboard/agent?next=/dashboard/new';
+  // Product flow: "+" should always go through fresh API-agent creation,
+  // then continue to session composer.
+  const plusActionHref = '/dashboard/agent?next=/dashboard/new';
   const actionLabel = hasAgent ? 'New Session' : 'Setup Agent';
+  const analyticsHref = dxdWalletAddress
+    ? `/leaderboard/${encodeURIComponent(dxdWalletAddress.toLowerCase())}`
+    : '/leaderboard/global';
 
   useEffect(() => { listSessions(); }, [listSessions]);
 
@@ -45,26 +51,36 @@ export default function DashboardPage() {
         {/* Top row: eyebrow + capsule button */}
         <div className="dash-command-card__top">
           <p className="dash-eyebrow">Market Making</p>
-          <Link
-            href={actionHref}
-            className="btn btn-primary"
-            style={
-              hasAgent
-                ? {
-                    width: 'clamp(38px, 10vw, 54px)',
-                    height: 'clamp(38px, 10vw, 54px)',
-                    padding: 0,
-                    borderRadius: 8,
-                    fontSize: 'clamp(20px, 5.8vw, 34px)',
-                    lineHeight: 1,
-                    letterSpacing: 0,
-                  }
-                : { padding: '8px 12px', fontSize: '10px', letterSpacing: '0.06em', lineHeight: 1 }
-            }
-            aria-label={hasAgent ? 'New session' : 'Setup agent'}
-          >
-            {hasAgent ? '+' : actionLabel}
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Link
+              href={analyticsHref}
+              className="btn btn-outline-red"
+              style={{ padding: '8px 12px', fontSize: '10px', letterSpacing: '0.06em', lineHeight: 1 }}
+              aria-label="Open analytics"
+            >
+              ANALYTICS
+            </Link>
+            <Link
+              href={hasAgent ? plusActionHref : actionHref}
+              className="btn btn-primary"
+              style={
+                hasAgent
+                  ? {
+                      width: 'clamp(38px, 10vw, 54px)',
+                      height: 'clamp(38px, 10vw, 54px)',
+                      padding: 0,
+                      borderRadius: 8,
+                      fontSize: 'clamp(20px, 5.8vw, 34px)',
+                      lineHeight: 1,
+                      letterSpacing: 0,
+                    }
+                  : { padding: '8px 12px', fontSize: '10px', letterSpacing: '0.06em', lineHeight: 1 }
+              }
+              aria-label={hasAgent ? 'Create agent then start session' : 'Setup agent'}
+            >
+              {hasAgent ? '+' : actionLabel}
+            </Link>
+          </div>
         </div>
 
         {/* Title */}

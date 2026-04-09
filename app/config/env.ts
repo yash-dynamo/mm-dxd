@@ -24,6 +24,8 @@ const envSchema = zod.object({
   // Broker settings for agent/MM order flow — optional
   NEXT_PUBLIC_BROKER_ADDRESS: zod.string().optional(),
   NEXT_PUBLIC_MAX_FEE_RATE: zod.string().optional(),
+  // UI diagnostics — optional (enable detailed error messages in development)
+  NEXT_PUBLIC_DXD_SHOW_DETAILED_ERRORS: zod.string().optional(),
 });
 
 const envVars = {
@@ -36,6 +38,7 @@ const envVars = {
   NEXT_PUBLIC_DXD_API_URL: process.env.NEXT_PUBLIC_DXD_API_URL,
   NEXT_PUBLIC_BROKER_ADDRESS: process.env.NEXT_PUBLIC_BROKER_ADDRESS,
   NEXT_PUBLIC_MAX_FEE_RATE: process.env.NEXT_PUBLIC_MAX_FEE_RATE,
+  NEXT_PUBLIC_DXD_SHOW_DETAILED_ERRORS: process.env.NEXT_PUBLIC_DXD_SHOW_DETAILED_ERRORS,
 };
 
 const parsedEnv = envSchema.safeParse(envVars);
