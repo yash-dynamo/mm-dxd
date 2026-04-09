@@ -176,18 +176,19 @@ export default function NewSessionPage() {
     );
   };
 
-  const isBackendLinkageSdkMismatch = (err: unknown) => {
-    const msg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
-    return (
-      msg.includes('failed wallet/agent linkage check')
-      || msg.includes("has no attribute 'agents'")
-      || (msg.includes('infoclient') && msg.includes('agents'))
-    );
-  };
-
   const toStartSessionErrorMessage = (err: unknown) => {
-    if (isBackendLinkageSdkMismatch(err)) {
-      return 'Backend linkage check is failing (InfoClient.agents missing). Please restart/update DXD API backend, then retry.';
+    if (err instanceof DxdApiError) {
+      const detail = (err.detail ?? '').toLowerCase();
+      if (detail.includes('wallet/agent linkage') || detail.includes('failed wallet/agent linkage check')) {
+        return 'Backend wallet-agent linkage check failed. Please restart DXD API and retry.';
+      }
+      if (err.status === 409) {
+        return 'One or more selected symbols are already running in another session.';
+      }
+      if (err.status >= 500) {
+        return 'DXD backend is temporarily unavailable. Please try again in a few seconds.';
+      }
+      if (err.detail?.trim()) return err.detail;
     }
     if (err instanceof Error && err.message.trim()) return err.message;
     return 'Failed to start session';

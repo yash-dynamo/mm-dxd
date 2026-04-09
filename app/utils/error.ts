@@ -32,7 +32,7 @@ export const errorOverrideConfig: ErrorOverrideConfig[] = [
   {
     originalError: "has no attribute 'agents'",
     overrideError:
-      'Backend SDK mismatch: InfoClient.agents is unavailable. Please update the backend SDK/service and retry.',
+      'Backend SDK mismatch in wallet-agent linkage check. Please update/restart backend service and retry.',
     strategy: 'includes',
   },
   {

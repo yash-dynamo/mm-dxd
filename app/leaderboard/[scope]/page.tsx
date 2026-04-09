@@ -5,15 +5,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useDxdAuth } from '@/hooks/dxd';
 import { useDxdAuthStore } from '@/stores';
-import { dxdApi, type LeaderboardFilter, type LeaderboardRow } from '@/lib/dxd-api';
+import { dxdApi, type LeaderboardRow } from '@/lib/dxd-api';
 import useMediaQuery from '@/hooks/use-media-query';
 
 type LeaderboardView = 'global' | 'personal';
-
-function fmtUsd(n: number) {
-  const sign = n < 0 ? '-' : '';
-  return `${sign}$${Math.abs(n).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
-}
 
 function fmtVolume(n: number) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
@@ -33,7 +28,6 @@ export default function LeaderboardScopePage() {
   const { dxdWalletAddress } = useDxdAuthStore();
   const wallet = dxdWalletAddress?.trim().toLowerCase() ?? null;
 
-  const [filter, setFilter] = useState<LeaderboardFilter>('volume');
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,8 +54,8 @@ export default function LeaderboardScopePage() {
       try {
         const data = await withAuth((token) =>
           view === 'personal'
-            ? dxdApi.getPersonalBots(token, { filter, limit: 100, offset: 0 })
-            : dxdApi.getLeaderboardBots(token, { filter, limit: 100, offset: 0 }),
+            ? dxdApi.getPersonalBots(token, { filter: 'volume', limit: 100, offset: 0 })
+            : dxdApi.getLeaderboardBots(token, { filter: 'volume', limit: 100, offset: 0 }),
         );
         const nextRows = Array.isArray(data.rows) ? data.rows : [];
         if (!cancelled) setRows(nextRows);
@@ -78,9 +72,13 @@ export default function LeaderboardScopePage() {
     return () => {
       cancelled = true;
     };
-  }, [withAuth, view, filter]);
+  }, [withAuth, view]);
 
   const personalHref = wallet ? `/leaderboard/${wallet}` : '/leaderboard/global';
+  const totalPersonalVolume = useMemo(
+    () => rows.reduce((sum, row) => sum + Number(row.volume ?? 0), 0),
+    [rows],
+  );
 
   return (
     <div className="dash-page dxd-page dxd-home-page">
@@ -106,35 +104,53 @@ export default function LeaderboardScopePage() {
           </div>
         </div>
         <h1 className="dash-title" style={{ marginBottom: 10 }}>
-          {view === 'personal' ? 'Your Bot Leaderboard' : 'Global Bot Leaderboard'}
+          {view === 'personal' ? 'Your Volume' : 'Global Volume Leaderboard'}
         </h1>
         <p className="dash-panel-desc" style={{ marginBottom: 0 }}>
           {view === 'personal'
-            ? 'Your bots with their global rank.'
-            : 'Top bots across all users.'}
+            ? 'Simple volume tracking across your bots.'
+            : 'Top bots across all users by traded volume.'}
         </p>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          className="btn btn-outline-red"
-          style={{ padding: '8px 12px', fontSize: '10px', lineHeight: 1, letterSpacing: '0.06em', opacity: filter === 'volume' ? 1 : 0.75 }}
-          onClick={() => setFilter('volume')}
-          disabled={filter === 'volume'}
+      {view === 'personal' && !isLoading && !error && (
+        <div
+          style={{
+            marginBottom: 14,
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--bg-elevated)',
+            padding: '10px 12px',
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
         >
-          SORT: VOLUME
-        </button>
-        <button
-          type="button"
-          className="btn btn-outline-red"
-          style={{ padding: '8px 12px', fontSize: '10px', lineHeight: 1, letterSpacing: '0.06em', opacity: filter === 'pnl' ? 1 : 0.75 }}
-          onClick={() => setFilter('pnl')}
-          disabled={filter === 'pnl'}
-        >
-          SORT: PNL
-        </button>
-      </div>
+          <span
+            style={{
+              fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+              fontSize: 'var(--text-xs)',
+              letterSpacing: 'var(--tracking-label)',
+              textTransform: 'uppercase',
+              color: 'var(--text-secondary)',
+              fontWeight: 700,
+            }}
+          >
+            Total Personal Volume
+          </span>
+          <strong
+            style={{
+              fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+              fontSize: 'var(--text-lg)',
+              color: 'var(--text-primary)',
+            }}
+          >
+            {fmtVolume(totalPersonalVolume)}
+          </strong>
+        </div>
+      )}
 
       <div
         style={{
@@ -159,10 +175,12 @@ export default function LeaderboardScopePage() {
         ) : isMobile ? (
           <div style={{ display: 'grid', gap: 10, padding: 10 }}>
             {rows.map((row) => {
-              const pnl = Number(row.pnl ?? 0);
+              const walletAddress = row.wallet_address_display || row.wallet_address || row.bot_address || '-';
+              const userLabel = row.user_id || row.bot_name || 'User';
+              const sessionCount = Number(row.session_count ?? 0);
               return (
                 <div
-                  key={`${row.bot_id ?? row.bot_address}-${row.rank}`}
+                  key={`${row.user_id ?? row.wallet_address ?? row.bot_id ?? row.bot_address ?? 'row'}-${row.rank}`}
                   style={{
                     border: '1px solid var(--border-subtle)',
                     borderRadius: 'var(--radius-md)',
@@ -174,18 +192,8 @@ export default function LeaderboardScopePage() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <strong style={{ fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif', fontSize: 14 }}>
-                      #{row.rank} · {row.bot_name || '-'}
+                      #{row.rank} · {userLabel}
                     </strong>
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: pnl >= 0 ? 'var(--green)' : 'var(--red-light)',
-                      }}
-                    >
-                      {row.pnl_display || fmtUsd(pnl)}
-                    </span>
                   </div>
                   <div
                     style={{
@@ -195,7 +203,20 @@ export default function LeaderboardScopePage() {
                       overflowWrap: 'anywhere',
                     }}
                   >
-                    {row.bot_address_display || row.bot_address}
+                    {walletAddress}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+                      fontSize: 12,
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    <span>Sessions</span>
+                    <strong style={{ color: 'var(--text-primary)' }}>{sessionCount}</strong>
                   </div>
                   <div
                     style={{
@@ -222,34 +243,29 @@ export default function LeaderboardScopePage() {
               <thead>
                 <tr style={{ background: 'var(--bg-card-alt)' }}>
                   <th style={{ textAlign: 'left', padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>Rank</th>
-                  <th style={{ textAlign: 'left', padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>Bot</th>
-                  <th style={{ textAlign: 'left', padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>Address</th>
+                  <th style={{ textAlign: 'left', padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>User</th>
+                  <th style={{ textAlign: 'left', padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>Wallet</th>
+                  <th style={{ textAlign: 'right', padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>Sessions</th>
                   <th style={{ textAlign: 'right', padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>Volume</th>
-                  <th style={{ textAlign: 'right', padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>PnL</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row) => {
-                  const pnl = Number(row.pnl ?? 0);
+                  const walletAddress = row.wallet_address_display || row.wallet_address || row.bot_address || '-';
+                  const userLabel = row.user_id || row.bot_name || '-';
+                  const sessionCount = Number(row.session_count ?? 0);
                   return (
-                    <tr key={`${row.bot_id ?? row.bot_address}-${row.rank}`}>
+                    <tr key={`${row.user_id ?? row.wallet_address ?? row.bot_id ?? row.bot_address ?? 'row'}-${row.rank}`}>
                       <td style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>#{row.rank}</td>
-                      <td style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>{row.bot_name || '-'}</td>
+                      <td style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)' }}>{userLabel}</td>
                       <td style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)', fontFamily: 'var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)' }}>
-                        {row.bot_address_display || row.bot_address}
+                        {walletAddress}
+                      </td>
+                      <td style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)', textAlign: 'right' }}>
+                        {sessionCount}
                       </td>
                       <td style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-subtle)', textAlign: 'right' }}>
                         {row.volume_display || fmtVolume(Number(row.volume ?? 0))}
-                      </td>
-                      <td
-                        style={{
-                          padding: '12px 14px',
-                          borderBottom: '1px solid var(--border-subtle)',
-                          textAlign: 'right',
-                          color: pnl >= 0 ? 'var(--green)' : 'var(--red-light)',
-                        }}
-                      >
-                        {row.pnl_display || fmtUsd(pnl)}
                       </td>
                     </tr>
                   );

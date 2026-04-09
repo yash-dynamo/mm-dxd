@@ -266,18 +266,22 @@ interface MetricsHistoryResponse {
   rows: Array<{ symbol: string } & SymbolMetrics>;
 }
 
-export type LeaderboardFilter = 'volume' | 'pnl';
+export type LeaderboardFilter = 'volume';
 
 export interface LeaderboardRow {
   rank: number;
-  bot_id?: string;
-  bot_name: string;
-  bot_address: string;
-  bot_address_display?: string;
   user_id?: string;
+  wallet_address: string;
+  wallet_address_display?: string;
   volume: number;
   volume_display?: string;
-  pnl: number;
+  session_count?: number;
+  // Backward-compatible aliases (older API responses)
+  bot_id?: string;
+  bot_name?: string;
+  bot_address?: string;
+  bot_address_display?: string;
+  pnl?: number;
   pnl_display?: string;
 }
 
@@ -332,19 +336,39 @@ function toStringOrEmpty(value: unknown): string {
 
 function normalizeLeaderboardRow(raw: unknown, index: number): LeaderboardRow {
   const row = (raw ?? {}) as Record<string, unknown>;
+  const walletAddress = toStringOrEmpty(
+    row.wallet_address
+      ?? row.walletAddress
+      ?? row.address
+      ?? row.bot_address
+      ?? row.botAddress,
+  );
+  const walletAddressDisplay = toOptionalString(
+    row.wallet_address_display
+      ?? row.walletAddressDisplay
+      ?? row.address_display
+      ?? row.bot_address_display
+      ?? row.botAddressDisplay,
+  );
+
   return {
     rank: toFiniteNumber(row.rank, index + 1),
-    bot_id: toOptionalString(row.bot_id ?? row.botId),
-    bot_name: toStringOrEmpty(row.bot_name ?? row.botName ?? row.agent_name ?? row.agentName) || '-',
-    bot_address: toStringOrEmpty(row.bot_address ?? row.botAddress ?? row.address),
-    bot_address_display: toOptionalString(row.bot_address_display ?? row.botAddressDisplay ?? row.address_display),
     user_id: toOptionalString(row.user_id ?? row.userId),
+    wallet_address: walletAddress,
+    wallet_address_display: walletAddressDisplay,
     volume: toFiniteNumber(
       row.volume ?? row.volume_usd ?? row.volumeUsd ?? row.total_volume_usd ?? row.totalVolumeUsd,
       0,
     ),
     volume_display: toOptionalString(row.volume_display ?? row.volumeDisplay),
-    pnl: toFiniteNumber(row.pnl ?? row.pnl_usd ?? row.pnlUsd ?? row.total_pnl ?? row.totalPnl, 0),
+    session_count: toOptionalFiniteNumber(row.session_count ?? row.sessionCount),
+    // Backward-compatible aliases
+    bot_id: toOptionalString(row.bot_id ?? row.botId),
+    bot_name: toOptionalString(row.bot_name ?? row.botName ?? row.agent_name ?? row.agentName),
+    bot_address: walletAddress || toStringOrEmpty(row.bot_address ?? row.botAddress ?? row.address),
+    bot_address_display:
+      walletAddressDisplay ?? toOptionalString(row.bot_address_display ?? row.botAddressDisplay ?? row.address_display),
+    pnl: toOptionalFiniteNumber(row.pnl ?? row.pnl_usd ?? row.pnlUsd ?? row.total_pnl ?? row.totalPnl),
     pnl_display: toOptionalString(row.pnl_display ?? row.pnlDisplay),
   };
 }
@@ -356,12 +380,24 @@ function normalizeLeaderboardResponse(raw: unknown): LeaderboardBotsResponse {
 
   const body = (raw ?? {}) as Record<string, unknown>;
   const rowsCandidate = body.rows ?? body.bots ?? body.data;
-  const rowList = Array.isArray(rowsCandidate) ? rowsCandidate : [];
+  const rowList = Array.isArray(rowsCandidate)
+    ? rowsCandidate
+    : rowsCandidate && typeof rowsCandidate === 'object'
+      ? [rowsCandidate]
+      : (
+        body.rank !== undefined
+        || body.wallet_address !== undefined
+        || body.walletAddress !== undefined
+        || body.user_id !== undefined
+        || body.userId !== undefined
+      )
+        ? [body]
+        : [];
 
   return {
     rows: rowList.map((r, i) => normalizeLeaderboardRow(r, i)),
     total: toOptionalFiniteNumber(body.total) ?? rowList.length,
-    filter: (body.filter === 'volume' || body.filter === 'pnl') ? body.filter : undefined,
+    filter: body.filter === 'volume' ? 'volume' : undefined,
     limit: toOptionalFiniteNumber(body.limit),
     offset: toOptionalFiniteNumber(body.offset),
   };

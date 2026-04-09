@@ -3,12 +3,10 @@
 import { useCallback, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
-import type { Address } from 'viem';
 import { useAuthStore, useDxdAuthStore } from '@/stores';
 import { useAccountActions } from '@/hooks/actions';
 import { env } from '@/config/env';
 import { useBrokerApproval } from './use-broker-approval';
-import { useInfoClient } from '@/hooks/info/use-info-client';
 import { showToast } from '@/components/ui/toast';
 
 const AGENT_VALID_DAYS = Number(process.env.NEXT_PUBLIC_AGENT_VALID_DAYS ?? 30);
@@ -36,13 +34,11 @@ const normalizeAgentSetupError = (err: unknown): string => {
     || lower.includes("has no attribute 'agents'")
     || lower.includes('infoclient')
   ) {
-    return 'Wallet/agent linkage check failed on backend (InfoClient.agents missing). Update/restart backend service, then retry.';
+    return 'Wallet/agent linkage check failed on backend. Update/restart backend service, then retry.';
   }
 
   return raw || 'Agent registration failed';
 };
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const isLinkageCheckSdkMismatchError = (message: string): boolean => {
   const lower = message.toLowerCase();
@@ -62,27 +58,8 @@ export function useAgentSetup() {
   const { setAgentInfo } = useDxdAuthStore();
   const { addAgent } = useAccountActions();
   const { ensureBrokerApproval } = useBrokerApproval();
-  const { infoClient } = useInfoClient();
   const brokerAddress = env.NEXT_PUBLIC_BROKER_ADDRESS;
   const maxFeeRate = env.NEXT_PUBLIC_MAX_FEE_RATE ?? '0.001';
-
-  const isAgentLinked = useCallback(
-    async (userAddress: string, targetAgentAddress: string) => {
-      try {
-        const agents = await infoClient.agents({ user: userAddress as Address });
-        return (
-          Array.isArray(agents)
-          && agents.some(
-            (entry) =>
-              entry?.agent_address?.toLowerCase() === targetAgentAddress.toLowerCase(),
-          )
-        );
-      } catch {
-        return false;
-      }
-    },
-    [infoClient],
-  );
 
   /** Step 1: generate key pair in-browser and surface to UI */
   const generateAgent = useCallback(() => {
@@ -120,47 +97,27 @@ export function useAgentSetup() {
         // addAgent signature is created by the main wallet client, so signer must be master.
         const signer = currentMaster;
 
-        const alreadyLinked = await isAgentLinked(currentAddress, generatedAgent.agentAddress);
-        if (!alreadyLinked) {
-          const result = await addAgent(
-            agentName,
-            generatedAgent.agentAddress as `0x${string}`,
-            generatedAgent.privateKey,
-            forAccount,
-            validUntil,
-            signer,
-            true,
-            { context: { source: 'api-agent' } },
-          );
+        const result = await addAgent(
+          agentName,
+          generatedAgent.agentAddress as `0x${string}`,
+          generatedAgent.privateKey,
+          forAccount,
+          validUntil,
+          signer,
+          true,
+          { context: { source: 'api-agent' } },
+        );
 
-          if (!result?.success) {
-            const addAgentError = result?.error || 'Failed to add agent';
-            if (!isLinkageCheckSdkMismatchError(addAgentError)) {
-              throw new Error(addAgentError);
-            }
-
-            // Workaround for upstream linkage-check incompatibility:
-            // verify linkage with short retries (indexing can lag by a second).
-            let linked = false;
-            for (let i = 0; i < 4; i += 1) {
-              linked = await isAgentLinked(currentAddress, generatedAgent.agentAddress);
-              if (linked) break;
-              await sleep(350);
-            }
-
-            if (!linked) {
-              throw new Error(addAgentError);
-            }
-
-            showToast.info({
-              message: 'Agent link recovered',
-              description: 'Recovered from linkage check mismatch using SDK agent lookup.',
-            });
+        if (!result?.success) {
+          const addAgentError = result?.error || 'Failed to add agent';
+          if (!isLinkageCheckSdkMismatchError(addAgentError)) {
+            throw new Error(addAgentError);
           }
-        } else {
-          showToast.info({
-            message: 'Agent already linked',
-            description: 'Using existing wallet-agent link from chain state.',
+
+          showToast.warning({
+            message: 'Linkage check skipped',
+            description:
+              'Continuing setup without backend linkage verification due service mismatch.',
           });
         }
         if (!brokerAddress) {
@@ -186,7 +143,7 @@ export function useAgentSetup() {
         setSetupStatus('error');
       }
     },
-    [generatedAgent, wagmiAddress, addAgent, brokerAddress, ensureBrokerApproval, maxFeeRate, setAgentInfo, isAgentLinked],
+    [generatedAgent, wagmiAddress, addAgent, brokerAddress, ensureBrokerApproval, maxFeeRate, setAgentInfo],
   );
 
   /** Read the agent private key from sessionStorage (for session creation) */
