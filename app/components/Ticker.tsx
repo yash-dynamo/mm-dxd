@@ -3,20 +3,7 @@
 import { useMemo } from "react";
 import Image from "next/image";
 import { useLandingTickers } from "@/hooks/use-landing-tickers";
-
-// Static placeholder shown instantly while API loads
-const PLACEHOLDER_ITEMS = [
-  { symbol: "BTC", value: "$—", change: "—", up: true },
-  { symbol: "ETH", value: "$—", change: "—", up: true },
-  { symbol: "SOL", value: "$—", change: "—", up: true },
-  { symbol: "ARB", value: "$—", change: "—", up: true },
-  { symbol: "SUI", value: "$—", change: "—", up: true },
-  { symbol: "DOGE", value: "$—", change: "—", up: true },
-  { symbol: "AVAX", value: "$—", change: "—", up: true },
-  { symbol: "TIA", value: "$—", change: "—", up: true },
-  { symbol: "EURUSD", value: "—", change: "—", up: true },
-  { symbol: "USDJPY", value: "—", change: "—", up: true },
-];
+import { DXD_PERP_SYMBOLS } from "@/lib/dxd-api";
 
 type TickerItem = {
   symbol: string;
@@ -24,6 +11,18 @@ type TickerItem = {
   change: string;
   up: boolean;
 };
+
+// Extract base symbol from instrument name (e.g., "BTC-PERP" -> "BTC")
+const getBaseSymbol = (instrumentName: string) => {
+  return instrumentName.split("-")[0].split("/")[0];
+};
+
+// Static placeholders (aligned with DXD_PERP_SYMBOLS) while the info feed loads
+const PLACEHOLDER_ITEMS: TickerItem[] = DXD_PERP_SYMBOLS.map((perp) => {
+  const symbol = getBaseSymbol(perp);
+  const value = symbol === "EURUSD" || symbol === "USDJPY" ? "—" : "$—";
+  return { symbol, value, change: "—", up: true };
+});
 
 const formatPrice = (value: number) => {
   if (!Number.isFinite(value)) return "$0";
@@ -37,11 +36,6 @@ const formatChange = (value: number) => {
   if (!Number.isFinite(value)) return "0.00%";
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(2)}%`;
-};
-
-// Extract base symbol from instrument name (e.g., "BTC-PERP" -> "BTC")
-const getBaseSymbol = (instrumentName: string) => {
-  return instrumentName.split("-")[0].split("/")[0];
 };
 
 // Get logo path for a symbol
