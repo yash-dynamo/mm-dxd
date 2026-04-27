@@ -86,7 +86,8 @@ export const DXD_PERP_SYMBOLS = [
   'USDJPY-PERP',
   'EURUSD-PERP',
   'USA500-PERP',
-  'USA100-PERP'
+  'USA100-PERP',
+  'AAPL-PERP'
 ] as const;
 
 export type DxdPerpSymbol = (typeof DXD_PERP_SYMBOLS)[number];
