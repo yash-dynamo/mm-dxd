@@ -70,6 +70,7 @@ export type DxdStrategy = 'maker' | 'taker';
 
 /** Canonical PERP list from DXD API. */
 export const DXD_PERP_SYMBOLS = [
+  // Crypto
   'HYPE-PERP',
   'BTC-PERP',
   'ETH-PERP',
@@ -77,6 +78,15 @@ export const DXD_PERP_SYMBOLS = [
   'XRP-PERP',
   'ZEC-PERP',
   'BNB-PERP',
+  // Equities / ETFs
+  'AAPL-PERP',
+  'AMZN-PERP',
+  'GOOGL-PERP',
+  'META-PERP',
+  'MSFT-PERP',
+  'EWJ-PERP',
+  'EWY-PERP',
+  // Commodities / Indices / FX
   'GOLD-PERP',
   'SILVER-PERP',
   'X-PERP',
@@ -86,8 +96,7 @@ export const DXD_PERP_SYMBOLS = [
   'USDJPY-PERP',
   'EURUSD-PERP',
   'USA500-PERP',
-  'USA100-PERP',
-  'AAPL-PERP'
+  'USA100-PERP'
 ] as const;
 
 export type DxdPerpSymbol = (typeof DXD_PERP_SYMBOLS)[number];
