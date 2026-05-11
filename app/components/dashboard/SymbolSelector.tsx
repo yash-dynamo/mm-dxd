@@ -5,6 +5,17 @@ import { DXD_PERP_SYMBOLS } from '@/lib/dxd-api';
 
 export type SymbolSelectionMode = 'multi' | 'single';
 
+const CATEGORY_ORDER = ['Crypto', 'Equities / ETFs', 'Commodities / Indices / FX', 'Other'] as const;
+const EQUITY_ETF = new Set(['AAPL-PERP', 'AMZN-PERP', 'GOOGL-PERP', 'META-PERP', 'MSFT-PERP', 'EWJ-PERP', 'EWY-PERP', 'TSLA-PERP', 'PLTR-PERP', 'NVDA-PERP']);
+const COMMODITY_INDEX_FX = new Set(['GOLD-PERP', 'SILVER-PERP', 'WTIOIL-PERP', 'BRENTOIL-PERP', 'NATGAS-PERP', 'USDJPY-PERP', 'EURUSD-PERP', 'USA500-PERP', 'USA100-PERP', 'X-PERP']);
+
+function categoryOf(sym: string) {
+  if (EQUITY_ETF.has(sym)) return 'Equities / ETFs';
+  if (COMMODITY_INDEX_FX.has(sym)) return 'Commodities / Indices / FX';
+  if (sym.endsWith('-PERP')) return 'Crypto';
+  return 'Other';
+}
+
 interface SymbolSelectorProps {
   value: string[];
   onChange: (symbols: string[]) => void;
@@ -42,6 +53,12 @@ export function SymbolSelector({
       : selectionMode === 'single'
         ? value[0]
         : `${value.length} selected`;
+  const grouped = CATEGORY_ORDER
+    .map((label) => ({
+      label,
+      items: symbols.filter((sym) => categoryOf(sym) === label),
+    }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <div>
@@ -99,42 +116,61 @@ export function SymbolSelector({
             overflowY: 'auto',
           }}
         >
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {symbols.map((sym) => {
-              const selected = value.includes(sym);
-              const disabled = disabledSet.has(sym.trim().toUpperCase());
-              return (
-                <button
-                  key={sym}
-                  type="button"
-                  onClick={() => toggle(sym)}
-                  disabled={disabled}
-                  title={disabled ? 'Conflict with another running session' : undefined}
+          <div style={{ display: 'grid', gap: 12 }}>
+            {grouped.map((group) => (
+              <div key={group.label}>
+                <p
                   style={{
+                    margin: '0 0 8px',
                     fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
-                    fontSize: 'var(--text-md)',
+                    fontSize: 'var(--text-xs)',
                     fontWeight: 700,
                     letterSpacing: 'var(--tracking-label)',
-                    padding: '12px 20px',
-                    borderRadius: 'var(--radius-md)',
-                    border: selected
-                      ? '1px solid var(--red)'
-                      : '1px solid var(--border-subtle)',
-                    background: selected
-                      ? 'rgba(200, 16, 46,0.14)'
-                      : 'rgba(255,255,255,0.03)',
-                    color: selected
-                      ? 'var(--red-light)'
-                      : 'var(--text-primary)',
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    opacity: disabled ? 0.35 : 1,
-                    transition: 'all var(--duration-fast) var(--ease-out)',
+                    color: 'var(--text-dim)',
+                    textTransform: 'uppercase',
                   }}
                 >
-                  {sym}
-                </button>
-              );
-            })}
+                  {group.label}
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {group.items.map((sym) => {
+                    const selected = value.includes(sym);
+                    const disabled = disabledSet.has(sym.trim().toUpperCase());
+                    return (
+                      <button
+                        key={sym}
+                        type="button"
+                        onClick={() => toggle(sym)}
+                        disabled={disabled}
+                        title={disabled ? 'Conflict with another running session' : undefined}
+                        style={{
+                          fontFamily: 'var(--font-ui), var(--font-sans), system-ui, sans-serif',
+                          fontSize: 'var(--text-md)',
+                          fontWeight: 700,
+                          letterSpacing: 'var(--tracking-label)',
+                          padding: '12px 20px',
+                          borderRadius: 'var(--radius-md)',
+                          border: selected
+                            ? '1px solid var(--red)'
+                            : '1px solid var(--border-subtle)',
+                          background: selected
+                            ? 'rgba(200, 16, 46,0.14)'
+                            : 'rgba(255,255,255,0.03)',
+                          color: selected
+                            ? 'var(--red-light)'
+                            : 'var(--text-primary)',
+                          cursor: disabled ? 'not-allowed' : 'pointer',
+                          opacity: disabled ? 0.35 : 1,
+                          transition: 'all var(--duration-fast) var(--ease-out)',
+                        }}
+                      >
+                        {sym}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
